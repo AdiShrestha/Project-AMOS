@@ -15,10 +15,10 @@ int main() {
     {
         // ── Test 1: rising occupancy → rising α (sign check, Decision 3) ─
         AlphaController ctrl(0.02f, 0.30f, 0.01f);
-        float a0 = ctrl.alpha();  // 0.02 (calm)
+        float a0 = ctrl.current();  // 0.02 (calm)
         // Apply high occupancy for many steps
         for (int i = 0; i < 50; ++i) ctrl.update(1.0f);
-        float a_final = ctrl.alpha();
+        float a_final = ctrl.current();
         assert(a_final > a0);  // α must rise (sign-flipped vs Project 1)
         printf("[test_alpha_controller] test1 PASS (rising occ → rising alpha: %.4f → %.4f)\n",
                a0, a_final);
@@ -27,7 +27,7 @@ int main() {
     {
         // ── Test 2: slew-rate bound — step from occ=0 to occ=1 ──────────
         AlphaController ctrl(0.02f, 0.30f, /*d_alpha_max=*/0.01f);
-        float prev = ctrl.alpha();
+        float prev = ctrl.current();
         for (int i = 0; i < 100; ++i) {
             float a = ctrl.update(1.0f);  // full-load step function
             float delta = std::fabs(a - prev);

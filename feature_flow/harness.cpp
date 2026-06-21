@@ -75,32 +75,42 @@ static RunResult run_architecture(
     RunResult res{arch_name, seed, 0, 0.0, 0, 0.0f, 0};
 
     Runtime rt;
+    rt.add_worker();
+    bool source_done = false;
 
     if (arch_name == "fixed" || arch_name == "throttle") {
         SourceOperator<RawBehaviorEvent> source("source", &q_raw,
-            [&src](Event<RawBehaviorEvent>& out, std::uint64_t seq){ return src(out, seq); });
+            [&src, &source_done](Event<RawBehaviorEvent>& out, std::uint64_t seq){ bool ok = src(out, seq); if(!ok) source_done=true; return ok; });
         KeyedFeatureExtractOp extract("extract", &q_raw, &q_feat, nullptr, 0.10f);
-        auto aggr = [](const std::vector<FeatureSnapshot>& buf) -> FeatureBatch {
-            FeatureBatch fb{}; for (std::size_t i=0;i<buf.size();i++) fb.push_back(buf[i],i); return fb;
+        auto aggr = [](const std::vector<Event<FeatureSnapshot>>& buf) -> FeatureBatch {
+            FeatureBatch fb{}; for (std::size_t i=0;i<buf.size();i++) fb.push_back(buf[i].data,i); return fb;
         };
         TumblingCountWindow<FeatureSnapshot,FeatureBatch> window("win",&q_feat,&q_batch,128,aggr);
         ScoringFlushOp scorer("scorer", &q_batch, &q_scored, &model);
         ResultSink sink("sink", &q_scored, result_csv);
-        rt.register_op(&source); rt.register_op(&extract);
-        rt.register_op(&window); rt.register_op(&scorer); rt.register_op(&sink);
-        rt.run_until_source_exhausted();
+        rt.register_op(&source, 0); rt.register_op(&extract, 0);
+        rt.register_op(&window, 0); rt.register_op(&scorer, 0); rt.register_op(&sink, 0);
+        rt.add_worker();
+        rt.start();
+        while(!source_done) { std::this_thread::sleep_for(std::chrono::milliseconds(5)); }
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        rt.stop();
         res.direction_changes = 0;
 
     } else if (arch_name == "drift") {
         SourceOperator<RawBehaviorEvent> source("source", &q_raw,
-            [&src](Event<RawBehaviorEvent>& out, std::uint64_t seq){ return src(out, seq); });
+            [&src, &source_done](Event<RawBehaviorEvent>& out, std::uint64_t seq){ bool ok = src(out, seq); if(!ok) source_done=true; return ok; });
         KeyedFeatureExtractOp extract("extract", &q_raw, &q_feat, nullptr, 0.10f);
         DriftAdaptiveWindowOp window("drift_win",&q_feat,&q_batch);
         ScoringFlushOp scorer("scorer",&q_batch,&q_scored,&model);
         ResultSink sink("sink",&q_scored,result_csv);
-        rt.register_op(&source); rt.register_op(&extract);
-        rt.register_op(&window); rt.register_op(&scorer); rt.register_op(&sink);
-        rt.run_until_source_exhausted();
+        rt.register_op(&source, 0); rt.register_op(&extract, 0);
+        rt.register_op(&window, 0); rt.register_op(&scorer, 0); rt.register_op(&sink, 0);
+        rt.add_worker();
+        rt.start();
+        while(!source_done) { std::this_thread::sleep_for(std::chrono::milliseconds(5)); }
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        rt.stop();
         res.direction_changes = window.direction_changes();
 
     } else { // adaptive
@@ -110,14 +120,18 @@ static RunResult run_architecture(
             init_controller_trace(trace_out);
         }
         SourceOperator<RawBehaviorEvent> source("source",&q_raw,
-            [&src](Event<RawBehaviorEvent>& out, std::uint64_t seq){ return src(out,seq); });
+            [&src, &source_done](Event<RawBehaviorEvent>& out, std::uint64_t seq){ bool ok = src(out,seq); if(!ok) source_done=true; return ok; });
         KeyedFeatureExtractOp extract("extract",&q_raw,&q_feat,&signal);
         AdaptiveFeatureWindowOp window("adaptive_win",&q_feat,&q_batch,&signal);
         ScoringFlushOp scorer("scorer",&q_batch,&q_scored,&model);
         ResultSink sink("sink",&q_scored,result_csv);
-        rt.register_op(&source); rt.register_op(&extract);
-        rt.register_op(&window); rt.register_op(&scorer); rt.register_op(&sink);
-        rt.run_until_source_exhausted();
+        rt.register_op(&source, 0); rt.register_op(&extract, 0);
+        rt.register_op(&window, 0); rt.register_op(&scorer, 0); rt.register_op(&sink, 0);
+        rt.add_worker();
+        rt.start();
+        while(!source_done) { std::this_thread::sleep_for(std::chrono::milliseconds(5)); }
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        rt.stop();
         res.direction_changes = window.controller().direction_changes();
         res.final_w     = window.controller().current();
         res.final_alpha = extract.last_alpha();

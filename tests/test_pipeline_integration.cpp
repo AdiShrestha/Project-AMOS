@@ -33,16 +33,17 @@ using namespace klstream;
 static std::size_t run_fixed(const std::vector<BehaviorRow>& rows,
                               const LogisticModel& model) {
     BehaviorSource src(rows, ReplayMode::MaxRate);
+    bool source_done = false;
     SPSCQueue<Event<RawBehaviorEvent>> q_raw(1024);
     SPSCQueue<Event<FeatureSnapshot>>  q_feat(1024);
     SPSCQueue<Event<FeatureBatch>>     q_batch(64);
     SPSCQueue<Event<ScoredResult>>     q_scored(1024);
 
     SourceOperator<RawBehaviorEvent> source("src", &q_raw,
-        [&src](Event<RawBehaviorEvent>& out, std::uint64_t seq){ return src(out, seq); });
+        [&src, &source_done](Event<RawBehaviorEvent>& out, std::uint64_t seq){ bool ok = src(out, seq); if(!ok) source_done=true; return ok; });
     KeyedFeatureExtractOp extract("ext", &q_raw, &q_feat, nullptr, 0.10f);
-    auto aggr = [](const std::vector<FeatureSnapshot>& buf) -> FeatureBatch {
-        FeatureBatch fb{}; for (std::size_t i=0;i<buf.size();i++) fb.push_back(buf[i],i); return fb;
+    auto aggr = [](const std::vector<Event<FeatureSnapshot>>& buf) -> FeatureBatch {
+        FeatureBatch fb{}; for (std::size_t i=0;i<buf.size();i++) fb.push_back(buf[i].data,i); return fb;
     };
     TumblingCountWindow<FeatureSnapshot,FeatureBatch> window("win",&q_feat,&q_batch,8,aggr);
     ScoringFlushOp scorer("scr",&q_batch,&q_scored,&model);
@@ -50,22 +51,24 @@ static std::size_t run_fixed(const std::vector<BehaviorRow>& rows,
     SinkOperator<ScoredResult> sink("sink",&q_scored,[&count](const Event<ScoredResult>&){ ++count; });
 
     Runtime rt;
-    rt.register_op(&source); rt.register_op(&extract);
-    rt.register_op(&window); rt.register_op(&scorer); rt.register_op(&sink);
-    rt.run_until_source_exhausted();
+    rt.add_worker();
+    rt.register_op(&source, 0); rt.register_op(&extract, 0);
+    rt.register_op(&window, 0); rt.register_op(&scorer, 0); rt.register_op(&sink, 0);
+    rt.start(); while(!source_done) { std::this_thread::sleep_for(std::chrono::milliseconds(5)); } std::this_thread::sleep_for(std::chrono::milliseconds(20)); rt.stop();
     return count;
 }
 
 static std::size_t run_drift(const std::vector<BehaviorRow>& rows,
                               const LogisticModel& model) {
     BehaviorSource src(rows, ReplayMode::MaxRate);
+    bool source_done = false;
     SPSCQueue<Event<RawBehaviorEvent>> q_raw(1024);
     SPSCQueue<Event<FeatureSnapshot>>  q_feat(1024);
     SPSCQueue<Event<FeatureBatch>>     q_batch(64);
     SPSCQueue<Event<ScoredResult>>     q_scored(1024);
 
     SourceOperator<RawBehaviorEvent> source("src",&q_raw,
-        [&src](Event<RawBehaviorEvent>& out, std::uint64_t seq){ return src(out,seq); });
+        [&src, &source_done](Event<RawBehaviorEvent>& out, std::uint64_t seq){ bool ok = src(out, seq); if(!ok) source_done=true; return ok; });
     KeyedFeatureExtractOp extract("ext",&q_raw,&q_feat,nullptr,0.10f);
     DriftAdaptiveWindowOp window("win",&q_feat,&q_batch,/*wmin*/4,/*wmax*/64);
     ScoringFlushOp scorer("scr",&q_batch,&q_scored,&model);
@@ -73,15 +76,17 @@ static std::size_t run_drift(const std::vector<BehaviorRow>& rows,
     SinkOperator<ScoredResult> sink("sink",&q_scored,[&count](const Event<ScoredResult>&){ ++count; });
 
     Runtime rt;
-    rt.register_op(&source); rt.register_op(&extract);
-    rt.register_op(&window); rt.register_op(&scorer); rt.register_op(&sink);
-    rt.run_until_source_exhausted();
+    rt.add_worker();
+    rt.register_op(&source, 0); rt.register_op(&extract, 0);
+    rt.register_op(&window, 0); rt.register_op(&scorer, 0); rt.register_op(&sink, 0);
+    rt.start(); while(!source_done) { std::this_thread::sleep_for(std::chrono::milliseconds(5)); } std::this_thread::sleep_for(std::chrono::milliseconds(20)); rt.stop();
     return count;
 }
 
 static std::size_t run_adaptive(const std::vector<BehaviorRow>& rows,
                                  const LogisticModel& model) {
     BehaviorSource src(rows, ReplayMode::MaxRate);
+    bool source_done = false;
     SPSCQueue<Event<RawBehaviorEvent>> q_raw(1024);
     SPSCQueue<Event<FeatureSnapshot>>  q_feat(1024);
     SPSCQueue<Event<FeatureBatch>>     q_batch(64);
@@ -89,7 +94,7 @@ static std::size_t run_adaptive(const std::vector<BehaviorRow>& rows,
     BackpressureSignal signal;
 
     SourceOperator<RawBehaviorEvent> source("src",&q_raw,
-        [&src](Event<RawBehaviorEvent>& out, std::uint64_t seq){ return src(out,seq); });
+        [&src, &source_done](Event<RawBehaviorEvent>& out, std::uint64_t seq){ bool ok = src(out, seq); if(!ok) source_done=true; return ok; });
     KeyedFeatureExtractOp extract("ext",&q_raw,&q_feat,&signal);
     AdaptiveFeatureWindowOp window("win",&q_feat,&q_batch,&signal,/*wmin*/4,/*wmax*/64);
     ScoringFlushOp scorer("scr",&q_batch,&q_scored,&model);
@@ -97,9 +102,10 @@ static std::size_t run_adaptive(const std::vector<BehaviorRow>& rows,
     SinkOperator<ScoredResult> sink("sink",&q_scored,[&count](const Event<ScoredResult>&){ ++count; });
 
     Runtime rt;
-    rt.register_op(&source); rt.register_op(&extract);
-    rt.register_op(&window); rt.register_op(&scorer); rt.register_op(&sink);
-    rt.run_until_source_exhausted();
+    rt.add_worker();
+    rt.register_op(&source, 0); rt.register_op(&extract, 0);
+    rt.register_op(&window, 0); rt.register_op(&scorer, 0); rt.register_op(&sink, 0);
+    rt.start(); while(!source_done) { std::this_thread::sleep_for(std::chrono::milliseconds(5)); } std::this_thread::sleep_for(std::chrono::milliseconds(20)); rt.stop();
     return count;
 }
 

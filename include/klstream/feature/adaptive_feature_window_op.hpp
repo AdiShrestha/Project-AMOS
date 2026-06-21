@@ -17,6 +17,7 @@
 #include "../core/spsc_queue.hpp"
 #include "../core/metrics.hpp"
 #include "../core/backpressure.hpp"
+#include "backpressure_signal.hpp"
 #include "types.hpp"
 #include <algorithm>
 #include <cstdint>
@@ -117,7 +118,7 @@ public:
             target_w_  = controller_.update(occ);
             buffer_.occupancy_at_window_start = static_cast<float>(occ);
             if (signal_) {
-                signal_->ema_occupancy.store(occ, std::memory_order_relaxed);
+                signal_->store(occ);
             }
         }
 
@@ -134,11 +135,7 @@ public:
             return OpStatus::Processed;
         }
 
-        Event<FeatureBatch> out_ev;
-        out_ev.timestamp_ns = in_ev.timestamp_ns;
-        out_ev.key  = 0;
-        out_ev.seq  = in_ev.seq;
-        out_ev.data = buffer_;
+        Event<FeatureBatch> out_ev{in_ev.timestamp_ns, 0, in_ev.seq, buffer_};
         buffer_ = FeatureBatch{};  // reset for next window
 
         if (output_->try_push(out_ev)) {

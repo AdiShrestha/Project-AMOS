@@ -70,15 +70,11 @@ private:
             auto it = last_publish_ts_.find(fs.user_id);
             if (it != last_publish_ts_.end()) {
                 staleness = static_cast<float>(
-                    static_cast<double>(last_batch_timestamp_ - it->second) / 1e9);
+                    static_cast<double>(fs.event_ts_ns - it->second) / 1e9);
             }
-            last_publish_ts_[fs.user_id] = last_batch_timestamp_;
+            last_publish_ts_[fs.user_id] = fs.event_ts_ns;
 
-            Event<ScoredResult> out_ev;
-            out_ev.timestamp_ns = last_batch_timestamp_;
-            out_ev.key  = fs.user_id;
-            out_ev.seq  = pending_batch_.first_seq + i;
-            out_ev.data = ScoredResult{
+            ScoredResult res{
                 fs.user_id,
                 score,
                 fs.label,
@@ -88,6 +84,8 @@ private:
                 staleness,
                 pending_batch_.occupancy_at_window_start
             };
+
+            Event<ScoredResult> out_ev{last_batch_timestamp_, fs.user_id, pending_batch_.first_seq + i, res};
 
             if (!output_->try_push(out_ev)) {
                 has_pending_idx_ = i;  // remember where we stopped

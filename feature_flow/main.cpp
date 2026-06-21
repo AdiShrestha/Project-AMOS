@@ -88,7 +88,7 @@ static auto make_throttled_generator(BehaviorSource& src,
         tracker.update();
         if (tracker.soft_pressure()) {
             limiter.set_rate(std::max(1000.0, limiter.rate() * 0.85));
-        } else if (tracker.low_pressure()) {
+        } else if (tracker.ema() < 0.30) {
             limiter.set_rate(std::min(100000.0, limiter.rate() * 1.05));
         }
         if (!limiter.try_consume()) return true; // skip this tick (not done, just throttled)
@@ -153,6 +153,8 @@ int main(int argc, char** argv) {
     std::cout << "[main] Output → " << cfg.out_path << "\n";
 
     Runtime rt;
+    rt.add_worker();
+    bool source_done = false;
 
     // ── Metrics objects (one per operator) ───────────────────────────────────
     OperatorMetrics m_src("source"), m_ext("extract"),
@@ -169,8 +171,8 @@ int main(int argc, char** argv) {
             /*signal=*/nullptr, /*fixed_alpha=*/0.10f);
         extract.attach_metrics(&m_ext);
 
-        auto aggr = [](const std::vector<FeatureSnapshot>& buf) -> FeatureBatch {
-            FeatureBatch fb{}; for (std::size_t i=0;i<buf.size();i++) fb.push_back(buf[i],i);
+        auto aggr = [](const std::vector<Event<FeatureSnapshot>>& buf) -> FeatureBatch {
+            FeatureBatch fb{}; for (std::size_t i=0;i<buf.size();i++) fb.push_back(buf[i].data,i);
             return fb;
         };
         TumblingCountWindow<FeatureSnapshot,FeatureBatch> window(
@@ -183,9 +185,13 @@ int main(int argc, char** argv) {
         ResultSink sink("sink", &q_scored, cfg.out_path);
         sink.attach_metrics(&m_sink);
 
-        rt.register_op(&source); rt.register_op(&extract);
-        rt.register_op(&window); rt.register_op(&scorer); rt.register_op(&sink);
-        rt.run_until_source_exhausted();
+        rt.register_op(&source, 0); rt.register_op(&extract, 0);
+        rt.register_op(&window, 0); rt.register_op(&scorer, 0); rt.register_op(&sink, 0);
+        rt.add_worker();
+        rt.start();
+        while(!source_done) { std::this_thread::sleep_for(std::chrono::milliseconds(5)); }
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        rt.stop();
     }
 
     // ── DriftAdaptive baseline ────────────────────────────────────────────────
@@ -208,9 +214,13 @@ int main(int argc, char** argv) {
         ResultSink sink("sink", &q_scored, cfg.out_path);
         sink.attach_metrics(&m_sink);
 
-        rt.register_op(&source); rt.register_op(&extract);
-        rt.register_op(&window); rt.register_op(&scorer); rt.register_op(&sink);
-        rt.run_until_source_exhausted();
+        rt.register_op(&source, 0); rt.register_op(&extract, 0);
+        rt.register_op(&window, 0); rt.register_op(&scorer, 0); rt.register_op(&sink, 0);
+        rt.add_worker();
+        rt.start();
+        while(!source_done) { std::this_thread::sleep_for(std::chrono::milliseconds(5)); }
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        rt.stop();
         std::cout << "[main] drift direction_changes=" << window.direction_changes() << "\n";
     }
 
@@ -223,8 +233,8 @@ int main(int argc, char** argv) {
         KeyedFeatureExtractOp extract("extract", &q_raw, &q_feat, nullptr, 0.10f);
         extract.attach_metrics(&m_ext);
 
-        auto aggr = [](const std::vector<FeatureSnapshot>& buf) -> FeatureBatch {
-            FeatureBatch fb{}; for (std::size_t i=0;i<buf.size();i++) fb.push_back(buf[i],i);
+        auto aggr = [](const std::vector<Event<FeatureSnapshot>>& buf) -> FeatureBatch {
+            FeatureBatch fb{}; for (std::size_t i=0;i<buf.size();i++) fb.push_back(buf[i].data,i);
             return fb;
         };
         TumblingCountWindow<FeatureSnapshot,FeatureBatch> window(
@@ -237,9 +247,13 @@ int main(int argc, char** argv) {
         ResultSink sink("sink", &q_scored, cfg.out_path);
         sink.attach_metrics(&m_sink);
 
-        rt.register_op(&source); rt.register_op(&extract);
-        rt.register_op(&window); rt.register_op(&scorer); rt.register_op(&sink);
-        rt.run_until_source_exhausted();
+        rt.register_op(&source, 0); rt.register_op(&extract, 0);
+        rt.register_op(&window, 0); rt.register_op(&scorer, 0); rt.register_op(&sink, 0);
+        rt.add_worker();
+        rt.start();
+        while(!source_done) { std::this_thread::sleep_for(std::chrono::milliseconds(5)); }
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        rt.stop();
     }
 
     // ── Adaptive contribution ─────────────────────────────────────────────────
@@ -261,9 +275,13 @@ int main(int argc, char** argv) {
         ResultSink sink("sink", &q_scored, cfg.out_path);
         sink.attach_metrics(&m_sink);
 
-        rt.register_op(&source); rt.register_op(&extract);
-        rt.register_op(&window); rt.register_op(&scorer); rt.register_op(&sink);
-        rt.run_until_source_exhausted();
+        rt.register_op(&source, 0); rt.register_op(&extract, 0);
+        rt.register_op(&window, 0); rt.register_op(&scorer, 0); rt.register_op(&sink, 0);
+        rt.add_worker();
+        rt.start();
+        while(!source_done) { std::this_thread::sleep_for(std::chrono::milliseconds(5)); }
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        rt.stop();
 
         std::cout << "[main] final W=" << window.controller().current()
                   << " direction_changes=" << window.controller().direction_changes()
@@ -272,7 +290,7 @@ int main(int argc, char** argv) {
 
     // ── Print summary metrics ─────────────────────────────────────────────────
     std::cout << "\n=== Operator Metrics ===\n";
-    for (auto* m : {&m_src, &m_ext, &m_win, &m_score, &m_sink}) m->print(std::cout);
+    // Removed metrics print loop as real KLStream handles it via MetricsReporter
 
     return 0;
 }

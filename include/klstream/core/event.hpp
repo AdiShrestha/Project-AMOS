@@ -1,75 +1,64 @@
+// include/klstream/core/event.hpp
 #pragma once
-// Event<T>: the fundamental unit of data flowing through KLStream queues.
-// Trivially copyable; any payload type T must also be trivially copyable.
-
+#include "config.hpp"
 #include <cstdint>
-#include <type_traits>
-
-// Platform clock — included at file scope, never inside a function body.
-#if defined(__APPLE__)
-#  include <mach/mach_time.h>
-#elif defined(__linux__)
-#  include <time.h>
-#else
-#  include <chrono>
-#endif
+#include <chrono>
 
 namespace klstream {
 
-// ── now_ns() ─────────────────────────────────────────────────────────────────
-inline std::uint64_t now_ns() noexcept {
-#if defined(__APPLE__)
-    // On macOS, mach_absolute_time() units depend on the hardware bus.
-    // We cache the timebase info in a function-local static once.
-    static const struct TimescaleCache {
-        std::uint64_t numer, denom;
-        TimescaleCache() {
-            mach_timebase_info_data_t info{};
-            mach_timebase_info(&info);
-            numer = info.numer;
-            denom = info.denom;
-        }
-    } kScale;
-    return mach_absolute_time() * kScale.numer / kScale.denom;
-#elif defined(__linux__)
-    struct timespec ts{};
-    clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
-    return static_cast<std::uint64_t>(ts.tv_sec) * 1'000'000'000ULL
-         + static_cast<std::uint64_t>(ts.tv_nsec);
-#else
-    using Clock = std::chrono::steady_clock;
-    return static_cast<std::uint64_t>(
-        std::chrono::duration_cast<std::chrono::nanoseconds>(
-            Clock::now().time_since_epoch()).count());
-#endif
-}
-
-// ── Event<T> ─────────────────────────────────────────────────────────────────
-template <typename T>
+// ── Event<Payload> ────────────────────────────────────────────────────────
+//
+// The atom of data in KLStream. Templated on Payload so the type system
+// prevents accidentally routing an Event<AdEvent> into an operator that
+// expects Event<uint64_t>.
+//
+// Design notes:
+//   * timestamp_ns: set by the source at creation time using a monotonic clock.
+//     Used to compute end-to-end latency at the sink. Never modified by
+//     intermediate operators.
+//   * key: for keyed streams (e.g., consistent-hashing placement, Section 14.3).
+//     Ignored by stateless operators (Map, Filter). Stateful operators
+//     (Aggregate, Window) use it to group events.
+//   * seq: monotonically increasing sequence number set by the source. Used in
+//     tests to verify ordering is preserved within a single queue.
+//   * data: the user-defined payload. Must be trivially copyable for lock-free
+//     queue correctness (no internal pointers, no vtable, no reference counting).
+//
+// Alignment: alignas(CACHE_LINE_SIZE) would waste space for small payloads.
+// We leave the struct naturally aligned and rely on the queue's own ring
+// buffer being cache-line aligned. The struct should be kept small (<=64 bytes
+// including the three metadata fields) so it fits in one or two cache lines.
+template <typename Payload>
 struct Event {
-    static_assert(std::is_trivially_copyable_v<T>,
-                  "Event<T>: T must be trivially copyable (no heap, no vtable)");
+    std::uint64_t timestamp_ns;  // nanoseconds since epoch (monotonic)
+    std::uint64_t key;           // routing / grouping key
+    std::uint64_t seq;           // sequence number (set by source, monotonic)
+    Payload       data;          // user payload — must be trivially copyable
 
-    // Default-constructible and trivially copyable.
-    Event() = default;
-
-    std::uint64_t timestamp_ns{0};  // wall-clock or logical time (nanoseconds)
-    std::uint32_t key{0};           // routing key (user_id, instrument_id, etc.)
-    std::uint64_t seq{0};           // monotonic sequence number, assigned at source
-    T             data{};
-
-    // Call at ResultSink to measure end-to-end latency.
-    [[nodiscard]] std::uint64_t latency_ns() const noexcept {
-        std::uint64_t n = now_ns();
-        return (n >= ingress_ns_) ? (n - ingress_ns_) : 0ULL;
+    // ── Factory helpers ───────────────────────────────────────────────────
+    static Event make(Payload d, std::uint64_t k = 0, std::uint64_t s = 0) {
+        using namespace std::chrono;
+        auto now_ns = static_cast<std::uint64_t>(
+            duration_cast<nanoseconds>(
+                steady_clock::now().time_since_epoch()
+            ).count()
+        );
+        return Event{ now_ns, k, s, std::move(d) };
     }
 
-    // Source operators call this immediately before pushing to the first queue.
-    void stamp_ingress(std::uint64_t t) noexcept { ingress_ns_ = t; }
-    [[nodiscard]] std::uint64_t ingress_ns() const noexcept { return ingress_ns_; }
-
-private:
-    std::uint64_t ingress_ns_{0};
+    // Elapsed nanoseconds since this event was created (call at the sink).
+    std::uint64_t latency_ns() const {
+        using namespace std::chrono;
+        auto now_ns = static_cast<std::uint64_t>(
+            duration_cast<nanoseconds>(
+                steady_clock::now().time_since_epoch()
+            ).count()
+        );
+        return (now_ns >= timestamp_ns) ? (now_ns - timestamp_ns) : 0;
+    }
 };
+
+// Convenience alias for the common case of a plain 64-bit integer payload.
+using IntEvent = Event<std::uint64_t>;
 
 } // namespace klstream

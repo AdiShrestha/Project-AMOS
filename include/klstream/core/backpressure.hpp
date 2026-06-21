@@ -1,89 +1,115 @@
+// include/klstream/core/backpressure.hpp
 #pragma once
-// Backpressure primitives.
-//
-//   EMAOccupancyTracker<Queue>  — wraps any Queue with .occupancy() → double,
-//                                 maintains an EMA of recent occupancy readings.
-//                                 Reused UNMODIFIED across Project 2's
-//                                 AdaptiveWindowOp and Project 3's
-//                                 AdaptiveFeatureWindowOp.
-//
-//   BackpressureSignal          — atomic shared state published by
-//                                 AdaptiveFeatureWindowOp (owner/writer) and
-//                                 read by KeyedFeatureExtractOp (reader).
-//                                 Single-writer / multi-reader; writer uses
-//                                 relaxed stores, readers use relaxed loads —
-//                                 the worst that can happen is one tick of lag,
-//                                 which is acceptable and documented.
-//
-//   TokenBucketRateLimiter      — for the RateThrottleSource baseline (Section 16).
-
 #include "config.hpp"
 #include <atomic>
 #include <chrono>
+#include <thread>
 #include <cstdint>
 
 namespace klstream {
 
-// ── EMAOccupancyTracker ───────────────────────────────────────────────────────
+// ── EMAOccupancyTracker ───────────────────────────────────────────────────
+//
+// Wraps any Queue that exposes .occupancy() and tracks an exponential
+// moving average of its fill fraction.
+//
+// The EMA alpha parameter controls smoothing:
+//   Small alpha (e.g. 0.05): slow to react, very smooth — good for
+//     predicting slow-building pressure from sustained overload.
+//   Large alpha (e.g. 0.30): reacts quickly — better for bursty workloads.
+//
+// Default alpha = 0.10 is a sensible starting point. The research extension
+// (Section 14.1) sweeps alpha values and measures the effect on p99 latency.
+//
+// USAGE:
+//   EMAOccupancyTracker tracker(my_queue, 0.10);
+//   // In the source's tick() loop:
+//   tracker.update();
+//   if (tracker.ema() > BP_SOFT_THRESHOLD) { /* slow down */ }
+
 template <typename Queue>
 class EMAOccupancyTracker {
 public:
-    explicit EMAOccupancyTracker(const Queue& q, double alpha = EMA_ALPHA_DEFAULT)
-        : queue_(q), alpha_(alpha) {}
+    explicit EMAOccupancyTracker(Queue& queue, double alpha = 0.10)
+        : queue_(queue), alpha_(alpha), ema_(0.0) {}
 
-    // Call once per tick() of the owning operator to refresh the EMA.
+    // Call once per tick() to update the EMA.
     void update() noexcept {
         double occ = queue_.occupancy();
         ema_ = alpha_ * occ + (1.0 - alpha_) * ema_;
     }
 
     [[nodiscard]] double ema() const noexcept { return ema_; }
-    [[nodiscard]] bool soft_pressure() const noexcept { return ema_ >= BP_SOFT_THRESHOLD; }
-    [[nodiscard]] bool low_pressure()  const noexcept { return ema_ <  BP_LOW_THRESHOLD; }
+
+    // Returns true if the EMA exceeds the soft backpressure threshold.
+    // When this returns true the source should reduce its emission rate.
+    [[nodiscard]] bool soft_pressure() const noexcept {
+        return ema_ > BP_SOFT_THRESHOLD;
+    }
+
+    // Returns true if occupancy is critically high (hard threshold).
+    // When this returns true the source should stop emitting entirely
+    // and wait, identical to the baseline blocking behaviour.
+    [[nodiscard]] bool hard_pressure() const noexcept {
+        return queue_.occupancy() > BP_HARD_THRESHOLD;
+    }
 
 private:
-    const Queue& queue_;
-    double alpha_;
-    double ema_{0.0};
+    Queue&      queue_;
+    double      alpha_;
+    double      ema_;
 };
 
-// ── BackpressureSignal ────────────────────────────────────────────────────────
-// Shared between AdaptiveFeatureWindowOp (writer) and KeyedFeatureExtractOp
-// (reader). Plain struct; pointer shared via main()'s lifetime.
-struct BackpressureSignal {
-    std::atomic<double> ema_occupancy{0.0};  // written by AdaptiveFeatureWindowOp
-
-    [[nodiscard]] double load() const noexcept {
-        return ema_occupancy.load(std::memory_order_relaxed);
-    }
-};
-
-// ── TokenBucketRateLimiter ────────────────────────────────────────────────────
-// Used by RateThrottleSource (Baseline 3, Section 16). Thread-safe only when
-// accessed by a single source thread.
+// ── TokenBucketRateLimiter ────────────────────────────────────────────────
+//
+// A simple token-bucket used by SourceOperator to smoothly rate-limit event
+// generation when adaptive backpressure is enabled.
+//
+// tokens are replenished at a configurable rate (tokens_per_sec).
+// Each call to try_consume() uses one token. When the bucket is empty,
+// try_consume() returns false and the source should pause.
+//
+// The rate can be reduced at runtime via set_rate(). This is how the adaptive
+// backpressure controller gradually slows the source when soft pressure is
+// detected (before the queue is actually full).
 class TokenBucketRateLimiter {
 public:
-    TokenBucketRateLimiter(double tokens_per_sec, double max_burst)
-        : rate_(tokens_per_sec), tokens_(max_burst), max_burst_(max_burst)
-        , last_(std::chrono::steady_clock::now()) {}
+    explicit TokenBucketRateLimiter(double tokens_per_sec,
+                                    double max_burst = 0.0)
+        : rate_(tokens_per_sec)
+        , tokens_(tokens_per_sec) // start full
+        , max_tokens_(max_burst > 0 ? max_burst : tokens_per_sec)
+        , last_(std::chrono::steady_clock::now())
+    {}
 
-    // Returns true if a token was consumed (may proceed), false if bucket empty.
+    // Refill tokens based on elapsed time, then try to consume one.
     [[nodiscard]] bool try_consume() noexcept {
-        auto now = std::chrono::steady_clock::now();
-        double elapsed = std::chrono::duration<double>(now - last_).count();
-        last_ = now;
-        tokens_ = std::min(max_burst_, tokens_ + elapsed * rate_);
-        if (tokens_ >= 1.0) { tokens_ -= 1.0; return true; }
+        refill();
+        if (tokens_ >= 1.0) {
+            tokens_ -= 1.0;
+            return true;
+        }
         return false;
     }
 
-    void set_rate(double r) noexcept { rate_ = r; }
-    [[nodiscard]] double rate() const noexcept { return rate_; }
+    void set_rate(double tokens_per_sec) noexcept {
+        rate_ = tokens_per_sec;
+    }
+
+    double rate() const noexcept { return rate_; }
 
 private:
+    void refill() noexcept {
+        auto now     = std::chrono::steady_clock::now();
+        double elapsed = std::chrono::duration<double>(now - last_).count();
+        last_    = now;
+        tokens_ += elapsed * rate_;
+        if (tokens_ > max_tokens_) tokens_ = max_tokens_;
+    }
+
     double rate_;
     double tokens_;
-    double max_burst_;
+    double max_tokens_;
     std::chrono::steady_clock::time_point last_;
 };
 

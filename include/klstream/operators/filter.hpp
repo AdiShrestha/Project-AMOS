@@ -1,6 +1,5 @@
+// include/klstream/operators/filter.hpp
 #pragma once
-// FilterOperator<T>: forwards Event<T> only when the predicate returns true.
-
 #include "../core/operator.hpp"
 #include "../core/event.hpp"
 #include "../core/spsc_queue.hpp"
@@ -9,17 +8,29 @@
 
 namespace klstream {
 
+// ── FilterOperator<T> ─────────────────────────────────────────────────────
+//
+// Stateless selective pass-through. Pops one Event<T> from input. If the
+// predicate returns true, pushes it to output unchanged. If false, the event
+// is dropped (this is one of the few operators that intentionally discards
+// events — it is correct by design, not a data-loss bug).
+//
+// Example:
+//   FilterOperator<uint64_t> even_only(
+//       "even_filter", &q_in, &q_out,
+//       [](uint64_t x) { return x % 2 == 0; });
 template <typename T>
 class FilterOperator : public IOperator {
 public:
-    using Predicate = std::function<bool(const T&)>;
     using Queue     = SPSCQueue<Event<T>>;
+    using Predicate = std::function<bool(const T&)>;
 
     FilterOperator(std::string name, Queue* input, Queue* output, Predicate pred)
         : IOperator(std::move(name))
-        , input_(input), output_(output), pred_(std::move(pred)) {}
+        , input_(input), output_(output), pred_(std::move(pred))
+    {}
 
-    void attach_metrics(OperatorMetrics* m) { metrics_ = m; }
+    void attach_metrics(OperatorMetrics* m) override { metrics_ = m; }
 
     OpStatus tick() override {
         if (has_pending_) {
@@ -39,7 +50,7 @@ public:
         }
 
         if (!pred_(ev.data)) {
-            // Dropped — still counts as Processed (we consumed an event)
+            // Filtered out — count as processed (we consumed it) but don't push.
             if (metrics_) metrics_->events_processed.increment();
             return OpStatus::Processed;
         }
@@ -48,6 +59,7 @@ public:
             if (metrics_) metrics_->events_processed.increment();
             return OpStatus::Processed;
         }
+
         pending_     = ev;
         has_pending_ = true;
         if (metrics_) metrics_->events_blocked.increment();
@@ -55,11 +67,11 @@ public:
     }
 
 private:
-    Queue*          input_;
-    Queue*          output_;
-    Predicate       pred_;
-    Event<T>        pending_{};
-    bool            has_pending_{false};
+    Queue*           input_;
+    Queue*           output_;
+    Predicate        pred_;
+    Event<T>         pending_{};
+    bool             has_pending_{false};
     OperatorMetrics* metrics_{nullptr};
 };
 

@@ -1,85 +1,184 @@
+// include/klstream/core/spsc_queue.hpp
 #pragma once
-// Lock-free Single-Producer Single-Consumer queue.
-// Based on the classic Lamport ring-buffer; correctness requires
-// that exactly ONE thread calls try_push() and exactly ONE calls try_pop().
-// Capacity must be a power of two — enforced by static_assert.
-
 #include "config.hpp"
 #include <atomic>
+#include <cassert>
 #include <cstddef>
-#include <cstdint>
 #include <memory>
+#include <new>
+#include <optional>
 #include <type_traits>
-#include <new>          // std::hardware_destructive_interference_size
+#include <thread>
+#include <chrono>
 
 namespace klstream {
+
+// ── SPSCQueue<T> ─────────────────────────────────────────────────────────
+//
+// A bounded, lock-free, single-producer / single-consumer ring buffer.
+//
+// CORRECTNESS CONTRACT (do not violate):
+//   * Exactly one thread calls push() or try_push() at a time (the producer).
+//   * Exactly one thread calls pop() or try_pop() at a time (the consumer).
+//   * These two threads may be different OS threads — that is the whole point.
+//   * T must be trivially copyable (POD-like). For complex types, wrap them
+//     in a std::shared_ptr before putting them in an Event.
+//
+// MEMORY LAYOUT (cache-line padded to prevent false sharing):
+//
+//   [padding 0]          <- start on cache line boundary
+//   write_idx_           <- producer writes, consumer reads (release/acquire)
+//   [padding 1]          <- isolate write_idx_ from read_idx_
+//   write_idx_cached_    <- producer's local shadow of read_idx_ (relaxed)
+//   [padding 2]
+//   read_idx_            <- consumer writes, producer reads (release/acquire)
+//   [padding 3]          <- isolate read_idx_ from write_idx_
+//   read_idx_cached_     <- consumer's local shadow of write_idx_ (relaxed)
+//   [padding 4]
+//   capacity_            <- const after construction
+//   buffer_              <- the actual ring, heap-allocated, cache-line aligned
+//
+// WHY CACHED INDICES:
+//   In the fast path (queue neither full nor empty), the producer only ever
+//   reads its own write_idx_ and its cached copy of read_idx_. It never
+//   touches the cache line that the consumer is modifying. This eliminates
+//   MESI "RFO" (Request For Ownership) cache-line ping-pong, which is the
+//   dominant cost in naive implementations.
 
 template <typename T>
 class SPSCQueue {
     static_assert(std::is_trivially_copyable_v<T>,
-                  "SPSCQueue<T>: T must be trivially copyable");
+        "SPSCQueue<T>: T must be trivially copyable. "
+        "Wrap complex types in std::shared_ptr.");
 
 public:
+    // capacity must be a power of 2 and >= 2.
     explicit SPSCQueue(std::size_t capacity = DEFAULT_QUEUE_CAPACITY)
-        : capacity_(next_pow2(capacity))
-        , mask_(capacity_ - 1)
-        , buffer_(std::make_unique<T[]>(capacity_))
-    {}
+        : capacity_(capacity)
+        , buffer_(static_cast<T*>(
+            ::operator new(capacity * sizeof(T),
+                           std::align_val_t{CACHE_LINE_SIZE})))
+    {
+        assert(capacity >= 2 && "SPSCQueue capacity must be >= 2");
+        assert((capacity & (capacity - 1)) == 0 &&
+               "SPSCQueue capacity must be a power of 2");
+    }
 
-    // Producer: returns true if the item was pushed, false if full.
-    [[nodiscard]] bool try_push(const T& item) noexcept {
-        const auto head = head_.load(std::memory_order_relaxed);
-        const auto next = (head + 1) & mask_;
-        if (next == tail_.load(std::memory_order_acquire)) return false; // full
-        buffer_[head] = item;
-        head_.store((head + 1) & mask_, std::memory_order_release);
+    ~SPSCQueue() {
+        ::operator delete(buffer_,
+            std::align_val_t{CACHE_LINE_SIZE});
+    }
+
+    // Non-copyable, non-movable (contains raw pointer + atomics).
+    SPSCQueue(const SPSCQueue&)            = delete;
+    SPSCQueue& operator=(const SPSCQueue&) = delete;
+    SPSCQueue(SPSCQueue&&)                 = delete;
+    SPSCQueue& operator=(SPSCQueue&&)      = delete;
+
+    // ── Producer side ─────────────────────────────────────────────────────
+
+    // try_push: returns true on success, false if the queue is full.
+    // Call from exactly ONE producer thread.
+    [[nodiscard]] bool try_push(const T& val) noexcept {
+        const std::size_t wi = write_idx_.load(std::memory_order_relaxed);
+        const std::size_t next_wi = (wi + 1) & (capacity_ - 1);
+
+        // Fast path: use cached read index.
+        if (next_wi == write_idx_cached_) {
+            // Cached value says queue might be full. Re-read the real index.
+            write_idx_cached_ = read_idx_.load(std::memory_order_acquire);
+            if (next_wi == write_idx_cached_) {
+                return false; // Queue is actually full.
+            }
+        }
+        buffer_[wi] = val;
+        // Release: make the write visible to the consumer before we advance
+        // write_idx_. The consumer will see the updated index and then read
+        // the element we just wrote.
+        write_idx_.store(next_wi, std::memory_order_release);
         return true;
     }
 
-    // Consumer: returns true and fills *out if an item was available.
+    // Blocking push: spins with three-tier backoff until space is available.
+    // Not recommended in the hot path — prefer try_push() + OpStatus::Blocked.
+    void push(const T& val) noexcept {
+        int spin = 0, yields = 0;
+        while (!try_push(val)) {
+            if (spin < SPIN_BEFORE_YIELD) {
+                ++spin;
+#if defined(__aarch64__)
+                __asm__ volatile("yield" ::: "memory");
+#elif defined(__x86_64__)
+                __asm__ volatile("pause" ::: "memory");
+#endif
+            } else if (yields < YIELD_BEFORE_SLEEP) {
+                ++yields;
+                std::this_thread::yield();
+            } else {
+                std::this_thread::sleep_for(
+                    std::chrono::nanoseconds(SLEEP_NS));
+            }
+        }
+    }
+
+    // ── Consumer side ─────────────────────────────────────────────────────
+
+    // try_pop: writes the front element into *out and returns true, or
+    // returns false if the queue is empty. out must not be null.
     [[nodiscard]] bool try_pop(T* out) noexcept {
-        const auto tail = tail_.load(std::memory_order_relaxed);
-        if (tail == head_.load(std::memory_order_acquire)) return false; // empty
-        *out = buffer_[tail];
-        tail_.store((tail + 1) & mask_, std::memory_order_release);
+        const std::size_t ri = read_idx_.load(std::memory_order_relaxed);
+
+        // Fast path: use cached write index.
+        if (ri == read_idx_cached_) {
+            read_idx_cached_ = write_idx_.load(std::memory_order_acquire);
+            if (ri == read_idx_cached_) {
+                return false; // Queue is actually empty.
+            }
+        }
+        *out = buffer_[ri];
+        read_idx_.store((ri + 1) & (capacity_ - 1),
+                        std::memory_order_release);
         return true;
     }
 
-    // Approximate occupancy in [0,1]; safe to call from either thread.
+    // Convenience: returns std::nullopt when empty.
+    std::optional<T> pop() noexcept {
+        T val;
+        if (try_pop(&val)) return val;
+        return std::nullopt;
+    }
+
+    // ── Inspection ────────────────────────────────────────────────────────
+
+    // Approximate occupancy [0.0, 1.0]. Approximate because read and write
+    // indices are read with relaxed ordering — the result may be stale.
+    // Good enough for the EMA tracker in backpressure.hpp.
     [[nodiscard]] double occupancy() const noexcept {
-        auto h = head_.load(std::memory_order_relaxed);
-        auto t = tail_.load(std::memory_order_relaxed);
-        std::size_t used = (h >= t) ? (h - t) : (capacity_ - t + h);
+        const std::size_t wi = write_idx_.load(std::memory_order_relaxed);
+        const std::size_t ri = read_idx_.load(std::memory_order_relaxed);
+        const std::size_t used = (wi - ri + capacity_) & (capacity_ - 1);
         return static_cast<double>(used) / static_cast<double>(capacity_);
     }
 
     [[nodiscard]] std::size_t capacity() const noexcept { return capacity_; }
+
     [[nodiscard]] bool empty() const noexcept {
-        return head_.load(std::memory_order_acquire)
-            == tail_.load(std::memory_order_acquire);
+        return write_idx_.load(std::memory_order_acquire)
+            == read_idx_.load(std::memory_order_acquire);
     }
 
 private:
-    static constexpr std::size_t kCacheLineSize =
-#ifdef __cpp_lib_hardware_interference_size
-        std::hardware_destructive_interference_size;
-#else
-        64;
-#endif
+    // Each hot atomic lives on its own 128-byte cache line.
+    // The layout is: pad | atomic | cache-shadow | pad | atomic | cache-shadow | pad
+    // so that no two of these four values share a cache line.
 
-    static std::size_t next_pow2(std::size_t n) noexcept {
-        if (n < 2) return 2;
-        --n;
-        for (std::size_t shift = 1; shift < sizeof(n)*8; shift <<= 1) n |= n >> shift;
-        return ++n;
-    }
+    alignas(CACHE_LINE_SIZE) std::atomic<std::size_t> write_idx_{0};
+    alignas(CACHE_LINE_SIZE) std::size_t              write_idx_cached_{0};
+    alignas(CACHE_LINE_SIZE) std::atomic<std::size_t> read_idx_{0};
+    alignas(CACHE_LINE_SIZE) std::size_t              read_idx_cached_{0};
 
     const std::size_t capacity_;
-    const std::size_t mask_;
-    std::unique_ptr<T[]> buffer_;
-
-    alignas(kCacheLineSize) std::atomic<std::size_t> head_{0};
-    alignas(kCacheLineSize) std::atomic<std::size_t> tail_{0};
+    T*                buffer_;   // heap-allocated, CACHE_LINE_SIZE-aligned
 };
 
 } // namespace klstream

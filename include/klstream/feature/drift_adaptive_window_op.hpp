@@ -94,11 +94,7 @@ public:
             return OpStatus::Processed;
         }
 
-        Event<FeatureBatch> out_ev;
-        out_ev.timestamp_ns = in_ev.timestamp_ns;
-        out_ev.key  = 0;
-        out_ev.seq  = in_ev.seq;
-        out_ev.data = buffer_;
+        Event<FeatureBatch> out_ev{in_ev.timestamp_ns, 0, in_ev.seq, buffer_};
         buffer_ = FeatureBatch{};
 
         if (output_->try_push(out_ev)) {
