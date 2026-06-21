@@ -9,12 +9,16 @@
 
 namespace klstream {
 
+inline constexpr std::size_t MAX_FEATURE_BATCH = 256;
+inline constexpr std::size_t MAX_TRACKED_USERS = 100000;
+
 // ── RawBehaviorEvent ─────────────────────────────────────────────────────────
 // The type that crosses the BehaviorSource → KeyedFeatureExtractOp queue.
 // Intentionally does NOT carry label/label_valid — those are evaluation-only
 // fields that must not widen the hot-path payload (Section 13.3).
 struct RawBehaviorEvent {
     std::uint32_t user_id;
+    std::uint64_t event_ts_ns;     // historical CSV timestamp
     std::uint32_t item_id;
     std::uint16_t category_id;
     std::uint8_t  behavior_code;   // 0=pv, 1=cart, 2=fav, 3=buy (Taobao)
@@ -30,6 +34,7 @@ struct FeatureSnapshot {
     static constexpr std::size_t kDim = 4;  // ema_engagement, log_pv, log_cart_fav, recency
 
     std::uint32_t user_id;
+    std::uint64_t event_ts_ns;
     float x[kDim];          // feature vector in the order above
     float alpha_used;       // α[n] that was active when this snapshot was computed
     std::uint8_t  label;

@@ -7,6 +7,7 @@
 #include "klstream/core/event.hpp"
 #include "klstream/feature/scoring_flush_op.hpp"
 #include "klstream/model/logistic_model.hpp"
+#include <algorithm>
 #include <cassert>
 #include <cstdio>
 #include <vector>
@@ -18,6 +19,7 @@ static FeatureBatch make_batch(std::uint32_t n) {
     for (std::uint32_t i = 0; i < n; ++i) {
         FeatureSnapshot s{};
         s.user_id = i + 1;
+        s.event_ts_ns = 1000 + i;
         s.x[0] = static_cast<float>(i) * 0.1f;
         s.label = 0; s.label_valid = 1;
         fb.push_back(s, static_cast<std::uint64_t>(i));
@@ -34,10 +36,7 @@ int main() {
         ScoringFlushOp op("scorer", &q_in, &q_out, &model);
 
         const std::uint32_t W = 10;
-        Event<FeatureBatch> batch_ev;
-        batch_ev.timestamp_ns = 1000;
-        batch_ev.seq = 99;
-        batch_ev.data = make_batch(W);
+        Event<FeatureBatch> batch_ev{1000, 0, 99, make_batch(W)};
         q_in.try_push(batch_ev);
 
         // Drain until idle
@@ -70,10 +69,7 @@ int main() {
         ScoringFlushOp op("scorer", &q_in, &q_out, &model);
 
         const std::uint32_t W = 10;
-        Event<FeatureBatch> batch_ev;
-        batch_ev.timestamp_ns = 2000;
-        batch_ev.seq = 0;
-        batch_ev.data = make_batch(W);
+        Event<FeatureBatch> batch_ev{2000, 0, 0, make_batch(W)};
         q_in.try_push(batch_ev);
 
         // Simulate draining the output queue as we tick, allowing progress

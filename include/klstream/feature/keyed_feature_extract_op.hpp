@@ -19,7 +19,7 @@
 #include "../core/event.hpp"
 #include "../core/spsc_queue.hpp"
 #include "../core/metrics.hpp"
-#include "../core/backpressure.hpp"
+#include "backpressure_signal.hpp"
 #include "types.hpp"
 #include "user_state.hpp"
 #include "engagement.hpp"
@@ -53,7 +53,7 @@ public:
         return alpha_;
     }
 
-    [[nodiscard]] float alpha() const noexcept { return alpha_; }
+    [[nodiscard]] float current() const noexcept { return alpha_; }
     [[nodiscard]] float alpha_min() const noexcept { return alpha_min_; }
     [[nodiscard]] float alpha_max() const noexcept { return alpha_max_; }
 
@@ -86,7 +86,7 @@ public:
 
     // For controller trace logging (Section 19)
     [[nodiscard]] float last_alpha() const noexcept {
-        return signal_ ? alpha_ctrl_.alpha() : fixed_alpha_;
+        return signal_ ? alpha_ctrl_.current() : fixed_alpha_;
     }
 
     // For unit testing: expose current user count
@@ -130,7 +130,7 @@ public:
 
         auto& state = users_[raw.user_id];
         float prev_ts_sec = state.last_ts_ns;  // last_ts_ns stores seconds (confusing name, fix below)
-        float ts_sec = static_cast<float>(in_ev.timestamp_ns) / 1e9f;
+        float ts_sec = static_cast<float>(raw.event_ts_ns) / 1e9f;
 
         float weight = (raw.amount > 0.0f)
             ? raw.amount              // ULB mode: use transaction amount
@@ -150,13 +150,9 @@ public:
         // label_for_seq() call in the wiring code (main.cpp Section 23).
         snap.label       = 0;
         snap.label_valid = 0;
+        snap.event_ts_ns = raw.event_ts_ns;
 
-        Event<FeatureSnapshot> out_ev;
-        out_ev.timestamp_ns = in_ev.timestamp_ns;
-        out_ev.key          = in_ev.key;
-        out_ev.seq          = in_ev.seq;
-        out_ev.data         = snap;
-        out_ev.stamp_ingress(in_ev.ingress_ns());
+        Event<FeatureSnapshot> out_ev{in_ev.timestamp_ns, in_ev.key, in_ev.seq, snap};
 
         if (output_->try_push(out_ev)) {
             if (metrics_) metrics_->events_processed.increment();

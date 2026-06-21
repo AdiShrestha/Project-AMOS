@@ -51,6 +51,7 @@ public:
              << r.alpha_used                        << ','
              << r.staleness_sec                     << ','
              << r.occupancy_at_decision             << '\n';
+        ++rows_written_;
         if (metrics_) metrics_->events_processed.increment();
         return OpStatus::Processed;
     }

@@ -1,72 +1,107 @@
+// include/klstream/core/runtime.hpp
 #pragma once
-// Runtime: registers operators, builds a single-worker cooperative scheduler,
-// and runs until the source is exhausted (all registered operators return Done
-// for a full round-trip) or stop() is called.
-//
-// For BPFeat's experiments all operators share one thread (matching Project 2's
-// single-node, single-worker design), which gives clean causal attribution:
-// the only wall-clock difference between architectures is the time spent inside
-// ScoringFlushOp's O(W) hot loop.
-
 #include "operator.hpp"
+#include "pinning.hpp"
 #include "worker.hpp"
-#include <chrono>
-#include <cstddef>
-#include <thread>
+#include "metrics.hpp"
+#include <cstdint>
+#include <memory>
+#include <stdexcept>
+#include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace klstream {
 
+// ── OperatorRegistration ──────────────────────────────────────────────────
+struct OperatorRegistration {
+    IOperator*   op;
+    CoreAffinity affinity;
+    int          worker_id; // which worker thread to assign this op to
+};
+
+// ── Runtime ───────────────────────────────────────────────────────────────
+//
+// The top-level coordinator. Responsibilities:
+//   1. Accept (operator, affinity, worker_id) registrations.
+//   2. Assign operators to WorkerThreads.
+//   3. Start all workers (and the MetricsReporter).
+//   4. Provide a blocking wait() method for main() to call.
+//   5. Stop cleanly on request.
+//
+// USAGE PATTERN:
+//
+//   klstream::Runtime rt;
+//   rt.add_worker();                         // Worker 0
+//   rt.add_worker();                         // Worker 1
+//   rt.register_op(&my_source, 0, CoreAffinity::Efficiency);
+//   rt.register_op(&my_map,    0, CoreAffinity::Performance);
+//   rt.register_op(&my_sink,   1, CoreAffinity::Efficiency);
+//   rt.metrics().add(&source_metrics);
+//   rt.metrics().add(&sink_metrics);
+//   rt.start();
+//   rt.wait_for(std::chrono::seconds(10));
+//   rt.stop();
+//
+// Thread safety: add_worker(), register_op(), start(), stop(), and wait_for()
+// must all be called from the same thread (typically main()).
 class Runtime {
 public:
-    Runtime() = default;
+    // Add a worker thread slot. Returns its 0-based index.
+    int add_worker(CoreAffinity default_affinity = CoreAffinity::Any) {
+        int idx = static_cast<int>(workers_.size());
+        workers_.emplace_back(std::make_unique<WorkerThread>());
+        workers_.back()->set_affinity(default_affinity);
+        return idx;
+    }
 
-    void register_op(IOperator* op) { ops_.push_back(op); }
-
-    // Runs the cooperative loop on the CALLER's thread (no extra thread created)
-    // until a full round of all operators returns Done/Idle — i.e., the source
-    // is exhausted and all queues have drained. This design keeps main.cpp
-    // experiments single-threaded for reproducibility, exactly mirroring
-    // Project 2's run_until_source_exhausted() semantics.
-    void run_until_source_exhausted(std::size_t max_idle_rounds = 1'000'000) {
-        std::size_t consecutive_idle = 0;
-        while (true) {
-            int done_count  = 0;
-            int idle_count  = 0;
-            for (auto* op : ops_) {
-                auto s = op->tick();
-                if (s == OpStatus::Done)                            ++done_count;
-                if (s == OpStatus::Idle || s == OpStatus::Blocked)  ++idle_count;
-            }
-            if (done_count > 0 && idle_count == static_cast<int>(ops_.size()) - done_count) {
-                // All non-Done operators are idle — pipeline has drained.
-                ++consecutive_idle;
-                if (consecutive_idle >= max_idle_rounds) break;
-            } else {
-                consecutive_idle = 0;
-            }
-            if (done_count == static_cast<int>(ops_.size())) break;
-            if (idle_count == static_cast<int>(ops_.size())) {
-                ++consecutive_idle;
-                if (consecutive_idle >= max_idle_rounds) break;
-                std::this_thread::yield();
-            }
+    // Register an operator with a specific worker thread.
+    void register_op(IOperator* op, int worker_id,
+                     CoreAffinity affinity = CoreAffinity::Any)
+    {
+        if (worker_id < 0 ||
+            worker_id >= static_cast<int>(workers_.size())) {
+            throw std::out_of_range(
+                "Runtime::register_op: invalid worker_id " +
+                std::to_string(worker_id));
         }
-        for (auto* op : ops_) op->shutdown();
+        op->id = next_op_id_++;
+        // Override the worker's default affinity if a per-op affinity is given.
+        if (affinity != CoreAffinity::Any) {
+            workers_[worker_id]->set_affinity(affinity);
+        }
+        workers_[worker_id]->assign(op);
     }
 
-    // For multi-threaded use (harness.cpp): build workers and return control.
-    Worker* build_worker(int core_id = -1) {
-        workers_.emplace_back(std::make_unique<Worker>(ops_, core_id));
-        return workers_.back().get();
+    MetricsReporter& metrics() { return reporter_; }
+
+    // Start all workers and the metrics reporter.
+    void start() {
+        if (started_) throw std::logic_error("Runtime::start() called twice");
+        started_ = true;
+        reporter_.start();
+        for (auto& w : workers_) w->start();
     }
 
-    void stop_all() { for (auto& w : workers_) w->stop(); }
-    void join_all()  { for (auto& w : workers_) w->join();  }
+    // Block the calling thread until duration elapses, then return.
+    template <typename Rep, typename Period>
+    void wait_for(std::chrono::duration<Rep, Period> duration) {
+        std::this_thread::sleep_for(duration);
+    }
+
+    // Stop all workers and the metrics reporter.
+    void stop() {
+        for (auto& w : workers_) w->stop();
+        reporter_.stop();
+    }
+
+    ~Runtime() { if (started_) stop(); }
 
 private:
-    std::vector<IOperator*>             ops_;
-    std::vector<std::unique_ptr<Worker>> workers_;
+    std::vector<std::unique_ptr<WorkerThread>> workers_;
+    MetricsReporter                            reporter_;
+    std::uint64_t                              next_op_id_{0};
+    bool                                       started_{false};
 };
 
 } // namespace klstream

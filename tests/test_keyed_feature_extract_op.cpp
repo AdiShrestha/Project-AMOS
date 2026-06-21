@@ -19,7 +19,7 @@ static void push_raw(SPSCQueue<Event<RawBehaviorEvent>>& q,
     ev.timestamp_ns = ts;
     ev.key  = uid;
     ev.seq  = seq;
-    ev.data = RawBehaviorEvent{uid, /*item*/1, /*cat*/0, bc, /*amount*/0.0f};
+    ev.data = RawBehaviorEvent{uid, 1000, /*item*/1, /*cat*/0, bc, /*amount*/0.0f};
     bool ok = q.try_push(ev);
     assert(ok && "push_raw: queue full");
 }
@@ -69,7 +69,7 @@ int main() {
             ev.timestamp_ns = 1000000000ULL * (i+1);
             ev.key  = 0;
             ev.seq  = static_cast<std::uint64_t>(i);
-            ev.data = RawBehaviorEvent{0, 0, 0, 0, /*amount*/100.0f + i};
+            ev.data = RawBehaviorEvent{0, 1000, 0, 0, 0, /*amount*/100.0f + i};
             q_in.try_push(ev);
         }
         for (int i = 0; i < 5; ++i) op.tick();

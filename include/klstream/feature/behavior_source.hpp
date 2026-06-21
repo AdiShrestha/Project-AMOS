@@ -96,13 +96,9 @@ public:
             }
         }
 
-        RawBehaviorEvent raw{r.user_id, r.item_id, r.category_id,
+        RawBehaviorEvent raw{r.user_id, r.timestamp_ns, r.item_id, r.category_id,
                              r.behavior_code, r.amount};
-        out = Event<RawBehaviorEvent>{};
-        out.timestamp_ns = r.timestamp_ns;
-        out.key          = r.user_id;
-        out.seq          = r.seq;
-        out.data         = raw;
+        out = Event<RawBehaviorEvent>::make(raw, r.user_id, r.seq);
         ++idx_;
         return true;
     }

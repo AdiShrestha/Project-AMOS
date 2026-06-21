@@ -1,36 +1,67 @@
+// include/klstream/core/operator.hpp
 #pragma once
-// IOperator: the abstract base class every KLStream operator implements.
-// The cooperative scheduler (Runtime) calls tick() in a round-robin loop
-// across all registered operators. Operators MUST NOT block inside tick();
-// if an output queue is full, they return OpStatus::Blocked and the
-// scheduler moves on to the next operator.
-
+#include <cstdint>
 #include <string>
 
 namespace klstream {
 
-enum class OpStatus {
-    Processed,  // did useful work (pushed or popped at least one event)
-    Idle,       // input queue empty, nothing to do
-    Blocked,    // output queue full, could not push — try again next tick
-    Done        // source exhausted; runtime may stop scheduling this operator
+// ── OpStatus ─────────────────────────────────────────────────────────────
+//
+// Return value of IOperator::tick(). The worker thread uses this to decide
+// what to do next:
+//
+//   Processed -> reset backoff counter, immediately call tick() again.
+//   Idle      -> increment backoff counter, apply spin/yield/sleep policy.
+//   Blocked   -> output queue was full; do NOT pop input on the next tick()
+//               (the operator must remember the un-pushed event internally).
+//               Increment backoff counter to give the downstream time to drain.
+enum class OpStatus : std::uint8_t {
+    Processed = 0,  // One event was successfully processed and pushed.
+    Idle      = 1,  // Input queue was empty; nothing to do.
+    Blocked   = 2,  // Output queue was full; event is held inside operator.
 };
 
+// ── IOperator ─────────────────────────────────────────────────────────────
+//
+// The abstract base class for every operator in the pipeline.
+//
+// Lifecycle:
+//   1. Construct the operator (pass queue pointers, lambda, etc. in ctor).
+//   2. Runtime calls init() once on the owning thread before the first tick().
+//   3. Runtime calls tick() in a tight loop for the operator's lifetime.
+//   4. Runtime calls shutdown() once when stopping (after setting stop flag).
+//
+// Threading: init(), tick(), and shutdown() are always called from the same
+// worker thread. The operator does not need to protect its own state with
+// locks — the queues are the synchronisation boundary.
+//
+// The operator OWNS a "pending" slot: when tick() returns Blocked, it means
+// the operator has popped an event from its input queue and stored it in an
+// internal field (e.g., `pending_`). On the next tick() call, it attempts
+// to push the pending event again without popping a new one. This guarantees
+// at-most-once-pop: we never lose data by popping something we could not push.
 class IOperator {
 public:
     explicit IOperator(std::string name) : name_(std::move(name)) {}
     virtual ~IOperator() = default;
 
-    // Non-blocking: do exactly ONE unit of work (push or pop ONE event).
-    // Return the appropriate OpStatus so the scheduler can act.
-    virtual OpStatus tick() = 0;
+    // Called once by the worker thread before the first tick().
+    virtual void init() {}
 
-    // Called once after the runtime loop exits, before thread join.
+    // Core scheduling unit. Called repeatedly. See OpStatus for semantics.
+    [[nodiscard]] virtual OpStatus tick() = 0;
+
+    // Called once after the stop flag is set. Flush, close files, etc.
     virtual void shutdown() {}
 
-    [[nodiscard]] const std::string& name() const noexcept { return name_; }
+    virtual void attach_metrics(struct OperatorMetrics*) {}
 
-protected:
+    const std::string& name() const { return name_; }
+
+    // Unique integer ID assigned by the Runtime at registration time.
+    std::uint64_t id = 0;
+
+private:
     std::string name_;
 };
 
