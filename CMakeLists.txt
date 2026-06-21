@@ -30,6 +30,11 @@ target_include_directories(klstream INTERFACE
 target_link_libraries(klstream INTERFACE Threads::Threads)
 target_compile_features(klstream INTERFACE cxx_std_17)
 
+# ── Testing ──────────────────────────────────────────────────────────────────
+# enable_testing() must be at root scope so CTest can discover tests registered
+# by add_test() inside the tests/ subdirectory.
+enable_testing()
+
 # ── Sub-projects ──────────────────────────────────────────────────────────────
 add_subdirectory(feature_flow)
 add_subdirectory(tests)
