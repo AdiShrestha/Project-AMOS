@@ -98,7 +98,11 @@ public:
 
         RawBehaviorEvent raw{r.user_id, r.item_id, r.category_id,
                              r.behavior_code, r.amount};
-        out = Event<RawBehaviorEvent>{r.timestamp_ns, r.user_id, r.seq, raw};
+        out = Event<RawBehaviorEvent>{};
+        out.timestamp_ns = r.timestamp_ns;
+        out.key          = r.user_id;
+        out.seq          = r.seq;
+        out.data         = raw;
         ++idx_;
         return true;
     }
