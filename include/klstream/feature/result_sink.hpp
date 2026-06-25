@@ -14,6 +14,7 @@
 #include <iomanip>
 #include <ostream>
 #include <string>
+#include <chrono>
 
 namespace klstream {
 
@@ -28,7 +29,7 @@ public:
         if (!out_) throw std::runtime_error("ResultSink: cannot open " + out_csv_path);
         out_ << "seq,result_timestamp_ns,latency_ns,user_id,score,"
                 "label,label_valid,window_size_used,alpha_used,"
-                "staleness_sec,occupancy_at_decision\n";
+                "staleness_sec,occupancy_at_decision,is_burst_period\n";
     }
 
     void attach_metrics(OperatorMetrics* m) { metrics_ = m; }
@@ -40,8 +41,9 @@ public:
             return OpStatus::Idle;
         }
         const auto& r = ev.data;
+        auto now_ns = std::chrono::steady_clock::now().time_since_epoch().count();
         out_ << ev.seq                              << ','
-             << ev.timestamp_ns                     << ','
+             << now_ns                              << ','
              << ev.latency_ns()                     << ','
              << r.user_id                           << ','
              << std::setprecision(8) << r.score     << ','
@@ -50,7 +52,8 @@ public:
              << r.window_size_used                  << ','
              << r.alpha_used                        << ','
              << r.staleness_sec                     << ','
-             << r.occupancy_at_decision             << '\n';
+             << r.occupancy_at_decision             << ','
+             << static_cast<int>(r.is_burst_period) << '\n';
         ++rows_written_;
         if (metrics_) metrics_->events_processed.increment();
         return OpStatus::Processed;

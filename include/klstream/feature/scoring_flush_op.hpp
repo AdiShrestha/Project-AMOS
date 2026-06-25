@@ -24,6 +24,8 @@
 #include "types.hpp"
 #include <iomanip>
 #include <unordered_map>
+#include <chrono>
+#include <thread>
 
 namespace klstream {
 
@@ -33,9 +35,11 @@ public:
     using OutQueue = SPSCQueue<Event<ScoredResult>>;
 
     ScoringFlushOp(std::string name, InQueue* input, OutQueue* output,
-                   const LogisticModel* model)
+                   const LogisticModel* model,
+                   std::uint64_t delay_per_item_us = 0)
         : IOperator(std::move(name))
         , input_(input), output_(output), model_(model)
+        , delay_per_item_us_(delay_per_item_us)
     {}
 
     void attach_metrics(OperatorMetrics* m) { metrics_ = m; }
@@ -74,6 +78,11 @@ private:
             }
             last_publish_ts_[fs.user_id] = fs.event_ts_ns;
 
+            if (delay_per_item_us_ > 0 && fs.is_burst_period) {
+                std::this_thread::sleep_for(
+                    std::chrono::microseconds(delay_per_item_us_));
+            }
+
             ScoredResult res{
                 fs.user_id,
                 score,
@@ -82,7 +91,8 @@ private:
                 last_batch_window_size_,
                 fs.alpha_used,
                 staleness,
-                pending_batch_.occupancy_at_window_start
+                pending_batch_.occupancy_at_window_start,
+                fs.is_burst_period
             };
 
             Event<ScoredResult> out_ev{last_batch_timestamp_, fs.user_id, pending_batch_.first_seq + i, res};
@@ -107,6 +117,7 @@ private:
     std::uint32_t        last_batch_window_size_{0};
     std::uint64_t        last_batch_timestamp_{0};
     std::unordered_map<std::uint32_t, std::uint64_t> last_publish_ts_;
+    std::uint64_t        delay_per_item_us_{0};
     OperatorMetrics*     metrics_{nullptr};
 };
 

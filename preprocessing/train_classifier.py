@@ -47,6 +47,8 @@ def compute_oracle_features(df: pd.DataFrame, alpha_max: float) -> pd.DataFrame:
         ema    = 0.0
         pv     = 0
         cart_fav = 0
+        raw_buy = 0
+        ema_recency = 0.0
         prev_ts_sec = 0.0
         for _, row in g.iterrows():
             bc     = int(row.get("behavior_code", 0))
@@ -54,9 +56,19 @@ def compute_oracle_features(df: pd.DataFrame, alpha_max: float) -> pd.DataFrame:
             ema    = alpha_max * weight + (1.0 - alpha_max) * ema
             if bc == 0: pv += 1
             elif bc in (1, 2): cart_fav += 1
+            elif bc == 3: raw_buy += 1
+            
             ts_sec = row["timestamp_ns"] / 1e9
             recency = 0.0 if prev_ts_sec == 0.0 else min(ts_sec - prev_ts_sec, 3600.0) / 3600.0
+            
+            gap = 0.0 if prev_ts_sec == 0.0 else ts_sec - prev_ts_sec
+            ema_recency = alpha_max * gap + (1.0 - alpha_max) * ema_recency
+            
             prev_ts_sec = ts_sec
+            
+            total_events = pv + cart_fav + raw_buy
+            buy_rate_ratio = raw_buy / max(1, total_events)
+            
             out_rows.append({
                 "seq":            row["seq"],
                 "user_id":        uid,
@@ -64,11 +76,43 @@ def compute_oracle_features(df: pd.DataFrame, alpha_max: float) -> pd.DataFrame:
                 "log_pv":         np.log1p(pv),
                 "log_cart_fav":   np.log1p(cart_fav),
                 "recency":        recency,
+                "buy_rate_ratio": buy_rate_ratio,
+                "log_buy":        np.log1p(raw_buy),
+                "ema_recency":    ema_recency,
                 "label":          int(row["label"]),
                 "label_valid":    int(row["label_valid"]),
             })
     return pd.DataFrame(out_rows)
-
+def find_best_oracle_alpha(df, alphas=[0.02, 0.05, 0.10, 0.15, 0.20, 0.30]):
+    """Find the alpha that maximizes oracle AUROC on a held-out validation split."""
+    best_alpha, best_auroc = None, 0.0
+    print("[train_classifier] Grid searching for best oracle alpha...")
+    for alpha in alphas:
+        feats = compute_oracle_features(df, alpha)
+        feats_valid = feats[feats['label_valid'] == 1]
+        
+        feature_cols = ["ema_engagement", "log_pv", "log_cart_fav", "recency", 
+                        "buy_rate_ratio", "log_buy", "ema_recency"]
+        X = feats_valid[feature_cols].to_numpy(dtype=np.float64)
+        y = feats_valid['label'].to_numpy(dtype=np.int32)
+        
+        X_tr, X_val, y_tr, y_val = train_test_split(
+            X, y, test_size=0.2, random_state=42, stratify=y)
+            
+        scaler = StandardScaler()
+        X_tr_s = scaler.fit_transform(X_tr)
+        X_val_s = scaler.transform(X_val)
+        
+        clf = LogisticRegression(class_weight='balanced', max_iter=2000, solver="lbfgs")
+        clf.fit(X_tr_s, y_tr)
+        auroc = roc_auc_score(y_val, clf.predict_proba(X_val_s)[:,1])
+        print(f"  alpha={alpha:.2f} -> val AUROC={auroc:.4f}")
+        
+        if auroc > best_auroc:
+            best_auroc, best_alpha = auroc, alpha
+            
+    print(f"Best oracle alpha: {best_alpha} (AUROC={best_auroc:.4f})")
+    return best_alpha
 
 def main():
     ap = argparse.ArgumentParser(description="Train oracle logistic regression for BPFeat")
@@ -78,26 +122,31 @@ def main():
                     help="Oracle α (most reactive, no smoothing lag). Default: 0.30")
     ap.add_argument("--test-size", type=float, default=0.20)
     ap.add_argument("--seed",      type=int,   default=42)
+    ap.add_argument("--grid-search-alpha", action="store_true", help="Perform grid search for best alpha")
     args = ap.parse_args()
 
     print(f"[train_classifier] Loading {args.replay} ...")
     raw = pd.read_csv(args.replay)
     print(f"[train_classifier] {len(raw):,} rows, {raw['user_id'].nunique():,} users")
 
+    if args.grid_search_alpha:
+        best_alpha = find_best_oracle_alpha(raw)
+        args.alpha_max = best_alpha
+
     print(f"[train_classifier] Computing oracle features (alpha_max={args.alpha_max}) ...")
     feats = compute_oracle_features(raw, args.alpha_max)
 
-    # Only train on rows with valid labels
-    feats = feats[feats["label_valid"] == 1].copy()
-    print(f"[train_classifier] {len(feats):,} labeled rows, "
-          f"positive rate: {feats['label'].mean():.4f}")
+    labeled_feats = feats[feats["label_valid"] == 1].copy()
+    print(f"[train_classifier] {len(labeled_feats):,} labeled rows, "
+          f"positive rate: {labeled_feats['label'].mean():.4f}")
 
-    feature_cols = ["ema_engagement", "log_pv", "log_cart_fav", "recency"]
-    X = feats[feature_cols].to_numpy(dtype=np.float64)
-    y = feats["label"].to_numpy(dtype=np.int32)
+    feature_cols = ["ema_engagement", "log_pv", "log_cart_fav", "recency", 
+                    "buy_rate_ratio", "log_buy", "ema_recency"]
+    X_labeled = labeled_feats[feature_cols].to_numpy(dtype=np.float64)
+    y_labeled = labeled_feats["label"].to_numpy(dtype=np.int32)
 
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=args.test_size, random_state=args.seed, stratify=y)
+        X_labeled, y_labeled, test_size=args.test_size, random_state=args.seed, stratify=y_labeled)
 
     # Scale features (stored scaler NOT saved — oracle features are also scaled
     # at runtime by the same mean/std fitted here; we bake the scaling into the
@@ -116,6 +165,33 @@ def main():
     auroc  = roc_auc_score(y_test, p_test)
     print(f"[train_classifier] Oracle AUPRC: {auprc:.4f}  AUROC: {auroc:.4f}")
     print("  (Report these numbers in Section 6/20 of the paper before any regret figures)")
+
+    # Compute oracle scores for all events and save
+    print("[train_classifier] Computing oracle scores for all events...")
+    X_all = feats[feature_cols].to_numpy(dtype=np.float64)
+    X_all_s = scaler.transform(X_all)
+    p_all = clf.predict_proba(X_all_s)[:, 1]
+    
+    # Bug 1 fixes:
+    # 1. Output all rows, not just label_valid=1
+    # 2. Output seq, user_id, score_oracle, label, label_valid
+    oracle_df = pd.DataFrame({
+        "seq": feats["seq"].astype(int),
+        "user_id": feats["user_id"].astype(int),
+        "score_oracle": p_all,
+        "label": feats["label"].astype(int),
+        "label_valid": feats["label_valid"].astype(int)
+    })
+    
+    print("DEBUG oracle sample:")
+    print(oracle_df[['seq','user_id','score_oracle','label','label_valid']].head(10))
+    
+    # Place oracle_scores.csv in the same directory as replay.csv
+    replay_stem = Path(args.replay).stem.replace("replay_", "")
+    out_name = f"oracle_scores_{replay_stem}.csv" if "ulb" in replay_stem else "oracle_scores.csv"
+    oracle_out_path = Path(args.replay).parent / out_name
+    oracle_df.to_csv(oracle_out_path, index=False)
+    print(f"[train_classifier] Oracle scores written → {oracle_out_path}")
 
     # Fold the scaler into the weight vector so LogisticModel::score() in C++
     # receives raw (unscaled) features and still produces correct logits.

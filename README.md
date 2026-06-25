@@ -6,6 +6,10 @@
 
 ---
 
+**Target Venue:** IEEE BigData 2026, IEEE ICDE 2027, IEEE ICDCS 2027.
+
+---
+
 ## Repository Structure
 
 ```
@@ -69,10 +73,19 @@ make -j$(nproc)
 cd build && cmake .. && make -j$(nproc)
 
 # Run adaptive architecture on synthetic data
-./feature_flow_main --arch adaptive --synthetic --out results/raw/adaptive_synthetic.csv
+./build/feature_flow/feature_flow_main --arch adaptive --synthetic --out results/raw/adaptive_synthetic.csv
 
-# Run the full harness (all 4 architectures, 5 seeds) on synthetic data
-./feature_flow_harness --synthetic --seeds 5 --out-dir results/raw/
+# Run the full harness (all 7 architectures, 5 seeds) on synthetic data
+./build/feature_flow/feature_flow_harness --synthetic --seeds 5
+```
+
+---
+
+## Sensitivity Sweep
+
+To run the AIMD sensitivity sweep on synthetic data:
+```bash
+./build/feature_flow/feature_flow_harness --synthetic --sweep
 ```
 
 ---
@@ -109,9 +122,9 @@ python preprocessing/train_classifier.py \
 ## Running All Architectures
 
 ```bash
-# Four architectures, single run
-for arch in fixed drift throttle adaptive; do
-    ./build/feature_flow_main \
+# 7 architectures, single run
+for arch in fixed drift throttle aonly bonly adaptive ralf; do
+    ./build/feature_flow/feature_flow_main \
         --arch $arch \
         --replay data/replay/replay_taobao_10k.csv \
         --model models/classifier_weights.txt \
@@ -135,10 +148,9 @@ All 6 tests should pass on synthetic data without any real dataset download.
 
 ```bash
 python analysis/compute_metrics.py \
-    --results-dir results/raw \
-    --replay data/replay/replay_taobao_10k.csv \
-    --model models/classifier_weights.txt \
-    --out-csv results/metrics_summary.csv
+    --all-archs \
+    --result-dir results/raw \
+    --oracle-csv data/replay/oracle_scores.csv
 ```
 
 ---

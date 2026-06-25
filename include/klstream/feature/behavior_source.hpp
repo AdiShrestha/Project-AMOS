@@ -97,7 +97,7 @@ public:
         }
 
         RawBehaviorEvent raw{r.user_id, r.timestamp_ns, r.item_id, r.category_id,
-                             r.behavior_code, r.amount};
+                             r.behavior_code, r.amount, r.is_burst_period};
         out = Event<RawBehaviorEvent>::make(raw, r.user_id, r.seq);
         ++idx_;
         return true;
@@ -163,8 +163,15 @@ public:
                   [](const BehaviorRow& a, const BehaviorRow& b){
                       return a.timestamp_ns < b.timestamp_ns;
                   });
-        // Re-assign seq after sort.
-        for (std::size_t i = 0; i < rows.size(); ++i) rows[i].seq = i;
+        // Re-assign seq after sort and assign contiguous burst period (middle third).
+        for (std::size_t i = 0; i < rows.size(); ++i) {
+            rows[i].seq = i;
+            if (i >= rows.size() / 3 && i < 2 * rows.size() / 3) {
+                rows[i].is_burst_period = 1;
+            } else {
+                rows[i].is_burst_period = 0;
+            }
+        }
         return rows;
     }
 

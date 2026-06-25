@@ -86,6 +86,7 @@ public:
             }
             if (last_dir_ != 0 && dir != last_dir_) ++direction_changes_;
             last_dir_ = dir;
+            buffer_.occupancy_at_window_start = 0.0f;
         }
 
         buffer_.push_back(in_ev.data, in_ev.seq);

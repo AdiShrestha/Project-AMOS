@@ -31,7 +31,7 @@ int main() {
         // because they have different behavior_codes.
         SPSCQueue<Event<RawBehaviorEvent>>  q_in(256);
         SPSCQueue<Event<FeatureSnapshot>>   q_out(256);
-        KeyedFeatureExtractOp op("ext", &q_in, &q_out, nullptr, 0.30f);
+        KeyedFeatureExtractOp op("ext", &q_in, &q_out, nullptr, nullptr, 0.30f);
 
         // User 1: only 'buy' (bc=3, weight=5), 5 events
         for (int i = 0; i < 5; ++i)
@@ -62,7 +62,7 @@ int main() {
         // ── Test 2: ULB degenerate single-key (user_id=0) ─────────────────
         SPSCQueue<Event<RawBehaviorEvent>> q_in(256);
         SPSCQueue<Event<FeatureSnapshot>>  q_out(256);
-        KeyedFeatureExtractOp op("ext", &q_in, &q_out, nullptr, 0.10f);
+        KeyedFeatureExtractOp op("ext", &q_in, &q_out, nullptr, nullptr, 0.10f);
 
         for (int i = 0; i < 5; ++i) {
             Event<RawBehaviorEvent> ev;
@@ -90,7 +90,7 @@ int main() {
         // ── Test 3: one FeatureSnapshot per input event ───────────────────
         SPSCQueue<Event<RawBehaviorEvent>> q_in(256);
         SPSCQueue<Event<FeatureSnapshot>>  q_out(256);
-        KeyedFeatureExtractOp op("ext", &q_in, &q_out, nullptr, 0.10f);
+        KeyedFeatureExtractOp op("ext", &q_in, &q_out, nullptr, nullptr, 0.10f);
 
         const int N = 20;
         for (int i = 0; i < N; ++i)

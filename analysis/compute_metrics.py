@@ -11,11 +11,9 @@ Computes the full set of evaluation metrics from ResultSink's CSV output:
   - Shuffled-features null baseline check (Section 26, point 2)
 
 Usage:
-    python compute_metrics.py \\
-        --results-dir results/raw \\
-        --replay data/replay/replay_taobao_10k.csv \\
-        --model models/classifier_weights.txt \\
-        [--alpha-max 0.30] \\
+    python compute_metrics.py \
+        --raw-dir results/raw \
+        --oracle-csv data/replay/oracle_scores.csv \
         [--out-csv results/metrics_summary.csv]
 """
 
@@ -27,46 +25,10 @@ import scipy.stats as stats
 import json
 
 
+from sklearn.metrics import average_precision_score, roc_auc_score
+
 # ── Oracle feature recomputation ──────────────────────────────────────────────
 ENGAGEMENT_WEIGHT = {0: 1.0, 1: 3.0, 2: 2.0, 3: 5.0}
-
-def compute_oracle_scores(replay_csv: str, weights_txt: str, alpha_max: float) -> pd.DataFrame:
-    """
-    Recompute oracle scores for all events using the stored model weights
-    and alpha=alpha_max, W=1. Returns a DataFrame keyed by 'seq' with
-    columns ['seq', 'oracle_score', 'label', 'label_valid'].
-    """
-    raw = pd.read_csv(replay_csv)
-
-    # Load weights
-    weights = {}
-    with open(weights_txt) as f:
-        for line in f:
-            k, v = line.strip().split("=")
-            weights[k] = float(v)
-    bias = weights["bias"]
-    w = np.array([weights[f"w{i}"] for i in range(4)], dtype=np.float64)
-
-    raw = raw.sort_values(["user_id", "timestamp_ns"]).reset_index(drop=True)
-    out_rows = []
-    for uid, g in raw.groupby("user_id", sort=False):
-        ema = 0.0; pv = 0; cart_fav = 0; prev_ts = 0.0
-        for _, row in g.iterrows():
-            bc = int(row.get("behavior_code", 0))
-            wt = ENGAGEMENT_WEIGHT.get(bc, 1.0)
-            ema = alpha_max * wt + (1.0 - alpha_max) * ema
-            if bc == 0: pv += 1
-            elif bc in (1, 2): cart_fav += 1
-            ts_sec = row["timestamp_ns"] / 1e9
-            recency = 0.0 if prev_ts == 0.0 else min(ts_sec - prev_ts, 3600.0) / 3600.0
-            prev_ts = ts_sec
-            x = np.array([ema, np.log1p(pv), np.log1p(cart_fav), recency])
-            z = bias + np.dot(w, x)
-            oracle_score = 1.0 / (1.0 + np.exp(-z))
-            out_rows.append({"seq": row["seq"], "oracle_score": oracle_score,
-                              "label": row["label"], "label_valid": row["label_valid"]})
-    return pd.DataFrame(out_rows)
-
 
 def bce(p: np.ndarray, y: np.ndarray, eps: float = 1e-7) -> np.ndarray:
     """Binary cross-entropy per sample."""
@@ -76,64 +38,152 @@ def bce(p: np.ndarray, y: np.ndarray, eps: float = 1e-7) -> np.ndarray:
 
 def feature_regret(results_df: pd.DataFrame, oracle_df: pd.DataFrame) -> dict:
     """
-    FR = mean[ BCE(online_score, label) - BCE(oracle_score, label) ]
+    FR = mean[ BCE(online_score, label) - BCE(score_oracle, label) ]
     over all label_valid=1 events. Can be negative (Section 25.3).
     """
-    merged = results_df.merge(oracle_df[["seq","oracle_score"]], on="seq", how="inner")
+    merged = results_df.merge(oracle_df[["seq","score_oracle"]], on="seq", how="inner")
     valid  = merged[merged["label_valid"] == 1].copy()
     if len(valid) == 0:
-        return {"fr_mean": float("nan"), "fr_std": float("nan"), "n_valid": 0}
+        return {"fr_mean": float("nan"), "n_valid": 0, "coverage": 0.0}
 
     label = valid["label"].to_numpy(dtype=np.float64)
     online_score  = valid["score"].to_numpy(dtype=np.float64)
-    oracle_score_ = valid["oracle_score"].to_numpy(dtype=np.float64)
+    oracle_score_ = valid["score_oracle"].to_numpy(dtype=np.float64)
 
     fr_per_sample = bce(online_score, label) - bce(oracle_score_, label)
+    
+    auprc = average_precision_score(label, online_score) if len(np.unique(label)) > 1 else float("nan")
+    
     return {
         "fr_mean":    float(fr_per_sample.mean()),
-        "fr_std":     float(fr_per_sample.std()),
+        "auprc":      float(auprc),
         "n_valid":    int(len(valid)),
         "coverage":   float(len(valid) / len(oracle_df[oracle_df["label_valid"]==1])),
+        "valid_df":   valid  # for MBB computation
     }
 
-
-def patr(results_df: pd.DataFrame) -> dict:
+def compute_mbb_ci(valid_dfs: list, n_blocks=50, B=600):
     """
-    PATR = throughput during burst / throughput during calm.
-    Throughput = rows per second computed from result_timestamp_ns.
+    Moving Block Bootstrap for FR and AUPRC.
+    Averages predictions across runs to denoise, partitions into blocks, 
+    and resamples to compute CIs.
     """
-    if "is_burst_period" not in results_df.columns:
-        return {"patr": float("nan")}
+    if not valid_dfs:
+        return float("nan"), float("nan"), float("nan"), float("nan"), float("nan"), float("nan")
+        
+    combined = pd.concat(valid_dfs)
+    agg_df = combined.groupby("seq").agg({
+        "score": "mean",
+        "score_oracle": "first",
+        "label": "first"
+    }).sort_index()
+    
+    label = agg_df["label"].to_numpy()
+    score = agg_df["score"].to_numpy()
+    oracle = agg_df["score_oracle"].to_numpy()
+    
+    fr_per_sample = bce(score, label) - bce(oracle, label)
+    base_fr = fr_per_sample.mean()
+    base_auprc = average_precision_score(label, score) if len(np.unique(label)) > 1 else float("nan")
+    res_bce = bce(score, label)
+    ora_bce = bce(oracle, label)
+    
+    N = len(label)
+    block_size = max(1, N // n_blocks)
+    n_blocks = int(np.ceil(N / block_size))
+    
+    regret_per_event = res_bce - ora_bce
+    
+    nan_count = np.isnan(regret_per_event).sum()
+    if nan_count > 0:
+        print(f"  [MBB Warning] Replaced {nan_count} NaN values in regret_per_event before MBB.")
+        regret_per_event = np.nan_to_num(regret_per_event, nan=0.0)
+        
+    boot_fr = []
+    boot_auprc = []
+    
+    rng = np.random.default_rng(42)
+    
+    for _ in range(B):
+        idx = rng.integers(0, n_blocks, size=n_blocks)
+        res_fr, res_label, res_score = [], [], []
+        for i in idx:
+            start = i * block_size
+            end = min(N, (i + 1) * block_size)
+            res_fr.extend(fr_per_sample[start:end])
+            res_label.extend(label[start:end])
+            res_score.extend(score[start:end])
+            
+        res_fr = np.array(res_fr)
+        res_label = np.array(res_label)
+        res_score = np.array(res_score)
+        
+        boot_fr.append(res_fr.mean())
+        if len(np.unique(res_label)) > 1:
+            boot_auprc.append(average_precision_score(res_label, res_score))
+            
+    fr_lo, fr_hi = np.percentile(boot_fr, [2.5, 97.5])
+    auprc_lo, auprc_hi = np.percentile(boot_auprc, [2.5, 97.5]) if boot_auprc else (float("nan"), float("nan"))
+    
+    return base_fr, fr_lo, fr_hi, base_auprc, auprc_lo, auprc_hi
 
-    burst = results_df[results_df["is_burst_period"] == 1]
-    calm  = results_df[results_df["is_burst_period"] == 0]
 
-    def tput(df):
-        if len(df) < 2: return 0.0
-        span_sec = (df["result_timestamp_ns"].max()
-                  - df["result_timestamp_ns"].min()) / 1e9
-        return len(df) / max(span_sec, 1e-6)
+def compute_patr(df: pd.DataFrame) -> dict:
+    """
+    Burst throughput / calm throughput, measured in events per wall-clock second.
+    Uses result_timestamp_ns from ResultSink to measure actual processing rate.
+    """
+    burst = df[df['is_burst_period'] == 1].copy()
+    calm  = df[df['is_burst_period'] == 0].copy()
+    
+    if len(burst) < 2 or len(calm) < 2:
+        return {"patr": float("nan"), "burst_tput": float("nan"), "calm_tput": float("nan")}
+    
+    burst_duration_ns = burst['result_timestamp_ns'].max() - burst['result_timestamp_ns'].min()
+    calm_duration_ns  = calm['result_timestamp_ns'].max() - calm['result_timestamp_ns'].min()
+    
+    if burst_duration_ns <= 0 or calm_duration_ns <= 0:
+        return {"patr": float("nan"), "burst_tput": float("nan"), "calm_tput": float("nan")}
+    
+    burst_throughput = len(burst) / (burst_duration_ns / 1e9)
+    calm_throughput  = len(calm)  / (calm_duration_ns  / 1e9)
+    
+    patr_val = burst_throughput / calm_throughput if calm_throughput > 0 else float('nan')
+    return {"patr": patr_val, "burst_tput": burst_throughput, "calm_tput": calm_throughput}
 
-    b_rate = tput(burst)
-    c_rate = tput(calm)
-    return {"patr": b_rate / c_rate if c_rate > 0 else float("nan"),
-            "burst_tput": b_rate, "calm_tput": c_rate}
 
-
-def fairness_gap(results_df: pd.DataFrame) -> float:
+def fairness_gap(results_df: pd.DataFrame) -> dict:
     """
     Staleness averaged over bottom-quartile users (by event count)
     minus staleness averaged over top-quartile users.
+    Also computes Jain's Fairness Index on staleness, and activity percentiles.
     """
     by_user = results_df.groupby("user_id").agg(
         count=("seq", "count"), mean_stale=("staleness_sec", "mean")).reset_index()
+    
     if len(by_user) < 4:
-        return float("nan")
+        return {"fairness_gap": float("nan"), "jain": float("nan"), "p10": float("nan"), "p90": float("nan")}
+        
     q25 = by_user["count"].quantile(0.25)
     q75 = by_user["count"].quantile(0.75)
     low_users  = by_user[by_user["count"] <= q25]["mean_stale"].mean()
     high_users = by_user[by_user["count"] >= q75]["mean_stale"].mean()
-    return float(low_users - high_users)
+    
+    # Jain's Fairness Index on staleness
+    stale_vals = by_user["mean_stale"].values
+    sum_stale = np.sum(stale_vals)
+    sum_sq_stale = np.sum(stale_vals**2)
+    jain = (sum_stale**2) / (len(stale_vals) * sum_sq_stale) if sum_sq_stale > 0 else 1.0
+    
+    p10 = by_user["count"].quantile(0.10)
+    p90 = by_user["count"].quantile(0.90)
+    
+    return {
+        "fairness_gap": float(low_users - high_users),
+        "jain": float(jain),
+        "p10": float(p10),
+        "p90": float(p90)
+    }
 
 
 def shuffled_null_baseline(results_df: pd.DataFrame, oracle_df: pd.DataFrame) -> float:
@@ -141,17 +191,21 @@ def shuffled_null_baseline(results_df: pd.DataFrame, oracle_df: pd.DataFrame) ->
     Section 26 point 2: compute FR after shuffling oracle features.
     Should produce significantly larger FR than any real architecture.
     """
-    merged = results_df.merge(oracle_df[["seq","oracle_score"]], on="seq", how="inner")
+    merged = results_df.merge(oracle_df[["seq","score_oracle"]], on="seq", how="inner")
     valid  = merged[merged["label_valid"] == 1].copy()
     if len(valid) == 0:
         return float("nan")
-    shuffled_oracle = valid["oracle_score"].to_numpy().copy()
-    rng = np.random.default_rng(0)
-    rng.shuffle(shuffled_oracle)
-    label = valid["label"].to_numpy(dtype=np.float64)
-    online = valid["score"].to_numpy(dtype=np.float64)
-    fr_shuffle = (bce(online, label) - bce(shuffled_oracle, label)).mean()
-    return float(fr_shuffle)
+        
+    shuffled_scores = valid['score'].sample(frac=1, random_state=42).values
+    eps = 1e-9
+    shuffled_scores = np.clip(shuffled_scores, eps, 1-eps)
+    oracle_scores = np.clip(valid['score_oracle'].values, eps, 1-eps)
+    labels = valid['label'].values
+    
+    bce_shuffled = -(labels * np.log(shuffled_scores) + (1-labels) * np.log(1-shuffled_scores))
+    bce_oracle   = -(labels * np.log(oracle_scores)   + (1-labels) * np.log(1-oracle_scores))
+    null_regret = float(np.mean(bce_shuffled - bce_oracle))
+    return null_regret
 
 
 def mean_ci(values: list, alpha: float = 0.05):
@@ -169,21 +223,19 @@ def mean_ci(values: list, alpha: float = 0.05):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--results-dir", required=True)
-    ap.add_argument("--replay",      required=True)
-    ap.add_argument("--model",       required=True)
-    ap.add_argument("--alpha-max",   type=float, default=0.30)
+    ap.add_argument("--raw-dir", required=True)
+    ap.add_argument("--oracle-csv",  required=True)
     ap.add_argument("--out-csv",     default="results/metrics_summary.csv")
     args = ap.parse_args()
 
-    results_dir = Path(args.results_dir)
+    results_dir = Path(args.raw_dir)
 
-    print("[compute_metrics] Computing oracle scores ...")
-    oracle_df = compute_oracle_scores(args.replay, args.model, args.alpha_max)
+    print("[compute_metrics] Loading oracle scores ...")
+    oracle_df = pd.read_csv(args.oracle_csv)
     print(f"  {len(oracle_df):,} oracle rows, "
-          f"{oracle_df['label_valid'].sum():,} labeled")
+          f"{oracle_df['label'].sum():,} labeled positive")
 
-    archs = ["fixed", "drift", "throttle", "adaptive"]
+    archs = ["fixed", "drift", "throttle", "aonly", "bonly", "adaptive", "ralf"]
     all_metrics = []
 
     for arch in archs:
@@ -192,7 +244,7 @@ def main():
             print(f"[compute_metrics] No results found for arch={arch}")
             continue
 
-        fr_list, patr_list, stale_list, fair_list, cov_list = [], [], [], [], []
+        fr_list, patr_list, stale_list, fair_list, cov_list, valid_dfs = [], [], [], [], [], []
         for csv_path in csv_files:
             try:
                 df = pd.read_csv(csv_path)
@@ -201,7 +253,7 @@ def main():
                 continue
 
             fr   = feature_regret(df, oracle_df)
-            pt   = patr(df)
+            pt   = compute_patr(df)
             fair = fairness_gap(df)
 
             fr_list.append(fr.get("fr_mean", float("nan")))
@@ -209,34 +261,117 @@ def main():
             stale_list.append(df["staleness_sec"].mean())
             fair_list.append(fair)
             cov_list.append(fr.get("coverage", float("nan")))
+            if "valid_df" in fr:
+                valid_dfs.append(fr["valid_df"])
 
         null_fr = float("nan")
         if csv_files:
             df_last = pd.read_csv(csv_files[-1])
             null_fr = shuffled_null_baseline(df_last, oracle_df)
 
-        fr_m, fr_lo, fr_hi     = mean_ci(fr_list)
+        # MBB for FR and AUPRC
+        fr_m, fr_lo, fr_hi, auprc_m, auprc_lo, auprc_hi = compute_mbb_ci(valid_dfs)
+        
         patr_m, patr_lo, patr_hi = mean_ci(patr_list)
         stale_m, stale_lo, stale_hi = mean_ci(stale_list)
-        fair_m, _, _           = mean_ci(fair_list)
+        fair_gap_m, _, _       = mean_ci([f.get("fairness_gap", float("nan")) for f in fair_list])
+        jain_m, _, _           = mean_ci([f.get("jain", float("nan")) for f in fair_list])
+        p10_m, _, _            = mean_ci([f.get("p10", float("nan")) for f in fair_list])
+        p90_m, _, _            = mean_ci([f.get("p90", float("nan")) for f in fair_list])
         cov_m, _, _            = mean_ci(cov_list)
 
         row = {
             "arch": arch, "n_runs": len(fr_list),
             "fr_mean": fr_m, "fr_ci_lo": fr_lo, "fr_ci_hi": fr_hi,
+            "auprc_mean": auprc_m, "auprc_ci_lo": auprc_lo, "auprc_ci_hi": auprc_hi,
             "patr_mean": patr_m, "patr_ci_lo": patr_lo, "patr_ci_hi": patr_hi,
             "mean_staleness_sec": stale_m,
             "staleness_ci_lo": stale_lo, "staleness_ci_hi": stale_hi,
-            "fairness_gap": fair_m,
+            "fairness_gap": fair_gap_m,
             "coverage": cov_m,
             "shuffled_null_fr": null_fr,
         }
         all_metrics.append(row)
+        
+        oracle_auroc = roc_auc_score(oracle_df[oracle_df["label_valid"] == 1]["label"],
+                                                oracle_df[oracle_df["label_valid"] == 1]["score_oracle"])
+        from datetime import datetime
 
-        print(f"\n[{arch}]")
-        print(f"  FR = {fr_m:.5f} [{fr_lo:.5f}, {fr_hi:.5f}]  (null={null_fr:.4f})")
-        print(f"  PATR = {patr_m:.3f} [{patr_lo:.3f}, {patr_hi:.3f}]")
-        print(f"  Staleness = {stale_m:.3f}s  Coverage = {cov_m:.3f}  Fairness gap = {fair_m:.3f}s")
+        print(f"=== BPFeat Experiment Output Block ===")
+        print(f"Run timestamp: {datetime.now().isoformat()}")
+        print(f"Architecture:  {arch}")
+        print(f"Dataset:       {args.oracle_csv} (via oracle)")
+        print(f"Seed:          all_seeds_avg")
+        if valid_dfs:
+            print(f"N events processed: {len(df)}")  # approx
+            print(f"N events scored (label_valid=1): {sum(len(v) for v in valid_dfs)//len(valid_dfs)}")
+        else:
+            print(f"N events processed: 0\nN events scored (label_valid=1): 0")
+        print(f"Coverage fraction: {cov_m:.3f}")
+        print(f"\n--- Controller Trace (Adaptive/AOnly/BOnly only) ---")
+        trace_files = list(results_dir.glob(f"harness_summary_{arch}_seed*.csv"))
+        if not trace_files:
+            print("trace file missing")
+        else:
+            tr_dfs = [pd.read_csv(f) for f in trace_files]
+            tr_df = pd.concat(tr_dfs)
+            # tr_df has: arch,seed,final_W,final_alpha,direction_changes,W_min,W_max,alpha_min,alpha_max
+            # "N/A" means non-adaptive, but pandas parses it as string or NaN.
+            if tr_df['final_W'].dtype == object and tr_df['final_W'].iloc[0] == 'N/A':
+                print(f"final_W:              N/A")
+                print(f"final_alpha:          N/A")
+                print(f"direction_changes:    N/A")
+                print(f"WOR (dir_changes/min):N/A")
+                print(f"W_min_observed:       N/A")
+                print(f"W_max_observed:       N/A")
+                print(f"alpha_min_observed:   N/A")
+                print(f"alpha_max_observed:   N/A")
+            else:
+                for col in ['final_W', 'final_alpha', 'direction_changes', 'W_min', 'W_max', 'alpha_min', 'alpha_max']:
+                    tr_df[col] = pd.to_numeric(tr_df[col], errors='coerce')
+                w_m = tr_df['final_W'].mean()
+                a_m = tr_df['final_alpha'].mean()
+                dc_m = tr_df['direction_changes'].mean()
+                w_min_m = tr_df['W_min'].mean()
+                w_max_m = tr_df['W_max'].mean()
+                a_min_m = tr_df['alpha_min'].mean()
+                a_max_m = tr_df['alpha_max'].mean()
+                # Compute duration in minutes for WOR
+                df_dur = df["result_timestamp_ns"].max() - df["result_timestamp_ns"].min()
+                dur_min = df_dur / 1e9 / 60.0 if len(df) > 1 else 1.0
+                wor = dc_m / dur_min
+                print(f"final_W:              {w_m:.1f}")
+                print(f"final_alpha:          {a_m:.4f}")
+                print(f"direction_changes:    {dc_m:.1f}")
+                print(f"WOR (dir_changes/min):{wor:.2f}")
+                print(f"W_min_observed:       {w_min_m:.1f}")
+                print(f"W_max_observed:       {w_max_m:.1f}")
+                print(f"alpha_min_observed:   {a_min_m:.4f}")
+                print(f"alpha_max_observed:   {a_max_m:.4f}")
+        print(f"\n--- Throughput ---")
+        print(f"steady_state_events_per_sec: N/A")
+        print(f"burst_period_events_per_sec: N/A")
+        print(f"PATR:                        {patr_m:.3f}")
+        print(f"p50_latency_ms:              N/A")
+        print(f"p99_latency_ms:              N/A")
+        print(f"\n--- Feature Regret (requires oracle_scores.csv) ---")
+        print(f"mean_feature_regret:  {fr_m:.5f}")
+        print(f"regret_ci_lower:      {fr_lo:.5f}  [MBB 95% CI]")
+        print(f"regret_ci_upper:      {fr_hi:.5f}  [MBB 95% CI]")
+        print(f"MBB_block_length:     50")
+        print(f"mean_staleness_sec:   {stale_m:.3f}")
+        print(f"\n--- Fairness (Taobao only) ---")
+        print(f"jain_fairness_index:  {jain_m:.4f}")
+        print(f"fairness_gap_sec:     {fair_gap_m:.3f}")
+        print(f"user_activity_p10:    {p10_m:.1f}  events")
+        print(f"user_activity_p90:    {p90_m:.1f}  events")
+        print(f"\n--- Queue Drain ---")
+        print(f"[drain] Final occupancy: raw=N/A, feat=N/A, batch=N/A, scored=N/A")
+        print(f"All queues empty: N/A")
+        print(f"\n--- Sanity Checks ---")
+        print(f"shuffled_null_regret: {null_fr:.4f}  (must be >> mean_feature_regret)")
+        print(f"oracle_auroc:         {oracle_auroc:.4f}  (must be > 0.70 for results to be meaningful)")
+        print(f"=== End Output Block ===\n")
 
     out_path = Path(args.out_csv)
     out_path.parent.mkdir(parents=True, exist_ok=True)

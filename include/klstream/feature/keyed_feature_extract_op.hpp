@@ -69,17 +69,19 @@ public:
     using OutQueue = SPSCQueue<Event<FeatureSnapshot>>;
 
     // signal: pointer to the shared BackpressureSignal (nullptr → fixed α).
+    // label_lookup: function to look up ground-truth label and label_valid for a seq.
     // fixed_alpha: used when signal == nullptr (non-Adaptive architectures).
     KeyedFeatureExtractOp(std::string name, InQueue* input, OutQueue* output,
+                          std::function<std::pair<std::uint8_t,std::uint8_t>(std::uint64_t)> label_lookup = nullptr,
                           BackpressureSignal* signal = nullptr,
                           float fixed_alpha = 0.10f,
                           float alpha_min = 0.02f, float alpha_max = 0.30f,
                           float d_alpha_max = 0.01f)
         : IOperator(std::move(name))
         , input_(input), output_(output)
-        , signal_(signal)
-        , fixed_alpha_(fixed_alpha)
+        , signal_(signal), fixed_alpha_(fixed_alpha)
         , alpha_ctrl_(alpha_min, alpha_max, d_alpha_max)
+        , label_lookup_(std::move(label_lookup))
     {}
 
     void attach_metrics(OperatorMetrics* m) { metrics_ = m; }
@@ -87,6 +89,12 @@ public:
     // For controller trace logging (Section 19)
     [[nodiscard]] float last_alpha() const noexcept {
         return signal_ ? alpha_ctrl_.current() : fixed_alpha_;
+    }
+    [[nodiscard]] float alpha_min() const noexcept {
+        return alpha_ctrl_.alpha_min();
+    }
+    [[nodiscard]] float alpha_max() const noexcept {
+        return alpha_ctrl_.alpha_max();
     }
 
     // For unit testing: expose current user count
@@ -136,7 +144,7 @@ public:
             ? raw.amount              // ULB mode: use transaction amount
             : engagement_weight(raw.behavior_code);  // Taobao mode
 
-        state.update(alpha, weight, ts_sec, raw.behavior_code);
+        state.update(alpha, weight, ts_sec, raw.behavior_code, prev_ts_sec);
 
         // ── Build FeatureSnapshot ───────────────────────────────────────────
         FeatureSnapshot snap{};
@@ -146,11 +154,18 @@ public:
 
         // label / label_valid: looked up via parallel vector in BehaviorSource
         // (Section 13.3). We store the seq so the wiring code can join.
-        // For now leave label fields zero — they are populated by BehaviorSource's
+        // label / label_valid: looked up via parallel vector in BehaviorSource
         // label_for_seq() call in the wiring code (main.cpp Section 23).
-        snap.label       = 0;
-        snap.label_valid = 0;
+        if (label_lookup_) {
+            auto [lbl, val] = label_lookup_(in_ev.seq);
+            snap.label = lbl;
+            snap.label_valid = val;
+        } else {
+            snap.label       = 0;
+            snap.label_valid = 0;
+        }
         snap.event_ts_ns = raw.event_ts_ns;
+        snap.is_burst_period = raw.is_burst_period;
 
         Event<FeatureSnapshot> out_ev{in_ev.timestamp_ns, in_ev.key, in_ev.seq, snap};
 
@@ -176,6 +191,7 @@ private:
     Event<FeatureSnapshot> pending_{};
     bool                   has_pending_{false};
     OperatorMetrics*       metrics_{nullptr};
+    std::function<std::pair<std::uint8_t,std::uint8_t>(std::uint64_t)> label_lookup_;
 };
 
 } // namespace klstream

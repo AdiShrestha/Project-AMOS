@@ -57,37 +57,35 @@ def tag_burst_periods(df: pd.DataFrame, window_minutes: int = 30,
 def compute_labels(df: pd.DataFrame) -> pd.DataFrame:
     """
     Label assignment (Section 10):
-    A user's events are labeled label=1 (purchase propensity) for all events
-    that occur within the same session (30-minute gap = new session) as a 'buy'
-    event, 0 otherwise. label_valid=1 for all events where the full session
-    context is available (i.e., the user has ≥ 2 events total).
+    A user's events are labeled label=1 (purchase propensity) if there is a 'buy'
+    event within 2 hours after the current event, 0 otherwise. label_valid=1 for 
+    all events where the forward 2-hour window is fully within the dataset time range.
     """
     df = df.sort_values(["user_id", "timestamp_ns"]).copy()
     labels = np.zeros(len(df), dtype=np.uint8)
     label_valid = np.zeros(len(df), dtype=np.uint8)
 
-    session_gap_ns = 30 * 60 * int(1e9)  # 30 minutes
+    window_ns = 2 * 60 * 60 * int(1e9)  # 2 hours
+    max_ts = df["timestamp_ns"].max()
 
     for uid, g in df.groupby("user_id", sort=False):
-        if len(g) < 2:
-            continue
         idx = g.index.tolist()
         ts  = g["timestamp_ns"].values
         bc  = g["behavior_code"].values
 
-        # Session IDs: new session after a 30-minute gap
-        sessions = np.zeros(len(g), dtype=int)
-        for i in range(1, len(g)):
-            sessions[i] = sessions[i-1] + (1 if ts[i] - ts[i-1] > session_gap_ns else 0)
-
-        # Does each session contain a buy?
-        buy_sessions = set(sessions[bc == 3].tolist())
+        buy_indices = np.where(bc == 3)[0]
         for i, ix in enumerate(idx):
-            label_valid[ix] = 1
-            labels[ix] = 1 if sessions[i] in buy_sessions else 0
+            label_valid[ix] = 1 if (max_ts - ts[i]) >= window_ns else 0
+            
+            has_buy = False
+            for bi in buy_indices:
+                if ts[i] <= ts[bi] <= ts[i] + window_ns:
+                    has_buy = True
+                    break
+            labels[ix] = 1 if has_buy else 0
 
-    df["label"]       = labels
-    df["label_valid"] = label_valid
+    df["label"]       = pd.Series(labels, index=np.arange(len(df)))
+    df["label_valid"] = pd.Series(label_valid, index=np.arange(len(df)))
     return df
 
 

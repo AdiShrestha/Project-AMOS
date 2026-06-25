@@ -24,6 +24,7 @@ struct RawBehaviorEvent {
     std::uint8_t  behavior_code;   // 0=pv, 1=cart, 2=fav, 3=buy (Taobao)
                                     // 0=transaction (ULB)
     float         amount;          // 0.0 for Taobao; transaction amount for ULB
+    std::uint8_t  is_burst_period;
 };
 static_assert(std::is_trivially_copyable_v<RawBehaviorEvent>);
 
@@ -31,7 +32,7 @@ static_assert(std::is_trivially_copyable_v<RawBehaviorEvent>);
 // The type that crosses KeyedFeatureExtractOp → [WindowOp] queue.
 // Holds the feature vector for ONE user at ONE moment in time.
 struct FeatureSnapshot {
-    static constexpr std::size_t kDim = 4;  // ema_engagement, log_pv, log_cart_fav, recency
+    static constexpr std::size_t kDim = 7;  // see prompt feature enrichment order
 
     std::uint32_t user_id;
     std::uint64_t event_ts_ns;
@@ -73,6 +74,7 @@ struct ScoredResult {
     float         alpha_used;
     float         staleness_sec;
     float         occupancy_at_decision;
+    std::uint8_t  is_burst_period;
 };
 static_assert(std::is_trivially_copyable_v<ScoredResult>);
 

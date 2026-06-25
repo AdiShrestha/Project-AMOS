@@ -55,6 +55,20 @@ def group_delay_analytic(alpha: float, w: np.ndarray) -> np.ndarray:
 
 def build_time_varying_heatmap(alpha_trace: np.ndarray, n_freqs: int = 256) -> np.ndarray:
     """
+    IMPORTANT MATHEMATICAL CAVEAT (cite in paper, Section 7):
+    BPFeat's Mechanism B implements a Linear Time-Variant (LTV) filter because
+    alpha[n] changes per-event. Frozen-time Z-domain analysis (treating alpha
+    as constant over short windows to compute H(z) = alpha / (1-(1-alpha)z^-1))
+    is a known APPROXIMATION for LTV systems — the frozen-time transfer function
+    cannot capture the recursive nature of the LTV difference equation (Park &
+    Nguyen, UT Austin). This analysis is used strictly as a POST-HOC DIAGNOSTIC
+    to visualize how the filter's frequency response varies with measured system
+    load (i.e., does high occupancy correlate with a narrowed passband?). It is
+    NOT used to design the system or prove stability guarantees. Reviewers with
+    DSP backgrounds should be directed to this explicit caveat.
+    Reference: S. Park, "Recursive Synthesis of Linear Time-Variant Digital
+    Filters via Chebyshev Approximation," UT Austin CVRC.
+    
     Stitches one frequency-response column per logged alpha[n] sample.
     Drives from REAL controller output, not a synthetic sweep grid.
     """
