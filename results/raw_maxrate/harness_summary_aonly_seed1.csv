@@ -1,0 +1,2 @@
+arch,seed,final_W,final_alpha,direction_changes,W_min,W_max,alpha_min,alpha_max
+aonly,1,256,0.02,10,8,256,0.02,0.3

@@ -1,0 +1,2 @@
+arch,seed,final_W,final_alpha,direction_changes,W_min,W_max,alpha_min,alpha_max
+adaptive,0,8,0.295223,3,8,256,0.02,0.3

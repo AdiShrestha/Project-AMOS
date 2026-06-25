@@ -66,6 +66,7 @@ public:
         running_.store(false, std::memory_order_release);
         if (thread_.joinable()) thread_.join();
         for (auto* op : operators_) op->shutdown();
+        operators_.clear();
     }
 
     ~WorkerThread() { stop(); }

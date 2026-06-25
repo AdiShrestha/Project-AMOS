@@ -43,3 +43,5 @@ paper/*.bbl
 paper/*.blg
 
 bpfeat_build_prompt.md
+
+UserBehavior.csv

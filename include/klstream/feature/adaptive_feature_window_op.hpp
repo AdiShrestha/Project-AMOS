@@ -56,6 +56,8 @@ public:
     [[nodiscard]] std::uint64_t direction_changes() const noexcept { return direction_changes_; }
     [[nodiscard]] std::uint64_t shrink_events()   const noexcept { return shrink_events_; }
     [[nodiscard]] std::uint64_t grow_events()     const noexcept { return grow_events_; }
+    [[nodiscard]] std::uint32_t min_val()         const noexcept { return w_min_; }
+    [[nodiscard]] std::uint32_t max_val()         const noexcept { return w_max_; }
 
 private:
     void track_direction(double occ) {
@@ -88,14 +90,17 @@ public:
                             std::uint32_t w_min  = 8,
                             std::uint32_t w_max  = MAX_FEATURE_BATCH,
                             double occ_low  = 0.30,
-                            double occ_high = 0.70)
+                            double occ_high = 0.70,
+                            double shrink_factor = 0.70,
+                            double grow_factor   = 1.15)
         : IOperator(std::move(name))
         , input_(input), output_(output), signal_(signal)
-        , controller_(w_min, w_max, occ_low, occ_high)
+        , controller_(w_min, w_max, occ_low, occ_high, shrink_factor, grow_factor)
         , tracker_(*output)     // ← reads occupancy of ITS OWN output queue
     {}
 
     void attach_metrics(OperatorMetrics* m) { metrics_ = m; }
+    void set_trace_out(std::ostream* out) { trace_out_ = out; }
     [[nodiscard]] const BPFeatController& controller() const noexcept { return controller_; }
 
     OpStatus tick() override {
@@ -159,6 +164,7 @@ private:
     Event<FeatureBatch>           pending_{};
     bool                          has_pending_{false};
     OperatorMetrics*              metrics_{nullptr};
+    std::ostream*                 trace_out_{nullptr};
 };
 
 } // namespace klstream
