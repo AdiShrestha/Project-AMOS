@@ -27,7 +27,7 @@ public:
         , out_(out_csv_path)
     {
         if (!out_) throw std::runtime_error("ResultSink: cannot open " + out_csv_path);
-        out_ << "seq,result_timestamp_ns,latency_ns,user_id,score,"
+        out_ << "seq,result_timestamp_ns,result_wall_ns,latency_ns,user_id,score,"
                 "label,label_valid,window_size_used,alpha_used,"
                 "staleness_sec,occupancy_at_decision,is_burst_period\n";
     }
@@ -44,6 +44,7 @@ public:
         auto now_ns = std::chrono::steady_clock::now().time_since_epoch().count();
         out_ << ev.seq                              << ','
              << now_ns                              << ','
+             << r.result_wall_ns                    << ','
              << ev.latency_ns()                     << ','
              << r.user_id                           << ','
              << std::setprecision(8) << r.score     << ','

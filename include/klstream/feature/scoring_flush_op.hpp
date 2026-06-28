@@ -44,6 +44,14 @@ public:
 
     void attach_metrics(OperatorMetrics* m) { metrics_ = m; }
 
+    struct LatencyEntry {
+        std::uint64_t wall_ns;
+        std::uint64_t latency_ns;
+        std::uint32_t batch_size;
+        std::uint8_t  is_burst;
+    };
+    const std::vector<LatencyEntry>& batch_latency_log() const { return batch_latency_log_; }
+
     OpStatus tick() override {
         // Resume a partially-flushed batch first.
         if (has_pending_idx_ < pending_batch_.count) {
@@ -65,6 +73,16 @@ public:
 private:
     // The O(W) hot loop — Section 8.2's causal mechanism.
     OpStatus flush_from(std::uint32_t start_idx) {
+        std::uint64_t batch_wall_start_ns;
+        {
+            using namespace std::chrono;
+            batch_wall_start_ns = static_cast<std::uint64_t>(
+                duration_cast<nanoseconds>(
+                    steady_clock::now().time_since_epoch()
+                ).count()
+            );
+        }
+
         for (std::uint32_t i = start_idx; i < pending_batch_.count; ++i) {
             const FeatureSnapshot& fs = pending_batch_.items[i];
             double score = model_->score(fs.x);
@@ -92,6 +110,7 @@ private:
                 fs.alpha_used,
                 staleness,
                 pending_batch_.occupancy_at_window_start,
+                batch_wall_start_ns,
                 fs.is_burst_period
             };
 
@@ -106,6 +125,26 @@ private:
         // Full batch flushed.
         has_pending_idx_ = pending_batch_.count;
         if (metrics_) metrics_->events_processed.increment();
+
+        std::uint64_t batch_wall_end_ns;
+        {
+            using namespace std::chrono;
+            batch_wall_end_ns = static_cast<std::uint64_t>(
+                duration_cast<nanoseconds>(
+                    steady_clock::now().time_since_epoch()
+                ).count()
+            );
+        }
+        last_batch_latency_ns_ = batch_wall_end_ns - batch_wall_start_ns;
+        if (batch_latency_log_.size() < 100000) {
+            batch_latency_log_.push_back({
+                batch_wall_start_ns,
+                last_batch_latency_ns_,
+                pending_batch_.count,
+                (pending_batch_.count > 0 ? pending_batch_.items[0].is_burst_period : static_cast<std::uint8_t>(0))
+            });
+        }
+
         return OpStatus::Processed;
     }
 
@@ -119,6 +158,8 @@ private:
     std::unordered_map<std::uint32_t, std::uint64_t> last_publish_ts_;
     std::uint64_t        delay_per_item_us_{0};
     OperatorMetrics*     metrics_{nullptr};
+    std::vector<LatencyEntry> batch_latency_log_;
+    std::uint64_t        last_batch_latency_ns_{0};
 };
 
 } // namespace klstream

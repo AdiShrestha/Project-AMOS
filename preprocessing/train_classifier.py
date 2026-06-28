@@ -83,12 +83,65 @@ def compute_oracle_features(df: pd.DataFrame, alpha_max: float) -> pd.DataFrame:
                 "label_valid":    int(row["label_valid"]),
             })
     return pd.DataFrame(out_rows)
-def find_best_oracle_alpha(df, alphas=[0.02, 0.05, 0.10, 0.15, 0.20, 0.30]):
+
+def compute_oracle_features_ulb(df: pd.DataFrame, alpha_max: float) -> tuple[pd.DataFrame, float]:
+    """
+    ULB features: behavior_code is amount. We normalize ema_engagement by max_amount.
+    Returns (feats_df, max_amount)
+    """
+    df = df.sort_values(["user_id", "timestamp_ns"], kind="mergesort").reset_index(drop=True)
+    max_amount = df["behavior_code"].max()
+    if max_amount <= 0:
+        max_amount = 1.0
+        
+    out_rows = []
+    for uid, g in df.groupby("user_id", sort=False):
+        ema    = 0.0
+        pv     = 0
+        cart_fav = 0
+        raw_buy = 0
+        ema_recency = 0.0
+        prev_ts_sec = 0.0
+        for _, row in g.iterrows():
+            amt = float(row.get("behavior_code", 0))
+            ema    = alpha_max * amt + (1.0 - alpha_max) * ema
+            
+            if amt > 0: raw_buy += 1
+            else: pv += 1
+            
+            ts_sec = row["timestamp_ns"] / 1e9
+            recency = 0.0 if prev_ts_sec == 0.0 else min(ts_sec - prev_ts_sec, 3600.0) / 3600.0
+            gap = 0.0 if prev_ts_sec == 0.0 else ts_sec - prev_ts_sec
+            ema_recency = alpha_max * gap + (1.0 - alpha_max) * ema_recency
+            prev_ts_sec = ts_sec
+            
+            total_events = pv + cart_fav + raw_buy
+            buy_rate_ratio = raw_buy / max(1, total_events)
+            
+            out_rows.append({
+                "seq":            row["seq"],
+                "user_id":        uid,
+                "ema_engagement": ema / max_amount, # NORMALIZED
+                "log_pv":         np.log1p(pv),
+                "log_cart_fav":   np.log1p(cart_fav),
+                "recency":        recency,
+                "buy_rate_ratio": buy_rate_ratio,
+                "log_buy":        np.log1p(raw_buy),
+                "ema_recency":    ema_recency,
+                "label":          int(row["label"]),
+                "label_valid":    int(row["label_valid"]),
+            })
+    return pd.DataFrame(out_rows), float(max_amount)
+def find_best_oracle_alpha(df, is_ulb=False, alphas=[0.02, 0.05, 0.10, 0.15, 0.20, 0.30]):
     """Find the alpha that maximizes oracle AUROC on a held-out validation split."""
     best_alpha, best_auroc = None, 0.0
     print("[train_classifier] Grid searching for best oracle alpha...")
     for alpha in alphas:
-        feats = compute_oracle_features(df, alpha)
+        if is_ulb:
+            feats, _ = compute_oracle_features_ulb(df, alpha)
+        else:
+            feats = compute_oracle_features(df, alpha)
+            
         feats_valid = feats[feats['label_valid'] == 1]
         
         feature_cols = ["ema_engagement", "log_pv", "log_cart_fav", "recency", 
@@ -129,12 +182,17 @@ def main():
     raw = pd.read_csv(args.replay)
     print(f"[train_classifier] {len(raw):,} rows, {raw['user_id'].nunique():,} users")
 
+    is_ulb = "ulb" in args.replay.lower()
     if args.grid_search_alpha:
-        best_alpha = find_best_oracle_alpha(raw)
+        best_alpha = find_best_oracle_alpha(raw, is_ulb=is_ulb)
         args.alpha_max = best_alpha
 
     print(f"[train_classifier] Computing oracle features (alpha_max={args.alpha_max}) ...")
-    feats = compute_oracle_features(raw, args.alpha_max)
+    max_amount = 1.0
+    if is_ulb:
+        feats, max_amount = compute_oracle_features_ulb(raw, args.alpha_max)
+    else:
+        feats = compute_oracle_features(raw, args.alpha_max)
 
     labeled_feats = feats[feats["label_valid"] == 1].copy()
     print(f"[train_classifier] {len(labeled_feats):,} labeled rows, "
@@ -212,6 +270,12 @@ def main():
         for i, w in enumerate(w_raw):
             f.write(f"w{i}={w:.10f}\n")
     print(f"[train_classifier] Weights written → {args.out}")
+    
+    if is_ulb:
+        norm_path = out_path.with_suffix(".norm")
+        with open(norm_path, "w") as f:
+            f.write(f"max_amount={max_amount:.6f}\n")
+        print(f"[train_classifier] ULB Normalization written → {norm_path}")
 
 
 if __name__ == "__main__":
