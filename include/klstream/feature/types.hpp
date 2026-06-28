@@ -74,6 +74,7 @@ struct ScoredResult {
     float         alpha_used;
     float         staleness_sec;
     float         occupancy_at_decision;
+    std::uint64_t result_wall_ns     = 0;
     std::uint8_t  is_burst_period;
 };
 static_assert(std::is_trivially_copyable_v<ScoredResult>);

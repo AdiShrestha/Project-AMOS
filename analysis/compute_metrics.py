@@ -221,6 +221,117 @@ def mean_ci(values: list, alpha: float = 0.05):
     return m, ci[0], ci[1]
 
 
+def compute_burst_stratified_metrics(run_csv: str) -> dict:
+    """
+    Computes staleness separately for burst and calm periods.
+    
+    This is the primary metric for Mechanism A's contribution:
+    - During burst: Adaptive W shrinks → features refreshed after 8 events
+    - During calm:  Adaptive W grows  → features refreshed after up to 256 events
+    - Fixed always waits for 128 events → no differentiation between burst/calm
+    
+    The burst-period staleness ratio (Fixed / Adaptive) should be ~16×
+    if the controller is working correctly.
+    """
+    df = pd.read_csv(run_csv)
+    
+    if 'is_burst_period' not in df.columns:
+        return {'error': 'is_burst_period column missing from results CSV'}
+    if 'staleness_sec' not in df.columns:
+        return {'error': 'staleness_sec column missing from results CSV'}
+    
+    burst = df[df['is_burst_period'] == 1]
+    calm  = df[df['is_burst_period'] == 0]
+    
+    def safe_stats(series):
+        if len(series) == 0:
+            return {'mean': float('nan'), 'p50': float('nan'),
+                    'p95': float('nan'), 'p99': float('nan'), 'n': 0}
+        return {
+            'mean': float(series.mean()),
+            'p50':  float(series.quantile(0.50)),
+            'p95':  float(series.quantile(0.95)),
+            'p99':  float(series.quantile(0.99)),
+            'n':    int(len(series))
+        }
+    
+    # Per-user burst staleness (mean staleness per user during burst periods)
+    if 'user_id' in df.columns and len(burst) > 0:
+        user_burst_staleness = burst.groupby('user_id')['staleness_sec'].mean()
+        user_calm_staleness  = calm.groupby('user_id')['staleness_sec'].mean() if len(calm) > 0 else pd.Series()
+        per_user_burst_mean = float(user_burst_staleness.mean())
+        per_user_calm_mean  = float(user_calm_staleness.mean()) if len(user_calm_staleness) > 0 else float('nan')
+    else:
+        per_user_burst_mean = float('nan')
+        per_user_calm_mean  = float('nan')
+    
+    return {
+        'burst_staleness': safe_stats(burst['staleness_sec']),
+        'calm_staleness':  safe_stats(calm['staleness_sec']),
+        'per_user_burst_mean_staleness_sec': per_user_burst_mean,
+        'per_user_calm_mean_staleness_sec':  per_user_calm_mean,
+        'burst_event_count': int(len(burst)),
+        'calm_event_count':  int(len(calm)),
+    }
+
+def compute_feature_refresh_rate(run_csv: str) -> dict:
+    """
+    Feature refresh rate = number of times per user per hour their features
+    are updated (i.e., they appear in a ScoredResult row).
+    
+    For Adaptive (W=8 during burst): 16 refreshes per 128 events
+    For Fixed (W=128 always):         1 refresh per 128 events
+    → Adaptive provides 16× more frequent feature refreshes during burst.
+    
+    This is the correct metric for Mechanism A: not throughput, but freshness cadence.
+    """
+    df = pd.read_csv(run_csv)
+    
+    required = ['user_id', 'result_timestamp_ns', 'is_burst_period']
+    missing = [c for c in required if c not in df.columns]
+    if missing:
+        return {'error': f'Missing columns: {missing}'}
+    
+    if df['result_timestamp_ns'].std() == 0:
+        return {'error': 'result_timestamp_ns is constant — wall-clock timestamps not set'}
+    
+    results = {}
+    for period_name, mask in [('burst', df['is_burst_period'] == 1),
+                               ('calm',  df['is_burst_period'] == 0)]:
+        sub = df[mask]
+        if len(sub) == 0:
+            results[period_name] = {'refreshes_per_user_per_hour': float('nan')}
+            continue
+        
+        # Duration of this period in hours (wall-clock)
+        duration_ns = sub['result_timestamp_ns'].max() - sub['result_timestamp_ns'].min()
+        duration_hours = duration_ns / 3.6e12
+        
+        if duration_hours <= 0:
+            results[period_name] = {'refreshes_per_user_per_hour': float('nan')}
+            continue
+        
+        if 'user_id' in sub.columns:
+            total_refreshes = len(sub)
+            unique_users = sub['user_id'].nunique()
+            refreshes_per_user_per_hour = (total_refreshes / unique_users) / duration_hours
+        else:
+            refreshes_per_user_per_hour = float('nan')
+        
+        results[period_name] = {
+            'refreshes_per_user_per_hour': refreshes_per_user_per_hour,
+            'duration_hours': duration_hours,
+            'total_refreshes': len(sub),
+            'unique_users': sub['user_id'].nunique() if 'user_id' in sub.columns else 0,
+        }
+    
+    # Ratio: burst refresh rate vs calm refresh rate (higher = better staleness control)
+    burst_rate = results.get('burst', {}).get('refreshes_per_user_per_hour', float('nan'))
+    calm_rate  = results.get('calm',  {}).get('refreshes_per_user_per_hour', float('nan'))
+    results['burst_to_calm_refresh_ratio'] = burst_rate / calm_rate if calm_rate > 0 else float('nan')
+    
+    return results
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--raw-dir", required=True)
@@ -263,6 +374,13 @@ def main():
             cov_list.append(fr.get("coverage", float("nan")))
             if "valid_df" in fr:
                 valid_dfs.append(fr["valid_df"])
+
+        # We compute burst/refresh metrics for the first valid seed to match Claude's instructions
+        burst_metrics = {}
+        refresh_metrics = {}
+        if csv_files:
+            burst_metrics = compute_burst_stratified_metrics(str(csv_files[0]))
+            refresh_metrics = compute_feature_refresh_rate(str(csv_files[0]))
 
         null_fr = float("nan")
         if csv_files:
@@ -371,6 +489,21 @@ def main():
         print(f"\n--- Sanity Checks ---")
         print(f"shuffled_null_regret: {null_fr:.4f}  (must be >> mean_feature_regret)")
         print(f"oracle_auroc:         {oracle_auroc:.4f}  (must be > 0.70 for results to be meaningful)")
+
+        print(f"""
+--- Burst-Stratified Staleness (THE KEY MECHANISM A RESULT) ---
+burst_staleness_mean_sec:     {burst_metrics.get('burst_staleness', {}).get('mean', 'N/A')}
+burst_staleness_p99_sec:      {burst_metrics.get('burst_staleness', {}).get('p99', 'N/A')}
+calm_staleness_mean_sec:      {burst_metrics.get('calm_staleness', {}).get('mean', 'N/A')}
+calm_staleness_p99_sec:       {burst_metrics.get('calm_staleness', {}).get('p99', 'N/A')}
+per_user_burst_staleness_sec: {burst_metrics.get('per_user_burst_mean_staleness_sec', 'N/A')}
+staleness_burst_calm_ratio:   {(burst_metrics.get('burst_staleness', {}).get('mean', 0) / max(1, burst_metrics.get('calm_staleness', {}).get('mean', 1))):.3f}
+
+--- Feature Refresh Rate ---
+burst_refreshes_per_user_per_hour: {refresh_metrics.get('burst', {}).get('refreshes_per_user_per_hour', 'N/A')}
+calm_refreshes_per_user_per_hour:  {refresh_metrics.get('calm', {}).get('refreshes_per_user_per_hour', 'N/A')}
+burst_to_calm_refresh_ratio:       {refresh_metrics.get('burst_to_calm_refresh_ratio', 'N/A')}
+""")
         print(f"=== End Output Block ===\n")
 
     out_path = Path(args.out_csv)

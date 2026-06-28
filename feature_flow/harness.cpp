@@ -80,7 +80,8 @@ static RunResult run_architecture(
         std::uint32_t seed,
         bool log_trace = false,
         const SweepConfig* sweep_cfg = nullptr,
-        std::uint64_t scoring_delay_us = 0) {
+        std::uint64_t scoring_delay_us = 0,
+        float ulb_max_amount = 1.0f) {
 
     // Re-construct BehaviorSource for this run (same rows, MaxRate replay)
     BehaviorSource src(rows, ReplayMode::MaxRate, 1.0);
@@ -108,7 +109,7 @@ static RunResult run_architecture(
     if (arch_name == "fixed" || arch_name == "throttle") {
         SourceOperator<RawBehaviorEvent> source("source", &q_raw,
             [&src, &source_done](Event<RawBehaviorEvent>& out, std::uint64_t seq){ bool ok = src(out, seq); if(!ok) source_done=true; return ok; });
-        KeyedFeatureExtractOp extract("extract", &q_raw, &q_feat, [&](std::uint64_t s){return src.label_for_seq(s);}, nullptr, 0.10f);
+        KeyedFeatureExtractOp extract("extract", &q_raw, &q_feat, [&](std::uint64_t s){return src.label_for_seq(s);}, nullptr, 0.10f, 0.02f, 0.30f, 0.01f, ulb_max_amount);
         auto aggr = [](const std::vector<Event<FeatureSnapshot>>& buf) -> FeatureBatch {
             FeatureBatch fb{};
             fb.occupancy_at_window_start = 0.0f;
@@ -133,12 +134,24 @@ static RunResult run_architecture(
         }
         printf("[drain] Final occupancy: raw=%.3f, feat=%.3f, batch=%.3f, scored=%.3f\n", q_raw.occupancy(), q_feat.occupancy(), q_batch.occupancy(), q_scored.occupancy());
         rt.stop();
+        {
+            std::string lat_path = out_dir + "/batch_latency_" + arch_name + "_seed" 
+                                   + std::to_string(seed) + ".csv";
+            std::ofstream lat_out(lat_path);
+            lat_out << "wall_ns,latency_ns,batch_size,is_burst\n";
+            for (const auto& entry : scorer.batch_latency_log()) {
+                lat_out << entry.wall_ns << ','
+                        << entry.latency_ns << ','
+                        << entry.batch_size << ','
+                        << static_cast<int>(entry.is_burst) << '\n';
+            }
+        }
         res.direction_changes = 0;
 
     } else if (arch_name == "drift") {
         SourceOperator<RawBehaviorEvent> source("source", &q_raw,
             [&src, &source_done](Event<RawBehaviorEvent>& out, std::uint64_t seq){ bool ok = src(out, seq); if(!ok) source_done=true; return ok; });
-        KeyedFeatureExtractOp extract("extract", &q_raw, &q_feat, [&](std::uint64_t s){return src.label_for_seq(s);}, nullptr, 0.10f);
+        KeyedFeatureExtractOp extract("extract", &q_raw, &q_feat, [&](std::uint64_t s){return src.label_for_seq(s);}, nullptr, 0.10f, 0.02f, 0.30f, 0.01f, ulb_max_amount);
         DriftAdaptiveWindowOp window("drift_win",&q_feat,&q_batch);
         ScoringFlushOp scorer("scorer", &q_batch, &q_scored, &model, scoring_delay_us);
         ResultSink sink("sink",&q_scored,result_csv);
@@ -158,6 +171,18 @@ static RunResult run_architecture(
         }
         printf("[drain] Final occupancy: raw=%.3f, feat=%.3f, batch=%.3f, scored=%.3f\n", q_raw.occupancy(), q_feat.occupancy(), q_batch.occupancy(), q_scored.occupancy());
         rt.stop();
+        {
+            std::string lat_path = out_dir + "/batch_latency_" + arch_name + "_seed" 
+                                   + std::to_string(seed) + ".csv";
+            std::ofstream lat_out(lat_path);
+            lat_out << "wall_ns,latency_ns,batch_size,is_burst\n";
+            for (const auto& entry : scorer.batch_latency_log()) {
+                lat_out << entry.wall_ns << ','
+                        << entry.latency_ns << ','
+                        << entry.batch_size << ','
+                        << static_cast<int>(entry.is_burst) << '\n';
+            }
+        }
         res.direction_changes = window.direction_changes();
 
     } else if (arch_name == "aonly") {
@@ -166,7 +191,7 @@ static RunResult run_architecture(
         SourceOperator<RawBehaviorEvent> source("source",&q_raw,
             [&src, &source_done](Event<RawBehaviorEvent>& out, std::uint64_t seq){ bool ok = src(out,seq); if(!ok) source_done=true; return ok; });
         // fixed α=0.02
-        KeyedFeatureExtractOp extract("extract",&q_raw,&q_feat,[&](std::uint64_t s){return src.label_for_seq(s);},nullptr,0.02f);
+        KeyedFeatureExtractOp extract("extract",&q_raw,&q_feat,[&](std::uint64_t s){return src.label_for_seq(s);},nullptr,0.02f, 0.02f, 0.30f, 0.01f, ulb_max_amount);
         AdaptiveFeatureWindowOp window("adaptive_win",&q_feat,&q_batch,&signal);
         ScoringFlushOp scorer("scorer", &q_batch, &q_scored, &model, scoring_delay_us);
         ResultSink sink("sink",&q_scored,result_csv);
@@ -182,6 +207,18 @@ static RunResult run_architecture(
             std::this_thread::sleep_for(std::chrono::milliseconds(5));
         }
         rt.stop();
+        {
+            std::string lat_path = out_dir + "/batch_latency_" + arch_name + "_seed" 
+                                   + std::to_string(seed) + ".csv";
+            std::ofstream lat_out(lat_path);
+            lat_out << "wall_ns,latency_ns,batch_size,is_burst\n";
+            for (const auto& entry : scorer.batch_latency_log()) {
+                lat_out << entry.wall_ns << ','
+                        << entry.latency_ns << ','
+                        << entry.batch_size << ','
+                        << static_cast<int>(entry.is_burst) << '\n';
+            }
+        }
         res.direction_changes = window.controller().direction_changes();
         res.final_w     = window.controller().current();
         res.final_alpha = extract.last_alpha();
@@ -195,7 +232,7 @@ static RunResult run_architecture(
         if (log_trace) { trace_out.open(trace_csv); init_controller_trace(trace_out); }
         SourceOperator<RawBehaviorEvent> source("source",&q_raw,
             [&src, &source_done](Event<RawBehaviorEvent>& out, std::uint64_t seq){ bool ok = src(out,seq); if(!ok) source_done=true; return ok; });
-        KeyedFeatureExtractOp extract("extract",&q_raw,&q_feat,[&](std::uint64_t s){return src.label_for_seq(s);},&signal);
+        KeyedFeatureExtractOp extract("extract",&q_raw,&q_feat,[&](std::uint64_t s){return src.label_for_seq(s);},&signal, 0.10f, 0.02f, 0.30f, 0.01f, ulb_max_amount);
         auto aggr = [](const std::vector<Event<FeatureSnapshot>>& buf) -> FeatureBatch {
             FeatureBatch fb{}; fb.occupancy_at_window_start = 0.0f;
             for (std::size_t i=0;i<buf.size();i++) fb.push_back(buf[i].data,buf[i].seq); return fb;
@@ -216,6 +253,18 @@ static RunResult run_architecture(
             std::this_thread::sleep_for(std::chrono::milliseconds(5));
         }
         rt.stop();
+        {
+            std::string lat_path = out_dir + "/batch_latency_" + arch_name + "_seed" 
+                                   + std::to_string(seed) + ".csv";
+            std::ofstream lat_out(lat_path);
+            lat_out << "wall_ns,latency_ns,batch_size,is_burst\n";
+            for (const auto& entry : scorer.batch_latency_log()) {
+                lat_out << entry.wall_ns << ','
+                        << entry.latency_ns << ','
+                        << entry.batch_size << ','
+                        << static_cast<int>(entry.is_burst) << '\n';
+            }
+        }
         res.direction_changes = 0;
         res.final_w     = 128;
         res.final_alpha = extract.last_alpha();
@@ -227,7 +276,7 @@ static RunResult run_architecture(
     } else if (arch_name == "ralf") {
         SourceOperator<RawBehaviorEvent> source("source",&q_raw,
             [&src, &source_done](Event<RawBehaviorEvent>& out, std::uint64_t seq){ bool ok = src(out,seq); if(!ok) source_done=true; return ok; });
-        KeyedFeatureExtractOp extract("extract",&q_raw,&q_feat,[&](std::uint64_t s){return src.label_for_seq(s);},nullptr,0.10f);
+        KeyedFeatureExtractOp extract("extract",&q_raw,&q_feat,[&](std::uint64_t s){return src.label_for_seq(s);},nullptr,0.10f, 0.02f, 0.30f, 0.01f, ulb_max_amount);
         RALFWindowOp window("ralf_win",&q_feat,&q_batch);
         ScoringFlushOp scorer("scorer", &q_batch, &q_scored, &model, scoring_delay_us);
         ResultSink sink("sink",&q_scored,result_csv);
@@ -243,6 +292,18 @@ static RunResult run_architecture(
             std::this_thread::sleep_for(std::chrono::milliseconds(5));
         }
         rt.stop();
+        {
+            std::string lat_path = out_dir + "/batch_latency_" + arch_name + "_seed" 
+                                   + std::to_string(seed) + ".csv";
+            std::ofstream lat_out(lat_path);
+            lat_out << "wall_ns,latency_ns,batch_size,is_burst\n";
+            for (const auto& entry : scorer.batch_latency_log()) {
+                lat_out << entry.wall_ns << ','
+                        << entry.latency_ns << ','
+                        << entry.batch_size << ','
+                        << static_cast<int>(entry.is_burst) << '\n';
+            }
+        }
         res.direction_changes = 0;
 
     } else { // adaptive
@@ -253,7 +314,7 @@ static RunResult run_architecture(
         }
         SourceOperator<RawBehaviorEvent> source("source",&q_raw,
             [&src, &source_done](Event<RawBehaviorEvent>& out, std::uint64_t seq){ bool ok = src(out,seq); if(!ok) source_done=true; return ok; });
-        KeyedFeatureExtractOp extract("extract",&q_raw,&q_feat,[&](std::uint64_t s){return src.label_for_seq(s);},&signal);
+        KeyedFeatureExtractOp extract("extract",&q_raw,&q_feat,[&](std::uint64_t s){return src.label_for_seq(s);},&signal, 0.10f, 0.02f, 0.30f, 0.01f, ulb_max_amount);
         
         std::uint32_t w_min=8, w_max=MAX_FEATURE_BATCH;
         double occ_l=0.30, occ_h=0.70, shr=0.70, grw=1.15;
@@ -281,6 +342,18 @@ static RunResult run_architecture(
         }
         printf("[drain] Final occupancy: raw=%.3f, feat=%.3f, batch=%.3f, scored=%.3f\n", q_raw.occupancy(), q_feat.occupancy(), q_batch.occupancy(), q_scored.occupancy());
         rt.stop();
+        {
+            std::string lat_path = out_dir + "/batch_latency_" + arch_name + "_seed" 
+                                   + std::to_string(seed) + ".csv";
+            std::ofstream lat_out(lat_path);
+            lat_out << "wall_ns,latency_ns,batch_size,is_burst\n";
+            for (const auto& entry : scorer.batch_latency_log()) {
+                lat_out << entry.wall_ns << ','
+                        << entry.latency_ns << ','
+                        << entry.batch_size << ','
+                        << static_cast<int>(entry.is_burst) << '\n';
+            }
+        }
         res.direction_changes = window.controller().direction_changes();
         res.final_w     = window.controller().current();
         res.final_alpha = extract.last_alpha();
@@ -345,6 +418,18 @@ int main(int argc, char** argv) {
         std::cerr << "[harness] WARNING: using zero model\n";
         model = LogisticModel::zero();
     }
+    
+    float ulb_max_amount = 1.0f;
+    std::string norm_path = model_path.substr(0, model_path.find_last_of('.')) + ".norm";
+    std::ifstream norm_in(norm_path);
+    if (norm_in.is_open()) {
+        std::string line;
+        while (std::getline(norm_in, line)) {
+            if (line.find("max_amount=") == 0) {
+                ulb_max_amount = std::stof(line.substr(11));
+            }
+        }
+    }
 
     const std::vector<std::string> archs = {"fixed", "drift", "throttle", "aonly", "bonly", "adaptive", "ralf"};
 
@@ -360,7 +445,7 @@ int main(int argc, char** argv) {
                       << " shrink=" << c.shrink << " grow=" << c.grow 
                       << " occ=" << c.occ_low << "-" << c.occ_high << "\n";
             // Run Adaptive architecture with sweep config
-            RunResult r = run_architecture("adaptive", rows, model, out_dir, 0, false, &c, scoring_delay_us);
+            RunResult r = run_architecture("adaptive", rows, model, out_dir, 0, false, &c, scoring_delay_us, ulb_max_amount);
             swp_out << c.shrink << ',' << c.grow << ',' << c.occ_low << ',' << c.occ_high << ','
                     << r.events_processed << ',' << r.wall_time_ms << ','
                     << r.direction_changes << ',' << r.final_w << ',' << r.final_alpha << '\n';
@@ -378,7 +463,7 @@ int main(int argc, char** argv) {
             bool log_trace = (arch == "adaptive" && seed == 0);
             std::cout << "[harness] Running arch=" << arch << " seed=" << seed << " ...\n";
             RunResult r = run_architecture(arch, rows, model, out_dir,
-                                           static_cast<std::uint32_t>(seed), log_trace, nullptr, scoring_delay_us);
+                                           static_cast<std::uint32_t>(seed), log_trace, nullptr, scoring_delay_us, ulb_max_amount);
             summary << r.arch_name   << ','
                     << r.seed        << ','
                     << r.events_processed << ','

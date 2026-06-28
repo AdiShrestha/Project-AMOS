@@ -76,12 +76,14 @@ public:
                           BackpressureSignal* signal = nullptr,
                           float fixed_alpha = 0.10f,
                           float alpha_min = 0.02f, float alpha_max = 0.30f,
-                          float d_alpha_max = 0.01f)
+                          float d_alpha_max = 0.01f,
+                          float ulb_max_amount = 1.0f)
         : IOperator(std::move(name))
         , input_(input), output_(output)
         , signal_(signal), fixed_alpha_(fixed_alpha)
         , alpha_ctrl_(alpha_min, alpha_max, d_alpha_max)
         , label_lookup_(std::move(label_lookup))
+        , ulb_max_amount_(ulb_max_amount)
     {}
 
     void attach_metrics(OperatorMetrics* m) { metrics_ = m; }
@@ -151,6 +153,9 @@ public:
         snap.user_id    = raw.user_id;
         snap.alpha_used = alpha;
         state.export_features(snap.x, prev_ts_sec);
+        if (ulb_max_amount_ > 1.0f) {
+            snap.x[0] /= ulb_max_amount_;
+        }
 
         // label / label_valid: looked up via parallel vector in BehaviorSource
         // (Section 13.3). We store the seq so the wiring code can join.
@@ -192,6 +197,7 @@ private:
     bool                   has_pending_{false};
     OperatorMetrics*       metrics_{nullptr};
     std::function<std::pair<std::uint8_t,std::uint8_t>(std::uint64_t)> label_lookup_;
+    float                  ulb_max_amount_{1.0f};
 };
 
 } // namespace klstream
