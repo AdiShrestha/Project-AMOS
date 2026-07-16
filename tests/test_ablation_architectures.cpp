@@ -25,7 +25,7 @@ void test_a_only() {
     KeyedFeatureExtractOp extract("extract", &q_raw, &q_feat, nullptr, nullptr, 0.02f);
     AdaptiveFeatureWindowOp window("adaptive", &q_feat, &q_batch, &signal, 8, 256);
     
-    int events_to_push = 200;
+    int events_to_push = 300;
     for(int i=0; i<events_to_push; ++i) {
         Event<RawBehaviorEvent> ev;
         ev.key = i % 10;
@@ -42,7 +42,7 @@ void test_a_only() {
         if(window.tick() == OpStatus::Processed) making_progress = true;
     }
     
-    assert(q_batch.occupancy_approx() > 0);
+    assert(q_batch.occupancy() > 0.0);
 }
 
 void test_b_only() {
@@ -83,7 +83,7 @@ void test_b_only() {
         if(window.tick() == OpStatus::Processed) making_progress = true;
     }
     
-    assert(q_batch.occupancy_approx() > 0);
+    assert(q_batch.occupancy() > 0.0);
 }
 
 int main() {

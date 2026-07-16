@@ -132,24 +132,58 @@ def compute_patr(df: pd.DataFrame) -> dict:
     """
     Burst throughput / calm throughput, measured in events per wall-clock second.
     Uses result_timestamp_ns from ResultSink to measure actual processing rate.
+    Gap 3 guard: if timestamps are essentially constant (std < 1e6 ns) return nan.
     """
+    # Gap 3 verification guard
+    if df['result_timestamp_ns'].std() < 1e6:
+        return {"patr": float("nan"), "burst_tput": float("nan"), "calm_tput": float("nan"),
+                "note": "result_timestamp_ns appears constant — not wall-clock"}
+
     burst = df[df['is_burst_period'] == 1].copy()
     calm  = df[df['is_burst_period'] == 0].copy()
-    
+
     if len(burst) < 2 or len(calm) < 2:
         return {"patr": float("nan"), "burst_tput": float("nan"), "calm_tput": float("nan")}
-    
+
     burst_duration_ns = burst['result_timestamp_ns'].max() - burst['result_timestamp_ns'].min()
     calm_duration_ns  = calm['result_timestamp_ns'].max() - calm['result_timestamp_ns'].min()
-    
+
     if burst_duration_ns <= 0 or calm_duration_ns <= 0:
         return {"patr": float("nan"), "burst_tput": float("nan"), "calm_tput": float("nan")}
-    
+
     burst_throughput = len(burst) / (burst_duration_ns / 1e9)
     calm_throughput  = len(calm)  / (calm_duration_ns  / 1e9)
-    
+
     patr_val = burst_throughput / calm_throughput if calm_throughput > 0 else float('nan')
     return {"patr": patr_val, "burst_tput": burst_throughput, "calm_tput": calm_throughput}
+
+
+# Gap 1: Claude's exact burst-stratified staleness function
+def compute_burst_stratified_staleness(run_csv_path: str) -> dict:
+    """
+    Computes staleness separately for burst and calm periods.
+    This is the primary metric for Mechanism A: burst_mean << calm_mean when working.
+    For MaxRate with perpetual saturation, burst_mean ≈ calm_mean (mechanism not visible).
+    """
+    df = pd.read_csv(run_csv_path)
+    if 'is_burst_period' not in df.columns or 'staleness_sec' not in df.columns:
+        return {'error': 'missing columns'}
+    burst = df[df['is_burst_period'] == 1]['staleness_sec']
+    calm  = df[df['is_burst_period'] == 0]['staleness_sec']
+    return {
+        'burst_mean':  float(burst.mean()),
+        'burst_p50':   float(burst.quantile(0.50)),
+        'burst_p95':   float(burst.quantile(0.95)),
+        'burst_p99':   float(burst.quantile(0.99)),
+        'burst_n':     int(len(burst)),
+        'calm_mean':   float(calm.mean()),
+        'calm_p50':    float(calm.quantile(0.50)),
+        'calm_p95':    float(calm.quantile(0.95)),
+        'calm_p99':    float(calm.quantile(0.99)),
+        'calm_n':      int(len(calm)),
+        'burst_calm_ratio': float(burst.mean() / calm.mean()) if calm.mean() > 0 else float('nan'),
+    }
+
 
 
 def fairness_gap(results_df: pd.DataFrame) -> dict:

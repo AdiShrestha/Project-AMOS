@@ -1,0 +1,9 @@
+=== BPFeat Experiment Output Block ===
+Run timestamp: 2026-06-25T06:51:31
+Architecture:  adaptive
+PATR:                        N/A
+mean_feature_regret:  15.43215
+direction_changes:    36.3
+WOR (dir_changes/min):922.77
+coverage:             1.000
+jain:                 0.1687

@@ -1,0 +1,741 @@
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py:2337: RuntimeWarning: invalid value encountered in multiply
+  lower_bound = _a * scale + loc
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py:2338: RuntimeWarning: invalid value encountered in multiply
+  upper_bound = _b * scale + loc
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py:2337: RuntimeWarning: invalid value encountered in multiply
+  lower_bound = _a * scale + loc
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py:2338: RuntimeWarning: invalid value encountered in multiply
+  upper_bound = _b * scale + loc
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py:2337: RuntimeWarning: invalid value encountered in multiply
+  lower_bound = _a * scale + loc
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py:2338: RuntimeWarning: invalid value encountered in multiply
+  upper_bound = _b * scale + loc
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py:2337: RuntimeWarning: invalid value encountered in multiply
+  lower_bound = _a * scale + loc
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py:2338: RuntimeWarning: invalid value encountered in multiply
+  upper_bound = _b * scale + loc
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py:2337: RuntimeWarning: invalid value encountered in multiply
+  lower_bound = _a * scale + loc
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py:2338: RuntimeWarning: invalid value encountered in multiply
+  upper_bound = _b * scale + loc
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py:2337: RuntimeWarning: invalid value encountered in multiply
+  lower_bound = _a * scale + loc
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py:2338: RuntimeWarning: invalid value encountered in multiply
+  upper_bound = _b * scale + loc
+[compute_metrics] Loading oracle scores ...
+  980,885 oracle rows, 117,170 labeled positive
+=== BPFeat Experiment Output Block ===
+Run timestamp: 2026-06-24T20:23:04.912793
+Architecture:  fixed
+Dataset:       data/replay/oracle_scores.csv (via oracle)
+Seed:          all_seeds_avg
+N events processed: 980864
+N events scored (label_valid=1): 980853
+Coverage fraction: 1.000
+
+--- Controller Trace (Adaptive/AOnly/BOnly only) ---
+final_W:              nan
+final_alpha:          nan
+direction_changes:    nan
+WOR (dir_changes/min):nan
+W_min_observed:       nan
+W_max_observed:       nan
+alpha_min_observed:   nan
+alpha_max_observed:   nan
+
+--- Throughput ---
+steady_state_events_per_sec: N/A
+burst_period_events_per_sec: N/A
+PATR:                        0.128
+p50_latency_ms:              N/A
+p99_latency_ms:              N/A
+
+--- Feature Regret (requires oracle_scores.csv) ---
+mean_feature_regret:  -0.01596
+regret_ci_lower:      -0.01640  [MBB 95% CI]
+regret_ci_upper:      -0.01561  [MBB 95% CI]
+MBB_block_length:     50
+mean_staleness_sec:   5129.138
+
+--- Fairness (Taobao only) ---
+jain_fairness_index:  0.1547
+fairness_gap_sec:     21765.154
+user_activity_p10:    21.0  events
+user_activity_p90:    217.0  events
+
+--- Queue Drain ---
+[drain] Final occupancy: raw=N/A, feat=N/A, batch=N/A, scored=N/A
+All queues empty: N/A
+
+--- Sanity Checks ---
+shuffled_null_regret: 0.0192  (must be >> mean_feature_regret)
+oracle_auroc:         0.6561  (must be > 0.70 for results to be meaningful)
+=== End Output Block ===
+
+=== BPFeat Experiment Output Block ===
+Run timestamp: 2026-06-24T20:27:09.220620
+Architecture:  drift
+Dataset:       data/replay/oracle_scores.csv (via oracle)
+Seed:          all_seeds_avg
+N events processed: 980880
+N events scored (label_valid=1): 980869
+Coverage fraction: 1.000
+
+--- Controller Trace (Adaptive/AOnly/BOnly only) ---
+final_W:              nan
+final_alpha:          nan
+direction_changes:    nan
+WOR (dir_changes/min):nan
+W_min_observed:       nan
+W_max_observed:       nan
+alpha_min_observed:   nan
+alpha_max_observed:   nan
+
+--- Throughput ---
+steady_state_events_per_sec: N/A
+burst_period_events_per_sec: N/A
+PATR:                        0.128
+p50_latency_ms:              N/A
+p99_latency_ms:              N/A
+
+--- Feature Regret (requires oracle_scores.csv) ---
+mean_feature_regret:  -0.01596
+regret_ci_lower:      -0.01640  [MBB 95% CI]
+regret_ci_upper:      -0.01561  [MBB 95% CI]
+MBB_block_length:     50
+mean_staleness_sec:   5250.149
+
+--- Fairness (Taobao only) ---
+jain_fairness_index:  0.1359
+fairness_gap_sec:     21958.128
+user_activity_p10:    21.0  events
+user_activity_p90:    217.0  events
+
+--- Queue Drain ---
+[drain] Final occupancy: raw=N/A, feat=N/A, batch=N/A, scored=N/A
+All queues empty: N/A
+
+--- Sanity Checks ---
+shuffled_null_regret: 0.0190  (must be >> mean_feature_regret)
+oracle_auroc:         0.6561  (must be > 0.70 for results to be meaningful)
+=== End Output Block ===
+
+=== BPFeat Experiment Output Block ===
+Run timestamp: 2026-06-24T20:31:11.206194
+Architecture:  throttle
+Dataset:       data/replay/oracle_scores.csv (via oracle)
+Seed:          all_seeds_avg
+N events processed: 980864
+N events scored (label_valid=1): 980853
+Coverage fraction: 1.000
+
+--- Controller Trace (Adaptive/AOnly/BOnly only) ---
+final_W:              nan
+final_alpha:          nan
+direction_changes:    nan
+WOR (dir_changes/min):nan
+W_min_observed:       nan
+W_max_observed:       nan
+alpha_min_observed:   nan
+alpha_max_observed:   nan
+
+--- Throughput ---
+steady_state_events_per_sec: N/A
+burst_period_events_per_sec: N/A
+PATR:                        0.128
+p50_latency_ms:              N/A
+p99_latency_ms:              N/A
+
+--- Feature Regret (requires oracle_scores.csv) ---
+mean_feature_regret:  -0.01596
+regret_ci_lower:      -0.01640  [MBB 95% CI]
+regret_ci_upper:      -0.01561  [MBB 95% CI]
+MBB_block_length:     50
+mean_staleness_sec:   5231.908
+
+--- Fairness (Taobao only) ---
+jain_fairness_index:  0.2095
+fairness_gap_sec:     22069.511
+user_activity_p10:    21.0  events
+user_activity_p90:    217.0  events
+
+--- Queue Drain ---
+[drain] Final occupancy: raw=N/A, feat=N/A, batch=N/A, scored=N/A
+All queues empty: N/A
+
+--- Sanity Checks ---
+shuffled_null_regret: 0.0192  (must be >> mean_feature_regret)
+oracle_auroc:         0.6561  (must be > 0.70 for results to be meaningful)
+=== End Output Block ===
+
+=== BPFeat Experiment Output Block ===
+Run timestamp: 2026-06-24T20:35:12.904099
+Architecture:  aonly
+Dataset:       data/replay/oracle_scores.csv (via oracle)
+Seed:          all_seeds_avg
+N events processed: 980880
+N events scored (label_valid=1): 980869
+Coverage fraction: 1.000
+
+--- Controller Trace (Adaptive/AOnly/BOnly only) ---
+final_W:              8.0
+final_alpha:          0.0200
+direction_changes:    7.0
+WOR (dir_changes/min):51.42
+W_min_observed:       8.0
+W_max_observed:       256.0
+alpha_min_observed:   0.0200
+alpha_max_observed:   0.3000
+
+--- Throughput ---
+steady_state_events_per_sec: N/A
+burst_period_events_per_sec: N/A
+PATR:                        0.128
+p50_latency_ms:              N/A
+p99_latency_ms:              N/A
+
+--- Feature Regret (requires oracle_scores.csv) ---
+mean_feature_regret:  -0.10312
+regret_ci_lower:      -0.10471  [MBB 95% CI]
+regret_ci_upper:      -0.10135  [MBB 95% CI]
+MBB_block_length:     50
+mean_staleness_sec:   4825.035
+
+--- Fairness (Taobao only) ---
+jain_fairness_index:  0.1179
+fairness_gap_sec:     20868.935
+user_activity_p10:    21.0  events
+user_activity_p90:    217.0  events
+
+--- Queue Drain ---
+[drain] Final occupancy: raw=N/A, feat=N/A, batch=N/A, scored=N/A
+All queues empty: N/A
+
+--- Sanity Checks ---
+shuffled_null_regret: -0.0771  (must be >> mean_feature_regret)
+oracle_auroc:         0.6561  (must be > 0.70 for results to be meaningful)
+=== End Output Block ===
+
+=== BPFeat Experiment Output Block ===
+Run timestamp: 2026-06-24T20:39:25.562425
+Architecture:  bonly
+Dataset:       data/replay/oracle_scores.csv (via oracle)
+Seed:          all_seeds_avg
+N events processed: 980864
+N events scored (label_valid=1): 980853
+Coverage fraction: 1.000
+
+--- Controller Trace (Adaptive/AOnly/BOnly only) ---
+final_W:              128.0
+final_alpha:          0.2956
+direction_changes:    0.0
+WOR (dir_changes/min):0.00
+W_min_observed:       128.0
+W_max_observed:       128.0
+alpha_min_observed:   0.0200
+alpha_max_observed:   0.3000
+
+--- Throughput ---
+steady_state_events_per_sec: N/A
+burst_period_events_per_sec: N/A
+PATR:                        0.128
+p50_latency_ms:              N/A
+p99_latency_ms:              N/A
+
+--- Feature Regret (requires oracle_scores.csv) ---
+mean_feature_regret:  0.00416
+regret_ci_lower:      0.00310  [MBB 95% CI]
+regret_ci_upper:      0.00479  [MBB 95% CI]
+MBB_block_length:     50
+mean_staleness_sec:   5109.460
+
+--- Fairness (Taobao only) ---
+jain_fairness_index:  0.2488
+fairness_gap_sec:     21759.214
+user_activity_p10:    21.0  events
+user_activity_p90:    217.0  events
+
+--- Queue Drain ---
+[drain] Final occupancy: raw=N/A, feat=N/A, batch=N/A, scored=N/A
+All queues empty: N/A
+
+--- Sanity Checks ---
+shuffled_null_regret: 0.0526  (must be >> mean_feature_regret)
+oracle_auroc:         0.6561  (must be > 0.70 for results to be meaningful)
+=== End Output Block ===
+
+=== BPFeat Experiment Output Block ===
+Run timestamp: 2026-06-24T21:53:39.401832
+Architecture:  adaptive
+Dataset:       data/replay/oracle_scores.csv (via oracle)
+Seed:          all_seeds_avg
+N events processed: 980883
+N events scored (label_valid=1): 980871
+Coverage fraction: 1.000
+
+--- Controller Trace (Adaptive/AOnly/BOnly only) ---
+final_W:              8.0
+final_alpha:          0.2954
+direction_changes:    4.3
+WOR (dir_changes/min):31.18
+W_min_observed:       8.0
+W_max_observed:       256.0
+alpha_min_observed:   0.0200
+alpha_max_observed:   0.3000
+
+--- Throughput ---
+steady_state_events_per_sec: N/A
+burst_period_events_per_sec: N/A
+PATR:                        0.128
+p50_latency_ms:              N/A
+p99_latency_ms:              N/A
+
+--- Feature Regret (requires oracle_scores.csv) ---
+mean_feature_regret:  0.00353
+regret_ci_lower:      0.00171  [MBB 95% CI]
+regret_ci_upper:      0.00455  [MBB 95% CI]
+MBB_block_length:     50
+mean_staleness_sec:   4740.903/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py:2337: RuntimeWarning: invalid value encountered in multiply
+  lower_bound = _a * scale + loc
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py:2338: RuntimeWarning: invalid value encountered in multiply
+  upper_bound = _b * scale + loc
+
+
+--- Fairness (Taobao only) ---
+jain_fairness_index:  0.2115
+fairness_gap_sec:     19931.209
+user_activity_p10:    21.0  events
+user_activity_p90:    217.0  events
+
+--- Queue Drain ---
+[drain] Final occupancy: raw=N/A, feat=N/A, batch=N/A, scored=N/A
+All queues empty: N/A
+
+--- Sanity Checks ---
+shuffled_null_regret: 0.0513  (must be >> mean_feature_regret)
+oracle_auroc:         0.6561  (must be > 0.70 for results to be meaningful)
+=== End Output Block ===
+
+=== BPFeat Experiment Output Block ===
+Run timestamp: 2026-06-24T21:54:32.865853
+Architecture:  ralf
+Dataset:       data/replay/oracle_scores.csv (via oracle)
+Seed:          all_seeds_avg
+N events processed: 490368
+N events scored (label_valid=1): 490368
+Coverage fraction: 0.500
+
+--- Controller Trace (Adaptive/AOnly/BOnly only) ---
+final_W:              nan
+final_alpha:          nan
+direction_changes:    nan
+WOR (dir_changes/min):nan
+W_min_observed:       nan
+W_max_observed:       nan
+alpha_min_observed:   nan
+alpha_max_observed:   nan
+
+--- Throughput ---
+steady_state_events_per_sec: N/A
+burst_period_events_per_sec: N/A
+PATR:                        0.474
+p50_latency_ms:              N/A
+p99_latency_ms:              N/A
+
+--- Feature Regret (requires oracle_scores.csv) ---
+mean_feature_regret:  0.03088
+regret_ci_lower:      0.02444  [MBB 95% CI]
+regret_ci_upper:      0.03756  [MBB 95% CI]
+MBB_block_length:     50
+mean_staleness_sec:   356.187
+
+--- Fairness (Taobao only) ---
+jain_fairness_index:  0.0137
+fairness_gap_sec:     -113.648
+user_activity_p10:    18.0  events
+user_activity_p90:    128.0  events
+
+--- Queue Drain ---
+[drain] Final occupancy: raw=N/A, feat=N/A, batch=N/A, scored=N/A
+All queues empty: N/A
+
+--- Sanity Checks ---
+shuffled_null_regret: 0.0679  (must be >> mean_feature_regret)
+oracle_auroc:         0.6561  (must be > 0.70 for results to be meaningful)
+=== End Output Block ===
+
+
+[compute_metrics] Summary → results/metrics_summary.csv
+
+
+--- STRESS METRICS ---
+
+
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py:2337: RuntimeWarning: invalid value encountered in multiply
+  lower_bound = _a * scale + loc
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py:2338: RuntimeWarning: invalid value encountered in multiply
+  upper_bound = _b * scale + loc
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py:2337: RuntimeWarning: invalid value encountered in multiply
+  lower_bound = _a * scale + loc
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py:2338: RuntimeWarning: invalid value encountered in multiply
+  upper_bound = _b * scale + loc
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py:2337: RuntimeWarning: invalid value encountered in multiply
+  lower_bound = _a * scale + loc
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py:2338: RuntimeWarning: invalid value encountered in multiply
+  upper_bound = _b * scale + loc
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py:2337: RuntimeWarning: invalid value encountered in multiply
+  lower_bound = _a * scale + loc
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py:2338: RuntimeWarning: invalid value encountered in multiply
+  upper_bound = _b * scale + loc
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py:2337: RuntimeWarning: invalid value encountered in multiply
+  lower_bound = _a * scale + loc
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py:2338: RuntimeWarning: invalid value encountered in multiply
+  upper_bound = _b * scale + loc
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py:2337: RuntimeWarning: invalid value encountered in multiply
+  lower_bound = _a * scale + loc
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py:2338: RuntimeWarning: invalid value encountered in multiply
+  upper_bound = _b * scale + loc
+[compute_metrics] Loading oracle scores ...
+  980,885 oracle rows, 117,170 labeled positive
+=== BPFeat Experiment Output Block ===
+Run timestamp: 2026-06-24T20:23:18.049204
+Architecture:  fixed
+Dataset:       data/replay/oracle_scores.csv (via oracle)
+Seed:          all_seeds_avg
+N events processed: 980864
+N events scored (label_valid=1): 980853
+Coverage fraction: 1.000
+
+--- Controller Trace (Adaptive/AOnly/BOnly only) ---
+final_W:              nan
+final_alpha:          nan
+direction_changes:    nan
+WOR (dir_changes/min):nan
+W_min_observed:       nan
+W_max_observed:       nan
+alpha_min_observed:   nan
+alpha_max_observed:   nan
+
+--- Throughput ---
+steady_state_events_per_sec: N/A
+burst_period_events_per_sec: N/A
+PATR:                        0.128
+p50_latency_ms:              N/A
+p99_latency_ms:              N/A
+
+--- Feature Regret (requires oracle_scores.csv) ---
+mean_feature_regret:  -0.01596
+regret_ci_lower:      -0.01640  [MBB 95% CI]
+regret_ci_upper:      -0.01561  [MBB 95% CI]
+MBB_block_length:     50
+mean_staleness_sec:   6898.417
+
+--- Fairness (Taobao only) ---
+jain_fairness_index:  0.1693
+fairness_gap_sec:     29269.401
+user_activity_p10:    21.0  events
+user_activity_p90:    217.0  events
+
+--- Queue Drain ---
+[drain] Final occupancy: raw=N/A, feat=N/A, batch=N/A, scored=N/A
+All queues empty: N/A
+
+--- Sanity Checks ---
+shuffled_null_regret: 0.0192  (must be >> mean_feature_regret)
+oracle_auroc:         0.6561  (must be > 0.70 for results to be meaningful)
+=== End Output Block ===
+
+=== BPFeat Experiment Output Block ===
+Run timestamp: 2026-06-24T20:27:21.092804
+Architecture:  drift
+Dataset:       data/replay/oracle_scores.csv (via oracle)
+Seed:          all_seeds_avg
+N events processed: 980880
+N events scored (label_valid=1): 980869
+Coverage fraction: 1.000
+
+--- Controller Trace (Adaptive/AOnly/BOnly only) ---
+final_W:              nan
+final_alpha:          nan
+direction_changes:    nan
+WOR (dir_changes/min):nan
+W_min_observed:       nan
+W_max_observed:       nan
+alpha_min_observed:   nan
+alpha_max_observed:   nan
+
+--- Throughput ---
+steady_state_events_per_sec: N/A
+burst_period_events_per_sec: N/A
+PATR:                        0.128
+p50_latency_ms:              N/A
+p99_latency_ms:              N/A
+
+--- Feature Regret (requires oracle_scores.csv) ---
+mean_feature_regret:  -0.01596
+regret_ci_lower:      -0.01640  [MBB 95% CI]
+regret_ci_upper:      -0.01561  [MBB 95% CI]
+MBB_block_length:     50
+mean_staleness_sec:   6885.681
+
+--- Fairness (Taobao only) ---
+jain_fairness_index:  0.1690
+fairness_gap_sec:     29231.562
+user_activity_p10:    21.0  events
+user_activity_p90:    217.0  events
+
+--- Queue Drain ---
+[drain] Final occupancy: raw=N/A, feat=N/A, batch=N/A, scored=N/A
+All queues empty: N/A
+
+--- Sanity Checks ---
+shuffled_null_regret: 0.0190  (must be >> mean_feature_regret)
+oracle_auroc:         0.6561  (must be > 0.70 for results to be meaningful)
+=== End Output Block ===
+
+=== BPFeat Experiment Output Block ===
+Run timestamp: 2026-06-24T20:31:23.046126
+Architecture:  throttle
+Dataset:       data/replay/oracle_scores.csv (via oracle)
+Seed:          all_seeds_avg
+N events processed: 980864
+N events scored (label_valid=1): 980853
+Coverage fraction: 1.000
+
+--- Controller Trace (Adaptive/AOnly/BOnly only) ---
+final_W:              nan
+final_alpha:          nan
+direction_changes:    nan
+WOR (dir_changes/min):nan
+W_min_observed:       nan
+W_max_observed:       nan
+alpha_min_observed:   nan
+alpha_max_observed:   nan
+
+--- Throughput ---
+steady_state_events_per_sec: N/A
+burst_period_events_per_sec: N/A
+PATR:                        0.128
+p50_latency_ms:              N/A
+p99_latency_ms:              N/A
+
+--- Feature Regret (requires oracle_scores.csv) ---
+mean_feature_regret:  -0.01596
+regret_ci_lower:      -0.01640  [MBB 95% CI]
+regret_ci_upper:      -0.01561  [MBB 95% CI]
+MBB_block_length:     50
+mean_staleness_sec:   6877.566
+
+--- Fairness (Taobao only) ---
+jain_fairness_index:  0.1687
+fairness_gap_sec:     29199.127
+user_activity_p10:    21.0  events
+user_activity_p90:    217.0  events
+
+--- Queue Drain ---
+[drain] Final occupancy: raw=N/A, feat=N/A, batch=N/A, scored=N/A
+All queues empty: N/A
+
+--- Sanity Checks ---
+shuffled_null_regret: 0.0192  (must be >> mean_feature_regret)
+oracle_auroc:         0.6561  (must be > 0.70 for results to be meaningful)
+=== End Output Block ===
+
+=== BPFeat Experiment Output Block ===
+Run timestamp: 2026-06-24T20:35:26.413095
+Architecture:  aonly
+Dataset:       data/replay/oracle_scores.csv (via oracle)
+Seed:          all_seeds_avg
+N events processed: 980879
+N events scored (label_valid=1): 980871
+Coverage fraction: 1.000
+
+--- Controller Trace (Adaptive/AOnly/BOnly only) ---
+final_W:              90.7
+final_alpha:          0.0200
+direction_changes:    4.0
+WOR (dir_changes/min):17.83
+W_min_observed:       8.0
+W_max_observed:       256.0
+alpha_min_observed:   0.0200
+alpha_max_observed:   0.3000
+
+--- Throughput ---
+steady_state_events_per_sec: N/A
+burst_period_events_per_sec: N/A
+PATR:                        0.128
+p50_latency_ms:              N/A
+p99_latency_ms:              N/A
+
+--- Feature Regret (requires oracle_scores.csv) ---
+mean_feature_regret:  -0.10312
+regret_ci_lower:      -0.10471  [MBB 95% CI]
+regret_ci_upper:      -0.10135  [MBB 95% CI]
+MBB_block_length:     50
+mean_staleness_sec:   6913.854
+
+--- Fairness (Taobao only) ---
+jain_fairness_index:  0.1698
+fairness_gap_sec:     29305.154
+user_activity_p10:    21.0  events
+user_activity_p90:    217.0  events
+
+--- Queue Drain ---
+[drain] Final occupancy: raw=N/A, feat=N/A, batch=N/A, scored=N/A
+All queues empty: N/A
+
+--- Sanity Checks ---
+shuffled_null_regret: -0.0771  (must be >> mean_feature_regret)
+oracle_auroc:         0.6561  (must be > 0.70 for results to be meaningful)
+=== End Output Block ===
+
+=== BPFeat Experiment Output Block ===
+Run timestamp: 2026-06-24T20:39:38.452472
+Architecture:  bonly
+Dataset:       data/replay/oracle_scores.csv (via oracle)
+Seed:          all_seeds_avg
+N events processed: 980864
+N events scored (label_valid=1): 980853
+Coverage fraction: 1.000
+
+--- Controller Trace (Adaptive/AOnly/BOnly only) ---
+final_W:              128.0
+final_alpha:          0.2956
+direction_changes:    0.0
+WOR (dir_changes/min):0.00
+W_min_observed:       128.0
+W_max_observed:       128.0
+alpha_min_observed:   0.0200
+alpha_max_observed:   0.3000
+
+--- Throughput ---
+steady_state_events_per_sec: N/A
+burst_period_events_per_sec: N/A
+PATR:                        0.128
+p50_latency_ms:              N/A
+p99_latency_ms:              N/A
+
+--- Feature Regret (requires oracle_scores.csv) ---
+mean_feature_regret:  0.00442
+regret_ci_lower:      0.00391  [MBB 95% CI]
+regret_ci_upper:      0.00479  [MBB 95% CI]
+MBB_block_length:     50
+mean_staleness_sec:   6909.652
+
+--- Fairness (Taobao only) ---
+jain_fairness_index:  0.1698
+fairness_gap_sec:     29317.333
+user_activity_p10:    21.0  events
+user_activity_p90:    217.0  events
+
+--- Queue Drain ---
+[drain] Final occupancy: raw=N/A, feat=N/A, batch=N/A, scored=N/A
+All queues empty: N/A
+
+--- Sanity Checks ---
+shuffled_null_regret: 0.0527  (must be >> mean_feature_regret)
+oracle_auroc:         0.6561  (must be > 0.70 for results to be meaningful)
+=== End Output Block ===
+
+=== BPFeat Experiment Output Block ===
+Run timestamp: 2026-06-24T21:53:47.259517
+Architecture:  adaptive
+Dataset:       data/replay/oracle_scores.csv (via oracle)
+Seed:          all_seeds_avg
+N events processed: 980881
+N events scored (label_valid=1): 980871
+Coverage fraction: 1.000
+
+--- Controller Trace (Adaptive/AOnly/BOnly only) ---
+final_W:              8.0
+final_alpha:          0.2887
+direction_changes:    6.3
+WOR (dir_changes/min):28.70
+W_min_observed:       8.0
+W_max_observed:       256.0
+alpha_min_observed:   0.0200
+alpha_max_observed:   0.3000
+
+--- Throughput ---
+steady_state_events_per_sec: N/A
+burst_period_events_per_sec: N/A
+PATR:                        0.128
+p50_latency_ms:              N/A
+p99_latency_ms:              N/A
+
+--- Feature Regret (requires oracle_scores.csv) ---
+mean_feature_regret:  0.00358
+regret_ci_lower:      0.00255  [MBB 95% CI]
+regret_ci_upper:      0.00417  [MBB 95% CI]
+MBB_block_length:     50
+mean_staleness_sec:   6909.093/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py:2337: RuntimeWarning: invalid value encountered in multiply
+  lower_bound = _a * scale + loc
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py:2338: RuntimeWarning: invalid value encountered in multiply
+  upper_bound = _b * scale + loc
+
+
+--- Fairness (Taobao only) ---
+jain_fairness_index:  0.1697
+fairness_gap_sec:     29300.785
+user_activity_p10:    21.0  events
+user_activity_p90:    217.0  events
+
+--- Queue Drain ---
+[drain] Final occupancy: raw=N/A, feat=N/A, batch=N/A, scored=N/A
+All queues empty: N/A
+
+--- Sanity Checks ---
+shuffled_null_regret: 0.0504  (must be >> mean_feature_regret)
+oracle_auroc:         0.6561  (must be > 0.70 for results to be meaningful)
+=== End Output Block ===
+
+=== BPFeat Experiment Output Block ===
+Run timestamp: 2026-06-24T21:54:39.245692
+Architecture:  ralf
+Dataset:       data/replay/oracle_scores.csv (via oracle)
+Seed:          all_seeds_avg
+N events processed: 490368
+N events scored (label_valid=1): 490368
+Coverage fraction: 0.500
+
+--- Controller Trace (Adaptive/AOnly/BOnly only) ---
+final_W:              nan
+final_alpha:          nan
+direction_changes:    nan
+WOR (dir_changes/min):nan
+W_min_observed:       nan
+W_max_observed:       nan
+alpha_min_observed:   nan
+alpha_max_observed:   nan
+
+--- Throughput ---
+steady_state_events_per_sec: N/A
+burst_period_events_per_sec: N/A
+PATR:                        0.474
+p50_latency_ms:              N/A
+p99_latency_ms:              N/A
+
+--- Feature Regret (requires oracle_scores.csv) ---
+mean_feature_regret:  0.03091
+regret_ci_lower:      0.02447  [MBB 95% CI]
+regret_ci_upper:      0.03779  [MBB 95% CI]
+MBB_block_length:     50
+mean_staleness_sec:   488.048
+
+--- Fairness (Taobao only) ---
+jain_fairness_index:  0.0186
+fairness_gap_sec:     -142.362
+user_activity_p10:    18.0  events
+user_activity_p90:    128.0  events
+
+--- Queue Drain ---
+[drain] Final occupancy: raw=N/A, feat=N/A, batch=N/A, scored=N/A
+All queues empty: N/A
+
+--- Sanity Checks ---
+shuffled_null_regret: 0.0679  (must be >> mean_feature_regret)
+oracle_auroc:         0.6561  (must be > 0.70 for results to be meaningful)
+=== End Output Block ===
+
+
+[compute_metrics] Summary → results/metrics_summary.csv
