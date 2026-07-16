@@ -361,6 +361,11 @@ static RunResult run_architecture(
         res.w_max = window.controller().max_val();
         res.alpha_min = extract.alpha_min();
         res.alpha_max = extract.alpha_max();
+        // Gap 8: report controller overhead
+        printf("[overhead] arch=%s seed=%u  mean_control_overhead=%.1f ns/window-start  calls=%llu\n",
+               arch_name.c_str(), seed,
+               window.mean_control_overhead_ns(),
+               (unsigned long long)window.control_calls());
     }
 
     // Bug 2 Fix: Write trace summary file
@@ -388,16 +393,22 @@ int main(int argc, char** argv) {
     bool synthetic = false;
     bool sweep = false;
     std::uint64_t scoring_delay_us = 0;
+    std::string only_arch = "";   // Gap 7: run only this arch if set
+    float cli_shrink = -1.0f;     // Gap 6: override shrink_factor
+    float cli_grow   = -1.0f;     // Gap 6: override grow_factor
 
     for (int i = 1; i < argc; ++i) {
         std::string a = argv[i];
-        if (a == "--replay"   && i+1 < argc) replay_path = argv[++i];
-        if (a == "--model"    && i+1 < argc) model_path  = argv[++i];
-        if (a == "--out-dir"  && i+1 < argc) out_dir     = argv[++i];
-        if (a == "--seeds"    && i+1 < argc) n_seeds     = std::stoi(argv[++i]);
-        if (a == "--synthetic")              synthetic   = true;
-        if (a == "--sweep")                  sweep       = true;
+        if (a == "--replay"        && i+1 < argc) replay_path        = argv[++i];
+        if (a == "--model"         && i+1 < argc) model_path         = argv[++i];
+        if (a == "--out-dir"       && i+1 < argc) out_dir            = argv[++i];
+        if (a == "--seeds"         && i+1 < argc) n_seeds            = std::stoi(argv[++i]);
+        if (a == "--synthetic")                   synthetic          = true;
+        if (a == "--sweep")                       sweep              = true;
         if (a == "--scoring-delay-us" && i+1 < argc) scoring_delay_us = std::stoull(argv[++i]);
+        if (a == "--arch"          && i+1 < argc) only_arch          = argv[++i];
+        if (a == "--shrink-factor" && i+1 < argc) cli_shrink         = std::stof(argv[++i]);
+        if (a == "--grow-factor"   && i+1 < argc) cli_grow           = std::stof(argv[++i]);
     }
 
     fs::create_directories(out_dir);
@@ -431,7 +442,20 @@ int main(int argc, char** argv) {
         }
     }
 
-    const std::vector<std::string> archs = {"fixed", "drift", "throttle", "aonly", "bonly", "adaptive", "ralf"};
+    // Build CLI sweep config if shrink/grow overrides provided
+    SweepConfig cli_sweep_cfg{0.70f, 1.15f, 0.30f, 0.70f};
+    bool use_cli_sweep = false;
+    if (cli_shrink > 0.0f) { cli_sweep_cfg.shrink = cli_shrink; use_cli_sweep = true; }
+    if (cli_grow   > 0.0f) { cli_sweep_cfg.grow   = cli_grow;   use_cli_sweep = true; }
+
+    const std::vector<std::string> all_archs = {"fixed", "drift", "throttle", "aonly", "bonly", "adaptive", "ralf"};
+    std::vector<std::string> archs;
+    if (!only_arch.empty()) {
+        archs = {only_arch};
+        std::cout << "[harness] --arch filter: only running " << only_arch << "\n";
+    } else {
+        archs = all_archs;
+    }
 
     if (sweep) {
         std::cout << "[harness] Running AIMD sensitivity sweep on synthetic data...\n";
@@ -462,8 +486,9 @@ int main(int argc, char** argv) {
         for (const auto& arch : archs) {
             bool log_trace = (arch == "adaptive" && seed == 0);
             std::cout << "[harness] Running arch=" << arch << " seed=" << seed << " ...\n";
+            const SweepConfig* sweep_ptr = (arch == "adaptive" && use_cli_sweep) ? &cli_sweep_cfg : nullptr;
             RunResult r = run_architecture(arch, rows, model, out_dir,
-                                           static_cast<std::uint32_t>(seed), log_trace, nullptr, scoring_delay_us, ulb_max_amount);
+                                           static_cast<std::uint32_t>(seed), log_trace, sweep_ptr, scoring_delay_us, ulb_max_amount);
             summary << r.arch_name   << ','
                     << r.seed        << ','
                     << r.events_processed << ','

@@ -86,14 +86,18 @@ def compute_oracle_features(df: pd.DataFrame, alpha_max: float) -> pd.DataFrame:
 
 def compute_oracle_features_ulb(df: pd.DataFrame, alpha_max: float) -> tuple[pd.DataFrame, float]:
     """
-    ULB features: behavior_code is amount. We normalize ema_engagement by max_amount.
+    ULB features: transaction Amount drives ema_engagement (NOT behavior_code).
+    behavior_code is always 0 in ULB — it carries no information.
+    We normalize ema_engagement by max_amount so C++ inference at runtime
+    (which divides raw.amount / ulb_max_amount) uses the same scale.
     Returns (feats_df, max_amount)
     """
     df = df.sort_values(["user_id", "timestamp_ns"], kind="mergesort").reset_index(drop=True)
-    max_amount = df["behavior_code"].max()
+    # Use the 'amount' column (0-25691 range), NOT behavior_code (always 0)
+    max_amount = float(df["amount"].max())
     if max_amount <= 0:
         max_amount = 1.0
-        
+
     out_rows = []
     for uid, g in df.groupby("user_id", sort=False):
         ema    = 0.0
@@ -103,25 +107,25 @@ def compute_oracle_features_ulb(df: pd.DataFrame, alpha_max: float) -> tuple[pd.
         ema_recency = 0.0
         prev_ts_sec = 0.0
         for _, row in g.iterrows():
-            amt = float(row.get("behavior_code", 0))
-            ema    = alpha_max * amt + (1.0 - alpha_max) * ema
-            
+            amt = float(row.get("amount", 0.0))   # ← use 'amount', not 'behavior_code'
+            ema    = alpha_max * (amt / max_amount) + (1.0 - alpha_max) * ema
+
             if amt > 0: raw_buy += 1
             else: pv += 1
-            
+
             ts_sec = row["timestamp_ns"] / 1e9
             recency = 0.0 if prev_ts_sec == 0.0 else min(ts_sec - prev_ts_sec, 3600.0) / 3600.0
             gap = 0.0 if prev_ts_sec == 0.0 else ts_sec - prev_ts_sec
             ema_recency = alpha_max * gap + (1.0 - alpha_max) * ema_recency
             prev_ts_sec = ts_sec
-            
+
             total_events = pv + cart_fav + raw_buy
             buy_rate_ratio = raw_buy / max(1, total_events)
-            
+
             out_rows.append({
                 "seq":            row["seq"],
                 "user_id":        uid,
-                "ema_engagement": ema / max_amount, # NORMALIZED
+                "ema_engagement": ema,           # already normalized (amt/max_amount)
                 "log_pv":         np.log1p(pv),
                 "log_cart_fav":   np.log1p(cart_fav),
                 "recency":        recency,
@@ -132,6 +136,7 @@ def compute_oracle_features_ulb(df: pd.DataFrame, alpha_max: float) -> tuple[pd.
                 "label_valid":    int(row["label_valid"]),
             })
     return pd.DataFrame(out_rows), float(max_amount)
+
 def find_best_oracle_alpha(df, is_ulb=False, alphas=[0.02, 0.05, 0.10, 0.15, 0.20, 0.30]):
     """Find the alpha that maximizes oracle AUROC on a held-out validation split."""
     best_alpha, best_auroc = None, 0.0

@@ -45,3 +45,17 @@ paper/*.blg
 bpfeat_build_prompt.md
 
 UserBehavior.csv
+
+# Large run results
+results/runs/
+results/archive/
+
+# Logs
+*.log
+
+# Audit and metadata clutter
+pre_cleanup_inventory.txt
+audit_guide.md
+audit_report.md
+claude_data_export.md
+claude_final_results.md

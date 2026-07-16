@@ -103,6 +103,14 @@ public:
     void set_trace_out(std::ostream* out) { trace_out_ = out; }
     [[nodiscard]] const BPFeatController& controller() const noexcept { return controller_; }
 
+    // Gap 8: controller overhead measurement
+    [[nodiscard]] double mean_control_overhead_ns() const noexcept {
+        return control_calls_ > 0
+            ? static_cast<double>(control_overhead_ns_) / static_cast<double>(control_calls_)
+            : 0.0;
+    }
+    [[nodiscard]] std::uint64_t control_calls() const noexcept { return control_calls_; }
+
     OpStatus tick() override {
         if (has_pending_) {
             if (output_->try_push(pending_)) {
@@ -118,9 +126,15 @@ public:
         // Both happen from the same tracker_.update() call so both mechanisms
         // always react to the same instant's reading (Section 8.2, step 7).
         if (buffer_.count == 0) {
+            // Gap 8: measure controller overhead
+            auto ctrl_t0 = std::chrono::steady_clock::now();
             tracker_.update();
             double occ = tracker_.ema();
             target_w_  = controller_.update(occ);
+            auto ctrl_t1 = std::chrono::steady_clock::now();
+            control_overhead_ns_ += static_cast<std::uint64_t>(
+                std::chrono::duration_cast<std::chrono::nanoseconds>(ctrl_t1 - ctrl_t0).count());
+            ++control_calls_;
             buffer_.occupancy_at_window_start = static_cast<float>(occ);
             if (signal_) {
                 signal_->store(occ);
@@ -165,6 +179,9 @@ private:
     bool                          has_pending_{false};
     OperatorMetrics*              metrics_{nullptr};
     std::ostream*                 trace_out_{nullptr};
+    // Gap 8: overhead tracking
+    std::uint64_t                 control_overhead_ns_{0};
+    std::uint64_t                 control_calls_{0};
 };
 
 } // namespace klstream

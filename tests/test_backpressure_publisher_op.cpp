@@ -10,7 +10,7 @@ using namespace klstream;
 
 int main() {
     using Queue = SPSCQueue<Event<FeatureBatch>>;
-    Queue q(100);
+    Queue q(128);
     BackpressureSignal signal;
     
     BackpressurePublisherOp<Queue> op("bp_pub", &q, &signal);
@@ -26,7 +26,7 @@ int main() {
     assert(op.tick() == OpStatus::Idle);
     assert(signal.load() > 0.0f);
     
-    assert(q.occupancy_approx() == 50);
+    assert(static_cast<std::size_t>(q.occupancy() * q.capacity()) == 50);
     
     printf("[test_backpressure_publisher_op] ALL TESTS PASSED\n");
     return 0;

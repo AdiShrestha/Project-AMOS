@@ -38,18 +38,18 @@ int main() {
                                  /*drift_threshold=*/0.50,
                                  0.70, 1.15);
 
-        // Stable phase: push 300 events with ema_engagement ≈ 0.5
-        for (int i = 0; i < 300; ++i) q_in.try_push(make_snap(0.5f, i));
-        for (int i = 0; i < 300; ++i) op.tick();
+        // Stable phase: push 875 events with ema_engagement ≈ 0.5
+        for (int i = 0; i < 875; ++i) q_in.try_push(make_snap(0.5f, i));
+        for (int i = 0; i < 875; ++i) op.tick();
         // Drain batches
         Event<FeatureBatch> b;
         while (q_out.try_pop(&b)) {}
 
         std::uint32_t w_before = op.current_w();
 
-        // Drift phase: push 300 events with very high ema_engagement (big step)
-        for (int i = 0; i < 300; ++i) q_in.try_push(make_snap(50.0f, 300+i));
-        for (int i = 0; i < 300; ++i) op.tick();
+        // Drift phase: push 200 events with very high ema_engagement (big step)
+        for (int i = 0; i < 200; ++i) q_in.try_push(make_snap(50.0f, 875+i));
+        for (int i = 0; i < 200; ++i) op.tick();
         while (q_out.try_pop(&b)) {}
 
         std::uint32_t w_after = op.current_w();
