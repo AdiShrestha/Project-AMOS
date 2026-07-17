@@ -36,7 +36,7 @@
 
 ---
 
-## Chunk 02: KLStream Runtime Core
+## Chunk 02: KLStream Runtime Core [COMPLETE]
 
 **Objective:** Implement the foundational KLStream runtime components: event types, SPSC/MPMC queues, operator base class, backpressure infrastructure (EMAOccupancyTracker, TokenBucketRateLimiter), worker scheduling, and the runtime coordinator — with the INV-001 termination fix (exact emitted==written event-count matching) built in from first implementation, not retrofitted.
 
