@@ -3,8 +3,8 @@
 Factory Version: 1.0.1
 
 ## repository_clean: FAIL
-Evidence: ?? prompt.md
-?? revised_software/
+Evidence:  M revised_software/project/roadmap.md
+?? revised_software/project/chunks/
 
 
 ## frozen_file_hashes: PASS

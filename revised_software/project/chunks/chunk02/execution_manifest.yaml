@@ -1,0 +1,86 @@
+factory:
+  version: "1.0.1"
+
+chunk:
+  id: "chunk02"
+  objective: "Implement the foundational KLStream runtime core."
+
+preconditions:
+  clean_worktree: true
+  approved_prior_chunks:
+    - "chunk01"
+
+execution:
+  contracts:
+    - id: "C-02-1"
+      name: "Core Utilities & Event Payload"
+      allowed_files:
+        - "revised_software/source/include/klstream/core/config.hpp"
+        - "revised_software/source/include/klstream/core/event.hpp"
+        - "revised_software/source/include/klstream/core/metrics.hpp"
+        - "revised_software/source/include/klstream/core/pinning.hpp"
+      frozen_files: []
+      dependencies: []
+      required_report: "revised_software/project/chunks/chunk02/reports/C-02-1_report.md"
+      verification_scripts:
+        - "revised_software/project/chunks/chunk02/scripts/run_core_util_tests.sh"
+
+    - id: "C-02-2"
+      name: "SPSC & MPMC Lock-Free Queues"
+      allowed_files:
+        - "revised_software/source/include/klstream/core/spsc_queue.hpp"
+        - "revised_software/source/include/klstream/core/mpmc_queue.hpp"
+      frozen_files: []
+      dependencies:
+        - "C-02-1"
+      required_report: "revised_software/project/chunks/chunk02/reports/C-02-2_report.md"
+      verification_scripts:
+        - "revised_software/project/chunks/chunk02/scripts/run_queue_concurrency_tests.sh"
+
+    - id: "C-02-3"
+      name: "Operator & Backpressure Tracking"
+      allowed_files:
+        - "revised_software/source/include/klstream/core/operator.hpp"
+        - "revised_software/source/include/klstream/core/backpressure.hpp"
+      frozen_files: []
+      dependencies:
+        - "C-02-1"
+        - "C-02-2"
+      required_report: "revised_software/project/chunks/chunk02/reports/C-02-3_report.md"
+      verification_scripts:
+        - "revised_software/project/chunks/chunk02/scripts/run_operator_tests.sh"
+
+    - id: "C-02-4"
+      name: "Worker Scheduler & Core Threads"
+      allowed_files:
+        - "revised_software/source/include/klstream/core/worker.hpp"
+      frozen_files: []
+      dependencies:
+        - "C-02-1"
+        - "C-02-2"
+        - "C-02-3"
+      required_report: "revised_software/project/chunks/chunk02/reports/C-02-4_report.md"
+      verification_scripts:
+        - "revised_software/project/chunks/chunk02/scripts/run_worker_scheduler_tests.sh"
+
+    - id: "C-02-5"
+      name: "Runtime Coordinator & Verification"
+      allowed_files:
+        - "revised_software/source/include/klstream/core/runtime.hpp"
+        - "revised_software/source/CMakeLists.txt"
+      frozen_files: []
+      dependencies:
+        - "C-02-1"
+        - "C-02-2"
+        - "C-02-3"
+        - "C-02-4"
+      required_report: "revised_software/project/chunks/chunk02/reports/C-02-5_report.md"
+      verification_scripts:
+        - "revised_software/project/chunks/chunk02/scripts/run_exact_count_termination_tests.sh"
+
+verification_sequence:
+  - "C-02-1"
+  - "C-02-2"
+  - "C-02-3"
+  - "C-02-4"
+  - "C-02-5"
