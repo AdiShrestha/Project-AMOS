@@ -79,7 +79,7 @@ Filters via Chebyshev Approximation," UT Austin CVRC.
 | Architecture | Feature Regret (FR) | 95% CI (MBB) | Coverage | Staleness (s) | Jain J |
 |---|---|---|---|---|---|
 | Fixed (W=128, α=0.10) | −0.0160 | [−0.0164, −0.0156] | 100% | 6,002 | 0.151 |
-| DriftAdaptive | −0.0160 | [−0.0164, −0.0156] | 100% | 5,800 | 0.188 |
+| DriftAdaptive | −0.0160 | [−0.0164, −0.0156] | 100% | 5,866 | 0.188 |
 | RateThrottle | −0.0160 | [−0.0164, −0.0156] | 100% | 5,928 | 0.149 |
 | A-only (adaptive W) | −0.1031 | [−0.1047, −0.1014] | 100% | 5,680 | 0.213 |
 | B-only (adaptive α) | +0.0042 | [+0.0032, +0.0048] | 100% | 5,893 | 0.205 |
