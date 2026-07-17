@@ -91,6 +91,11 @@ def check_required_artifacts_exist(required):
 
 
 def run_all_checks():
+    # Find all report paths
+    report_paths = []
+    for p in Path('revised_software/project/chunks').glob('**/reports/*.md'):
+        report_paths.append(str(p))
+
     checks = [
         ("repository_clean", check_repository_clean()),
         ("frozen_file_hashes", check_frozen_file_hashes()),
@@ -102,6 +107,7 @@ def run_all_checks():
             'revised_software/project/invariants.md',
             'revised_software/project/roadmap.md',
         ])),
+        ("verdict_evidence_adjacency", check_verdict_evidence_adjacency(report_paths)),
     ]
     return checks
 
