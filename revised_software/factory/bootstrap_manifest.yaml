@@ -1,0 +1,80 @@
+factory:
+  version: "1.0.1"
+
+bootstrap:
+
+  directories:
+
+    - factory/
+
+    - project/
+
+    - project/chunks/
+
+    - project/evolution/
+
+    - source/
+
+  required_factory_files:
+
+    - factory/constitution.md
+    - factory/factory_spec.md
+    - factory/dynamic_rules.md
+    - factory/gatekeeper.py
+    - factory/CHANGELOG.md
+    - factory/VERSION
+
+  required_project_files:
+
+    - project/project_description.md
+    - project/architecture.md
+    - project/roadmap.md
+    - project/project_knowledge.md
+    - project/invariants.md
+
+  initial_chunk:
+
+    directory: project/chunks/chunk01/
+
+    required_files:
+
+      - chunk01.md
+      - execution_manifest.yaml
+
+  evolution:
+
+    directory: project/evolution/
+
+    required_files:
+
+      - evolution.md
+      - telemetry.jsonl
+      - experiments.yaml
+      - decision_log.md
+      - metrics.csv
+
+rules:
+
+  create_missing_directories: true
+
+  create_missing_files: true
+
+  overwrite_existing_files: false
+
+  delete_unknown_files: false
+
+  verify_before_generation: true
+
+  report_actions: true
+
+  fail_on_manifest_error: true
+
+  idempotent: true
+
+ownership:
+
+  bootstrap: Claude
+
+  verification: Gatekeeper
+
+  approval: Human

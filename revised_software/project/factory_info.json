@@ -1,0 +1,8 @@
+{
+  "factory_version": "1.0.1",
+  "factory_reference": "main",
+  "factory_commit": "dee1ae016bcc4c7e9dd965eab05889b849ded8d0",
+  "factory_repository": "git@github.com:AdiShrestha/software-factory.git",
+  "bootstrapped_on": "2026-07-17T09:49:53Z",
+  "bootstrap_command": "./bootstrap.sh "
+}
