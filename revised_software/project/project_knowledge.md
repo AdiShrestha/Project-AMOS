@@ -113,3 +113,11 @@ The build prompt specified that a golden parity test (independent Python recompu
 
 ### Finding 11 — RALF Tuning Asymmetry (→ INV-011)
 The RALF-surrogate baseline was run in a single, un-tuned configuration and compared against the primary contribution, which had been swept across multiple parameter configurations. An untuned single-configuration baseline compared against a swept contribution is not a valid comparison — it systematically disadvantages the baseline. The fix is that baseline comparison effort must be symmetric.
+
+---
+
+## Technical Notes
+
+### Note TN-001: Runtime Exact-Count Termination Timeout Scale
+The `Runtime::wait_until_matched` function implements a default timeout of 10 seconds, which is appropriate for the 10K event scale of Chunk 02 unit tests. When implementing/deploying the production harness in Chunk 05 against the full ~980K-event replay datasets, this timeout MUST be explicitly overridden or scaled dynamically. A multi-minute execution under heavy load will false-trip the default 10s timeout, leading to premature termination.
+

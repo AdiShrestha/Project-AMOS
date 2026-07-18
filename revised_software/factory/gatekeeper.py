@@ -68,11 +68,14 @@ def check_verdict_evidence_adjacency(report_paths):
     mode that let fabricated verdicts pass undetected the first time.
     This is Dynamic Rule D-001 (see dynamic_rules.md) encoded as enforcement.
     """
+    print(f"[INFO] Adjacency check evaluating reports: {report_paths}")
     orphaned = []
+    scanned_count = 0
     for report_path in report_paths:
         p = Path(report_path)
         if not p.exists():
             continue
+        scanned_count += 1
         lines = p.read_text(errors='ignore').splitlines()
         for i, line in enumerate(lines):
             stripped = line.strip()
@@ -82,7 +85,10 @@ def check_verdict_evidence_adjacency(report_paths):
                            or 'log file' in w.lower() for w in window):
                     orphaned.append(f"{report_path}:{i+1}: '{stripped}' "
                                      f"has no evidence/output block within 15 lines above it")
-    return len(orphaned) == 0, orphaned or "no orphaned verdicts found"
+    evidence_msg = f"scanned {scanned_count} files: {report_paths}"
+    if orphaned:
+        evidence_msg += f" | orphaned: {orphaned}"
+    return len(orphaned) == 0, evidence_msg
 
 
 def check_required_artifacts_exist(required):
@@ -91,15 +97,12 @@ def check_required_artifacts_exist(required):
 
 
 def run_all_checks():
-    # Find all report paths
+    # Find all report paths (contract reports and chunk reports)
     report_paths = []
     for p in Path('revised_software/project/chunks').glob('**/reports/*.md'):
         report_paths.append(str(p))
-
-    # Point to the walkthrough.md in the brain folder
-    walkthrough = Path('/Users/adi/.gemini/antigravity-ide/brain/5668d8d7-52ae-4815-852c-82e8abab2ff9/walkthrough.md')
-    if walkthrough.exists():
-        report_paths.append(str(walkthrough))
+    for p in Path('revised_software/project/chunks').glob('**/chunk_report.md'):
+        report_paths.append(str(p))
 
     checks = [
         ("repository_clean", check_repository_clean()),
