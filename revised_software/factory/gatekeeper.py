@@ -96,6 +96,11 @@ def run_all_checks():
     for p in Path('revised_software/project/chunks').glob('**/reports/*.md'):
         report_paths.append(str(p))
 
+    # Point to the walkthrough.md in the brain folder
+    walkthrough = Path('/Users/adi/.gemini/antigravity-ide/brain/5668d8d7-52ae-4815-852c-82e8abab2ff9/walkthrough.md')
+    if walkthrough.exists():
+        report_paths.append(str(walkthrough))
+
     checks = [
         ("repository_clean", check_repository_clean()),
         ("frozen_file_hashes", check_frozen_file_hashes()),

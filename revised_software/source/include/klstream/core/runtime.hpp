@@ -13,6 +13,7 @@
 #include <chrono>
 #include <thread>
 #include <atomic>
+#include <iostream>
 
 namespace klstream {
 
@@ -81,6 +82,9 @@ public:
                 return true;
             }
             if (std::chrono::steady_clock::now() - start_time > timeout) {
+                std::cerr << "[WARNING] wait_until_matched timed out after "
+                          << timeout.count() << "ms. Emitted: "
+                          << em << ", Processed: " << pr << std::endl;
                 return false;
             }
             std::this_thread::sleep_for(poll_interval);
