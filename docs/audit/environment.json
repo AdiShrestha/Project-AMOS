@@ -1,0 +1,35 @@
+{
+  "schema": "bpfeat.audit.environment.v1",
+  "purpose": "audit and correctness tests, not research performance measurements",
+  "user_supplied_hardware": {
+    "model": "MacBook Air M3",
+    "cpu_cores": 8,
+    "gpu_cores": 10,
+    "unified_memory_gb": 16,
+    "storage_gb": 512
+  },
+  "observed": {
+    "os": "ProductName:\t\tmacOS\nProductVersion:\t\t27.0\nBuildVersion:\t\t26A428\n",
+    "machine": "arm64",
+    "audit_python": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+    "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin\n",
+    "cmake": "cmake version 4.4.1\n\nCMake suite maintained and supported by Kitware (kitware.com/cmake).\n"
+  },
+  "unmeasured": [
+    "CPU/GPU frequency",
+    "power",
+    "energy",
+    "thermal telemetry",
+    "CPU affinity",
+    "sustained research throughput",
+    "predictive performance"
+  ],
+  "audit_python_packages": {
+    "numpy": "2.5.0",
+    "pandas": "3.0.3",
+    "scipy": "1.18.0",
+    "sklearn": "1.9.0",
+    "yaml": "6.0.3",
+    "pytest": "9.1.1"
+  }
+}

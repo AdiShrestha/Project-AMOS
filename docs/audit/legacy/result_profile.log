@@ -1,0 +1,33 @@
+CSV files fully profiled 25
+CSV files fully profiled 50
+CSV files fully profiled 75
+CSV files fully profiled 100
+CSV files fully profiled 125
+CSV files fully profiled 150
+CSV files fully profiled 175
+CSV files fully profiled 200
+CSV files fully profiled 225
+CSV files fully profiled 250
+CSV files fully profiled 275
+CSV files fully profiled 300
+CSV files fully profiled 325
+CSV files fully profiled 350
+CSV files fully profiled 375
+CSV files fully profiled 400
+CSV files fully profiled 425
+CSV files fully profiled 450
+CSV files fully profiled 475
+CSV files fully profiled 500
+CSV files fully profiled 525
+CSV files fully profiled 550
+CSV files fully profiled 575
+CSV files fully profiled 600
+CSV files fully profiled 625
+{
+  "files": 641,
+  "rows": 125902365,
+  "header_only_files": 23,
+  "files_with_errors": 0,
+  "files_with_nonfinite_cells": 141,
+  "files_with_duplicate_seq": 23
+}

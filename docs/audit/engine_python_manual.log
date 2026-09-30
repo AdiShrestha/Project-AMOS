@@ -1,0 +1,23 @@
+test_bad_input_has_no_success_receipt (test_cli.EngineCLITests.test_bad_input_has_no_success_receipt) ... skipped 'CLI verification requires BPFEAT_ENGINE; CTest provides it'
+test_existing_attempt_is_retained (test_cli.EngineCLITests.test_existing_attempt_is_retained) ... skipped 'CLI verification requires BPFEAT_ENGINE; CTest provides it'
+test_labels_and_sequence_duplicates_are_rejected (test_cli.EngineCLITests.test_labels_and_sequence_duplicates_are_rejected) ... skipped 'CLI verification requires BPFEAT_ENGINE; CTest provides it'
+test_missing_model_never_becomes_zero_model (test_cli.EngineCLITests.test_missing_model_never_becomes_zero_model) ... skipped 'CLI verification requires BPFEAT_ENGINE; CTest provides it'
+test_partial_duplicate_unknown_and_nan_models_rejected (test_cli.EngineCLITests.test_partial_duplicate_unknown_and_nan_models_rejected) ... skipped 'CLI verification requires BPFEAT_ENGINE; CTest provides it'
+test_raw_predictions_match_independent_feature_and_score_reference (test_cli.EngineCLITests.test_raw_predictions_match_independent_feature_and_score_reference) ... skipped 'CLI verification requires BPFEAT_ENGINE; CTest provides it'
+test_unknown_duplicate_and_invalid_options_rejected (test_cli.EngineCLITests.test_unknown_duplicate_and_invalid_options_rejected) ... skipped 'CLI verification requires BPFEAT_ENGINE; CTest provides it'
+test_censored_label_is_unknown_even_when_buy_observed (test_labels.LabelTests.test_censored_label_is_unknown_even_when_buy_observed) ... ok
+test_current_buy_and_same_time_buy_excluded (test_labels.LabelTests.test_current_buy_and_same_time_buy_excluded) ... ok
+test_duplicate_identity_rejected (test_labels.LabelTests.test_duplicate_identity_rejected) ... ok
+test_future_endpoint_included_and_witness_preserved (test_labels.LabelTests.test_future_endpoint_included_and_witness_preserved) ... ok
+test_generator_cohort_is_not_lost_between_passes (test_labels.LabelTests.test_generator_cohort_is_not_lost_between_passes) ... ok
+test_no_cross_key_witness (test_labels.LabelTests.test_no_cross_key_witness) ... ok
+test_dc_identity_with_small_gains (test_reference.FilterMathematicsTests.test_dc_identity_with_small_gains) ... ok
+test_exact_time_varying_kernel_matches_recursion (test_reference.FilterMathematicsTests.test_exact_time_varying_kernel_matches_recursion) ... ok
+test_group_delay_against_phase_derivative (test_reference.FilterMathematicsTests.test_group_delay_against_phase_derivative) ... ok
+test_invalid_math_inputs_rejected (test_reference.FilterMathematicsTests.test_invalid_math_inputs_rejected) ... ok
+test_span_is_variance_match_for_constant_alpha (test_reference.FilterMathematicsTests.test_span_is_variance_match_for_constant_alpha) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.000s
+
+OK (skipped=7)

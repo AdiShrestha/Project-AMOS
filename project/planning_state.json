@@ -1,0 +1,20 @@
+{
+  "schema": "bpfeat.planning_state.v1",
+  "status": "AUDITED_ENGINE_FOUNDATION_NOT_RESEARCH_READY",
+  "research_evidence_admitted": false,
+  "research_plan_frozen": false,
+  "factory_supplied_version": "3.3.0",
+  "blocked_dependencies": [
+    "provider authenticity and dataset terms",
+    "production canonicalization and complete lineage",
+    "prospective causal task and split protocol",
+    "model training and policy-bound provenance",
+    "publication/query architecture and work-cost mechanism",
+    "reviewed native execution and streaming factory adapters",
+    "independent metrics, inference and adversarial checks",
+    "prospectively frozen real experiments and venue review"
+  ],
+  "next_contracts": ["AMOS-01", "AMOS-02", "AMOS-03"],
+  "authority": "plan.md and the human research-integrity brief",
+  "scope_note": "This is planning metadata, not a factory receipt, external review or release certificate."
+}

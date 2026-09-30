@@ -1,0 +1,384 @@
+Start testing: Sep 30 19:10 +0545
+----------------------------------------------------------
+1/20 Testing: test_bpfeat_controller
+1/20 Test: test_bpfeat_controller
+Command: "/private/tmp/bpfeat-legacy-audit-build/tests/test_bpfeat_controller"
+Directory: /private/tmp/bpfeat-legacy-audit-build/tests
+"test_bpfeat_controller" start time: Sep 30 19:10 +0545
+Output:
+----------------------------------------------------------
+[test_bpfeat_controller] test1 PASS (shrink on high occupancy)
+[test_bpfeat_controller] test2 PASS (grow on low occupancy)
+[test_bpfeat_controller] test3 PASS (deadband holds steady)
+[test_bpfeat_controller] test4 PASS (clamped at w_min=8)
+[test_bpfeat_controller] test5 PASS (clamped at w_max=256)
+[test_bpfeat_controller] test6 PASS (direction_changes=3)
+[test_bpfeat_controller] ALL TESTS PASSED
+<end of output>
+Test time =   0.47 sec
+----------------------------------------------------------
+Test Passed.
+"test_bpfeat_controller" end time: Sep 30 19:10 +0545
+"test_bpfeat_controller" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/20 Testing: test_alpha_controller
+2/20 Test: test_alpha_controller
+Command: "/private/tmp/bpfeat-legacy-audit-build/tests/test_alpha_controller"
+Directory: /private/tmp/bpfeat-legacy-audit-build/tests
+"test_alpha_controller" start time: Sep 30 19:10 +0545
+Output:
+----------------------------------------------------------
+[test_alpha_controller] test1 PASS (rising occ → rising alpha: 0.0200 → 0.3000)
+[test_alpha_controller] test2 PASS (slew-rate bound respected)
+[test_alpha_controller] test3 PASS (alpha bounded [0.02, 0.30])
+[test_alpha_controller] test4 PASS (Project 3 sign: calm=0.020, stress=0.300)
+[test_alpha_controller] test5 PASS (pressure clamp and invalid hold)
+[test_alpha_controller] ALL TESTS PASSED
+<end of output>
+Test time =   0.33 sec
+----------------------------------------------------------
+Test Passed.
+"test_alpha_controller" end time: Sep 30 19:10 +0545
+"test_alpha_controller" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/20 Testing: test_keyed_feature_extract_op
+3/20 Test: test_keyed_feature_extract_op
+Command: "/private/tmp/bpfeat-legacy-audit-build/tests/test_keyed_feature_extract_op"
+Directory: /private/tmp/bpfeat-legacy-audit-build/tests
+"test_keyed_feature_extract_op" start time: Sep 30 19:10 +0545
+Output:
+----------------------------------------------------------
+[test_keyed] test1 PASS (user isolation: ema_u1=4.1596 > ema_u2=0.8319)
+[test_keyed] test2 PASS (ULB degenerate single key, user_count=1)
+[test_keyed] test3 PASS (20 input events → 20 snapshots)
+[test_keyed] test4 PASS (explicit Taobao/ULB mode semantics)
+[test_keyed_feature_extract_op] ALL TESTS PASSED
+<end of output>
+Test time =   0.33 sec
+----------------------------------------------------------
+Test Passed.
+"test_keyed_feature_extract_op" end time: Sep 30 19:10 +0545
+"test_keyed_feature_extract_op" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/20 Testing: test_scoring_flush_op
+4/20 Test: test_scoring_flush_op
+Command: "/private/tmp/bpfeat-legacy-audit-build/tests/test_scoring_flush_op"
+Directory: /private/tmp/bpfeat-legacy-audit-build/tests
+"test_scoring_flush_op" start time: Sep 30 19:10 +0545
+Output:
+----------------------------------------------------------
+[test_scoring_flush] test1 PASS (batch W=10, all 10 results produced)
+[test_scoring_flush] test2 PASS (Blocked-recovery: no skip/dup in W=10)
+[test_scoring_flush_op] ALL TESTS PASSED
+<end of output>
+Test time =   0.32 sec
+----------------------------------------------------------
+Test Passed.
+"test_scoring_flush_op" end time: Sep 30 19:10 +0545
+"test_scoring_flush_op" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/20 Testing: test_drift_adaptive_window_op
+5/20 Test: test_drift_adaptive_window_op
+Command: "/private/tmp/bpfeat-legacy-audit-build/tests/test_drift_adaptive_window_op"
+Directory: /private/tmp/bpfeat-legacy-audit-build/tests
+"test_drift_adaptive_window_op" start time: Sep 30 19:10 +0545
+Output:
+----------------------------------------------------------
+[test_drift_adaptive] test1 PASS (drift detected: W 256 → 179)
+[test_drift_adaptive] test2 PASS (saturated downstream, direction_changes=1, current_w=205)
+[test_drift_adaptive_window_op] ALL TESTS PASSED
+<end of output>
+Test time =   0.32 sec
+----------------------------------------------------------
+Test Passed.
+"test_drift_adaptive_window_op" end time: Sep 30 19:10 +0545
+"test_drift_adaptive_window_op" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/20 Testing: test_pipeline_integration
+6/20 Test: test_pipeline_integration
+Command: "/private/tmp/bpfeat-legacy-audit-build/tests/test_pipeline_integration"
+Directory: /private/tmp/bpfeat-legacy-audit-build/tests
+"test_pipeline_integration" start time: Sep 30 19:10 +0545
+Output:
+----------------------------------------------------------
+[integration] Generated 200 events
+[drain] Final occupancy: raw=0.000, feat=0.000, batch=0.000, scored=0.000
+[drain] Final occupancy: raw=0.000, feat=0.000, batch=0.000, scored=0.000
+[drain] Final occupancy: raw=0.000, feat=0.000, batch=0.000, scored=0.000
+[drain] Final occupancy: raw=0.000, feat=0.000, batch=0.000, scored=0.000
+[integration] fixed=200  drift=200  throttle=200  adaptive=200
+[test_pipeline_integration] ALL TESTS PASSED
+<end of output>
+Test time =   0.60 sec
+----------------------------------------------------------
+Test Passed.
+"test_pipeline_integration" end time: Sep 30 19:10 +0545
+"test_pipeline_integration" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/20 Testing: test_ralf_window_op
+7/20 Test: test_ralf_window_op
+Command: "/private/tmp/bpfeat-legacy-audit-build/tests/test_ralf_window_op"
+Directory: /private/tmp/bpfeat-legacy-audit-build/tests
+"test_ralf_window_op" start time: Sep 30 19:10 +0545
+Output:
+----------------------------------------------------------
+[test_ralf_window_op] deterministic tie/dedup PASS
+[test_ralf_window_op] ALL TESTS PASSED
+<end of output>
+Test time =   0.33 sec
+----------------------------------------------------------
+Test Passed.
+"test_ralf_window_op" end time: Sep 30 19:10 +0545
+"test_ralf_window_op" time elapsed: 00:00:00
+----------------------------------------------------------
+
+8/20 Testing: test_backpressure_publisher_op
+8/20 Test: test_backpressure_publisher_op
+Command: "/private/tmp/bpfeat-legacy-audit-build/tests/test_backpressure_publisher_op"
+Directory: /private/tmp/bpfeat-legacy-audit-build/tests
+"test_backpressure_publisher_op" start time: Sep 30 19:10 +0545
+Output:
+----------------------------------------------------------
+[test_backpressure_publisher_op] ALL TESTS PASSED
+<end of output>
+Test time =   0.35 sec
+----------------------------------------------------------
+Test Passed.
+"test_backpressure_publisher_op" end time: Sep 30 19:10 +0545
+"test_backpressure_publisher_op" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/20 Testing: test_ablation_architectures
+9/20 Test: test_ablation_architectures
+Command: "/private/tmp/bpfeat-legacy-audit-build/tests/test_ablation_architectures"
+Directory: /private/tmp/bpfeat-legacy-audit-build/tests
+"test_ablation_architectures" start time: Sep 30 19:10 +0545
+Output:
+----------------------------------------------------------
+[test_ablation_architectures] ALL TESTS PASSED
+<end of output>
+Test time =   0.33 sec
+----------------------------------------------------------
+Test Passed.
+"test_ablation_architectures" end time: Sep 30 19:10 +0545
+"test_ablation_architectures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+10/20 Testing: test_runtime_lifecycle
+10/20 Test: test_runtime_lifecycle
+Command: "/private/tmp/bpfeat-legacy-audit-build/tests/test_runtime_lifecycle"
+Directory: /private/tmp/bpfeat-legacy-audit-build/tests
+"test_runtime_lifecycle" start time: Sep 30 19:10 +0545
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.34 sec
+----------------------------------------------------------
+Test Passed.
+"test_runtime_lifecycle" end time: Sep 30 19:10 +0545
+"test_runtime_lifecycle" time elapsed: 00:00:00
+----------------------------------------------------------
+
+11/20 Testing: test_accounting_ledger
+11/20 Test: test_accounting_ledger
+Command: "/private/tmp/bpfeat-legacy-audit-build/tests/test_accounting_ledger"
+Directory: /private/tmp/bpfeat-legacy-audit-build/tests
+"test_accounting_ledger" start time: Sep 30 19:10 +0545
+Output:
+----------------------------------------------------------
+{"offered":0,"admitted":0,"terminal_scored":0,"partial_batches":0,"in_flight":0}
+{"offered":1,"admitted":1,"terminal_scored":1,"partial_batches":1,"in_flight":0}
+{"offered":7,"admitted":7,"terminal_scored":7,"partial_batches":1,"in_flight":0}
+{"offered":8,"admitted":8,"terminal_scored":8,"partial_batches":0,"in_flight":0}
+{"offered":9,"admitted":9,"terminal_scored":9,"partial_batches":1,"in_flight":0}
+{"offered":17,"admitted":17,"terminal_scored":17,"partial_batches":1,"in_flight":0}
+<end of output>
+Test time =   0.32 sec
+----------------------------------------------------------
+Test Passed.
+"test_accounting_ledger" end time: Sep 30 19:10 +0545
+"test_accounting_ledger" time elapsed: 00:00:00
+----------------------------------------------------------
+
+12/20 Testing: test_queue_lifecycle
+12/20 Test: test_queue_lifecycle
+Command: "/private/tmp/bpfeat-legacy-audit-build/tests/test_queue_lifecycle"
+Directory: /private/tmp/bpfeat-legacy-audit-build/tests
+"test_queue_lifecycle" start time: Sep 30 19:10 +0545
+Output:
+----------------------------------------------------------
+queue_lifecycle=PASS
+<end of output>
+Test time =   0.33 sec
+----------------------------------------------------------
+Test Passed.
+"test_queue_lifecycle" end time: Sep 30 19:10 +0545
+"test_queue_lifecycle" time elapsed: 00:00:00
+----------------------------------------------------------
+
+13/20 Testing: test_topology_manifest
+13/20 Test: test_topology_manifest
+Command: "/private/tmp/bpfeat-legacy-audit-build/tests/test_topology_manifest"
+Directory: /private/tmp/bpfeat-legacy-audit-build/tests
+"test_topology_manifest" start time: Sep 30 19:10 +0545
+Output:
+----------------------------------------------------------
+topology_manifest=PASS
+<end of output>
+Test time =   0.32 sec
+----------------------------------------------------------
+Test Passed.
+"test_topology_manifest" end time: Sep 30 19:10 +0545
+"test_topology_manifest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+14/20 Testing: test_native_trace
+14/20 Test: test_native_trace
+Command: "/private/tmp/bpfeat-legacy-audit-build/tests/test_native_trace"
+Directory: /private/tmp/bpfeat-legacy-audit-build/tests
+"test_native_trace" start time: Sep 30 19:10 +0545
+Output:
+----------------------------------------------------------
+native_trace=PASS
+<end of output>
+Test time =   0.33 sec
+----------------------------------------------------------
+Test Passed.
+"test_native_trace" end time: Sep 30 19:10 +0545
+"test_native_trace" time elapsed: 00:00:00
+----------------------------------------------------------
+
+15/20 Testing: test_semantic_precision
+15/20 Test: test_semantic_precision
+Command: "/private/tmp/bpfeat-legacy-audit-build/tests/test_semantic_precision"
+Directory: /private/tmp/bpfeat-legacy-audit-build/tests
+"test_semantic_precision" start time: Sep 30 19:10 +0545
+Output:
+----------------------------------------------------------
+epoch_precision=PASS
+<end of output>
+Test time =   0.33 sec
+----------------------------------------------------------
+Test Passed.
+"test_semantic_precision" end time: Sep 30 19:10 +0545
+"test_semantic_precision" time elapsed: 00:00:00
+----------------------------------------------------------
+
+16/20 Testing: test_semantic_differential
+16/20 Test: test_semantic_differential
+Command: "/private/tmp/bpfeat-legacy-audit-build/tests/test_semantic_differential"
+Directory: /private/tmp/bpfeat-legacy-audit-build/tests
+"test_semantic_differential" start time: Sep 30 19:10 +0545
+Output:
+----------------------------------------------------------
+semantic_cpp_events=10000
+<end of output>
+Test time =   0.34 sec
+----------------------------------------------------------
+Test Passed.
+"test_semantic_differential" end time: Sep 30 19:10 +0545
+"test_semantic_differential" time elapsed: 00:00:00
+----------------------------------------------------------
+
+17/20 Testing: test_dataset_adapter
+17/20 Test: test_dataset_adapter
+Command: "/private/tmp/bpfeat-legacy-audit-build/tests/test_dataset_adapter"
+Directory: /private/tmp/bpfeat-legacy-audit-build/tests
+"test_dataset_adapter" start time: Sep 30 19:10 +0545
+Output:
+----------------------------------------------------------
+[test_dataset_adapter] Starting adapter verification...
+  - Valid Taobao load: PASS
+  - Valid ULB load: PASS
+  - Sparse sequence label identity: PASS
+  - Fail-closed missing Taobao columns: PASS
+  - Fail-closed unknown Taobao behavior code: PASS
+  - Fail-closed non-zero ULB behavior code: PASS
+  - Fail-closed non-existent file: PASS
+  - Fail-closed unknown replay header: PASS
+  - Fail-closed duplicate sequence: PASS
+  - Fail-closed fabricated ULB identity: PASS
+  - Tie order and backward-time guard: PASS
+[test_dataset_adapter] All adapter tests PASSED successfully.
+<end of output>
+Test time =   0.34 sec
+----------------------------------------------------------
+Test Passed.
+"test_dataset_adapter" end time: Sep 30 19:10 +0545
+"test_dataset_adapter" time elapsed: 00:00:00
+----------------------------------------------------------
+
+18/20 Testing: test_config_parser
+18/20 Test: test_config_parser
+Command: "/private/tmp/bpfeat-legacy-audit-build/tests/test_config_parser"
+Directory: /private/tmp/bpfeat-legacy-audit-build/tests
+"test_config_parser" start time: Sep 30 19:10 +0545
+Output:
+----------------------------------------------------------
+[test_config_parser] Running configuration parser tests...
+[test_config_parser] test1: fixed_window_v1 PASS
+[test_config_parser] test1: backpressure_only_v1 PASS
+[test_config_parser] test1: rate_throttle_v1 PASS
+[test_config_parser] test1: bpfeat_adaptive_v1 PASS
+[test_config_parser] test2: unknown architecture fail-closed PASS
+[test_config_parser] test3: missing throttle rate fail-closed PASS
+[test_config_parser] test4: invalid queue capacity fail-closed PASS
+[test_config_parser] test5: invalid feature schema fail-closed PASS
+[test_config_parser] ALL TESTS PASSED
+<end of output>
+Test time =   0.33 sec
+----------------------------------------------------------
+Test Passed.
+"test_config_parser" end time: Sep 30 19:10 +0545
+"test_config_parser" time elapsed: 00:00:00
+----------------------------------------------------------
+
+19/20 Testing: test_harness_registry
+19/20 Test: test_harness_registry
+Command: "/private/tmp/bpfeat-legacy-audit-build/tests/test_harness_registry"
+Directory: /private/tmp/bpfeat-legacy-audit-build/tests
+"test_harness_registry" start time: Sep 30 19:10 +0545
+Output:
+----------------------------------------------------------
+[test_harness_registry] Running registry harness tests...
+[test_harness_registry] test1: empty dataset error PASS
+[test_harness_registry] test2: uninitialized execution error PASS
+[test_harness_registry] test3: fixed_window execution & counter accounting PASS
+[test_harness_registry] test4: bpfeat_adaptive execution PASS
+[test_harness_registry] ALL TESTS PASSED
+<end of output>
+Test time =   0.36 sec
+----------------------------------------------------------
+Test Passed.
+"test_harness_registry" end time: Sep 30 19:10 +0545
+"test_harness_registry" time elapsed: 00:00:00
+----------------------------------------------------------
+
+20/20 Testing: test_baseline_signatures
+20/20 Test: test_baseline_signatures
+Command: "/private/tmp/bpfeat-legacy-audit-build/tests/test_baseline_signatures"
+Directory: /private/tmp/bpfeat-legacy-audit-build/tests
+"test_baseline_signatures" start time: Sep 30 19:10 +0545
+Output:
+----------------------------------------------------------
+[test_baseline_signatures] Verifying architecture baseline signatures...
+[test_baseline_signatures] Signature 1 (fixed_window_v1): PASS
+[test_baseline_signatures] Signature 2 (backpressure_only_v1): PASS
+[test_baseline_signatures] Signature 3 (rate_throttle_v1): PASS
+[test_baseline_signatures] Signature 4 (bpfeat_adaptive_v1): PASS
+[test_baseline_signatures] ALL BASELINE SIGNATURES VERIFIED PASS
+<end of output>
+Test time =   0.40 sec
+----------------------------------------------------------
+Test Passed.
+"test_baseline_signatures" end time: Sep 30 19:10 +0545
+"test_baseline_signatures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Sep 30 19:10 +0545

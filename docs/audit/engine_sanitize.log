@@ -1,0 +1,28 @@
+-- The CXX compiler identification is AppleClang 21.0.0.21000101
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Found Python3: /opt/homebrew/Frameworks/Python.framework/Versions/3.14/bin/python3.14 (found version "3.14.6") found components: Interpreter
+-- Configuring done (1.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /Users/adi/Desktop/Projects/Using v3.3 New projects/New Bpfeat/build/sanitize
+[ 25%] Building CXX object CMakeFiles/bpfeat_engine.dir/source/apps/engine_main.cpp.o
+[ 50%] Building CXX object CMakeFiles/test_engine.dir/tests/test_engine.cpp.o
+[ 75%] Linking CXX executable test_engine
+[100%] Linking CXX executable bpfeat_engine
+[100%] Built target test_engine
+[100%] Built target bpfeat_engine
+Test project /Users/adi/Desktop/Projects/Using v3.3 New projects/New Bpfeat/build/sanitize
+    Start 1: engine_counterexamples
+1/2 Test #1: engine_counterexamples ...........   Passed    0.75 sec
+    Start 2: python_engine_checks
+2/2 Test #2: python_engine_checks .............   Passed    1.27 sec
+
+100% tests passed out of 2
+
+Total Test time (real) =   2.02 sec

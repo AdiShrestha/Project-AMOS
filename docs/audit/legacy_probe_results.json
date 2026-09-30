@@ -1,0 +1,51 @@
+{
+  "purpose": "legacy correctness counterexamples, not research results",
+  "native_stdout": "full_mpmc_occupancy=0\npartial_model_accepted_w6=0\ngrowth_integer_trap_before=8 after=8\nexpected_second_seq=30 actual=11\nexpected_retry_gap_seconds=4 actual=0\nindividual_creation_timestamp_replaced=123\n",
+  "compiler_stderr": "In file included from /Users/adi/Desktop/Projects/Using v3.3 New projects/New Bpfeat/docs/audit/probes/legacy_engine_probe.cpp:3:\n/Users/adi/Desktop/Projects/Using Older Factories/Project AMOS/source/include/klstream/feature/scoring_flush_op.hpp:45:10: warning: 'attach_metrics' overrides a member function but is not marked 'override' [-Winconsistent-missing-override]\n   45 |     void attach_metrics(OperatorMetrics* m) { metrics_ = m; }\n      |          ^\n/Users/adi/Desktop/Projects/Using Older Factories/Project AMOS/source/include/klstream/feature/../core/operator.hpp:75:18: note: overridden virtual function is here\n   75 |     virtual void attach_metrics(struct OperatorMetrics*) {}\n      |                  ^\nIn file included from /Users/adi/Desktop/Projects/Using v3.3 New projects/New Bpfeat/docs/audit/probes/legacy_engine_probe.cpp:4:\n/Users/adi/Desktop/Projects/Using Older Factories/Project AMOS/source/include/klstream/feature/adaptive_feature_window_op.hpp:103:10: warning: 'attach_metrics' overrides a member function but is not marked 'override' [-Winconsistent-missing-override]\n  103 |     void attach_metrics(OperatorMetrics* m) { metrics_ = m; }\n      |          ^\n/Users/adi/Desktop/Projects/Using Older Factories/Project AMOS/source/include/klstream/feature/../core/operator.hpp:75:18: note: overridden virtual function is here\n   75 |     virtual void attach_metrics(struct OperatorMetrics*) {}\n      |                  ^\n2 warnings generated.\n",
+  "orchestrator_with_missing_binary": [
+    {
+      "run_id": "diagnostic_only",
+      "status": "COMPLETED"
+    }
+  ],
+  "orchestrator_manifest_environment": {
+    "host_os": "Darwin-24.3.0",
+    "compiler": "AppleClang-16.0.0",
+    "build_type": "Debug",
+    "git_commit": "d2723f5",
+    "cpu_model": "Apple M1 Max"
+  },
+  "orchestrator_wall_time_ms": 25.0,
+  "orchestrator_rows": "seq,result_timestamp_ns,result_wall_ns,latency_ns,user_id,score,label,label_valid,window_size_used,alpha_used,staleness_sec,occupancy_at_decision,is_burst_period\n1,1700000000000000000,1700000000000000000,150,1,0.45,0,1,32,0.10,0.0,0.25,0\n2,1700000000000000000,1700000000000000000,150,1,0.45,0,1,32,0.10,0.0,0.25,0\n3,1700000000000000000,1700000000000000000,150,1,0.45,0,1,32,0.10,0.0,0.25,0\n",
+  "self_buy_label_fixture": [
+    {
+      "user_id": 1,
+      "timestamp_ns": 0,
+      "behavior_code": 3,
+      "label": 1,
+      "label_valid": 1
+    },
+    {
+      "user_id": 1,
+      "timestamp_ns": 1000000000000,
+      "behavior_code": 0,
+      "label": 0,
+      "label_valid": 1
+    },
+    {
+      "user_id": 2,
+      "timestamp_ns": 0,
+      "behavior_code": 0,
+      "label": 0,
+      "label_valid": 1
+    },
+    {
+      "user_id": 2,
+      "timestamp_ns": 10000000000000,
+      "behavior_code": 0,
+      "label": 0,
+      "label_valid": 0
+    }
+  ],
+  "burst_window_ignored": true
+}

@@ -1,0 +1,46 @@
+{
+  "schema": "bpfeat.migration_foundation.v1",
+  "created_at_utc": "2026-09-30T18:31:46.519883+00:00",
+  "research_evidence": false,
+  "scope": "Corrected per-event feature/batch/scoring engine and independent mathematical/label references; full research system remains planned.",
+  "source_and_test_sha256": {
+    "source/README.md": "e7679c125528cfc2c9d9735d709dae588089b7c389f0f575aef41a80cc8d1fe4",
+    "source/apps/engine_main.cpp": "d010c55373c7d70eb3990f2382bf1c84dbc902e41836a0ada1879f3ce01273d8",
+    "source/include/bpfeat/controllers.hpp": "c16cac615f404ed5f72e13334a30ba39a0c6c2db660a0e1e62d667893232bd8d",
+    "source/include/bpfeat/features.hpp": "8ce86cc8904a530f984530209660b843f2c8caead9509dbb5a7e1af1ac75405d",
+    "source/include/bpfeat/model.hpp": "fd9ebdff1952f36682f9c196dd983353c0be28e2bb8f06f4d6577823f10ac20e",
+    "source/include/bpfeat/pipeline.hpp": "60f9058bffabe51acaa1fa328de3d036e5d7817a25796105fe969f30ad4f6aee",
+    "source/include/bpfeat/replay.hpp": "00cf6d94b7b2dd76a178ec9954de872afc656c45640df7d22489c878cc7032c1",
+    "source/include/bpfeat/spsc_queue.hpp": "5437c068a38ae50c605df9259854030ff49d4a0ed0892a52c907486b0d20c608",
+    "source/preprocessing/labels.py": "f73e5573b9cf8ad6ffc6372d228f45931b4a8818750b0c88ceee0665fb33bb93",
+    "source/reference/filter_math.py": "de058d19093a9e0c82fd22723e8fca6b7de142e7465e3a9b87144ecd3c3b2a8f",
+    "source/requirements.lock": "e0f2802ff18a91b343f4a9a5b55299de810e203eaeaafe42b0a9a6522039c45a",
+    "tests/test_cli.py": "b3ef9529cc3f4b09568d49e986f8aec2bf7d80fcd8c8a6b32597992813657bf7",
+    "tests/test_engine.cpp": "1a3ef18a04a550e7c8c680f3bca5d1cafa9a42dfe3e9046cc10c7914b3f25d8d",
+    "tests/test_labels.py": "0e757c539e418691c3df9ca82e26172ad4c9decdf1230a82a4f39ed8ad7d7159",
+    "tests/test_reference.py": "3579bfa22ef17a8384ece9f6470a24dad4674c2f158bc3022245af8521045a0c",
+    "CMakeLists.txt": "e73eaf9aaeaf112e6dd93f98f22ae8955647d506551ba1c4faed9f5a6db61039",
+    "plan.md": "c0e334d9ff7fbf697418c7bbb4b0c7c8ce10d52e91af32ee542b3e0b6b2889ae",
+    "AGENTS.md": "d74dae66275218b76b9dd38cc61b0b2e85a714c7c676b42663b5f75448afe42f"
+  },
+  "validation": {
+    "legacy_cpp": "20 passed",
+    "legacy_python": "16 passed",
+    "factory_supplied": "276 passed",
+    "corrected_engine_debug": "2/2 CTest suites passed",
+    "corrected_engine_release": "2/2 CTest suites passed",
+    "address_undefined_sanitizers": "2/2 CTest suites passed",
+    "thread_sanitizer": "2/2 CTest suites passed",
+    "python_bound_to_release_engine": "18/18 passed; no skips"
+  },
+  "not_established": [
+    "dataset provider authenticity/terms",
+    "research performance",
+    "publication/query system",
+    "trained model validity",
+    "closed-loop stability",
+    "formal concurrency proof",
+    "submission readiness"
+  ],
+  "logs": "docs/audit/"
+}

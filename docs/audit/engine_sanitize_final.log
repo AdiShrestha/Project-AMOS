@@ -1,0 +1,9 @@
+Test project /Users/adi/Desktop/Projects/Using v3.3 New projects/New Bpfeat/build/sanitize
+    Start 1: engine_counterexamples
+1/2 Test #1: engine_counterexamples ...........   Passed    0.20 sec
+    Start 2: python_engine_checks
+2/2 Test #2: python_engine_checks .............   Passed    0.87 sec
+
+100% tests passed out of 2
+
+Total Test time (real) =   1.07 sec

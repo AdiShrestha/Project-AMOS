@@ -1,0 +1,32 @@
+{
+  "schema": "bpfeat.candidate_data.v1",
+  "candidates": [
+    {
+      "candidate_id": "UserBehavior.csv",
+      "kind": "Taobao candidate",
+      "local_path": "data/quarantine/raw/UserBehavior.csv",
+      "sha256": "46fdd7d389c1ddc7922eb7d9014af5573a4a3045da28c6c46197636873d8f1a9",
+      "bytes": 3672347465,
+      "physical_lines": 100150807,
+      "suggested_provider_landing_page": "https://tianchi.aliyun.com/dataset/649",
+      "acquisition_status": "UNVERIFIED",
+      "terms_status": "UNVERIFIED",
+      "research_admission": "BLOCKED",
+      "source": "User-supplied legacy local file; copy is byte identity preservation, not a verified provider download."
+    },
+    {
+      "candidate_id": "creditcard.csv",
+      "kind": "ULB candidate",
+      "local_path": "data/quarantine/raw/creditcard.csv",
+      "sha256": "76274b691b16a6c49d3f159c883398e03ccd6d1ee12d9d8ee38f4b4b98551a89",
+      "bytes": 150828752,
+      "physical_lines": 284808,
+      "suggested_provider_landing_page": "https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud",
+      "acquisition_status": "UNVERIFIED",
+      "terms_status": "UNVERIFIED",
+      "research_admission": "BLOCKED",
+      "source": "User-supplied legacy local file; copy is byte identity preservation, not a verified provider download."
+    }
+  ],
+  "release_raw_data": false
+}

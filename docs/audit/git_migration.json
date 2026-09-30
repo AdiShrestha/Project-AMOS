@@ -1,0 +1,23 @@
+{
+  "schema": "bpfeat.git_migration.v1",
+  "created_at_utc": "2026-09-30T18:27:20.142722+00:00",
+  "remote": "git@github.com:AdiShrestha/Project-AMOS.git",
+  "published_legacy_commit": "37c85a6ba1905eb5029d24bd9dba26f928c8f06b",
+  "workspace_archive_commit": "39a7cdcb15db53f13c2082d71f91df01a7cf407c",
+  "archive_paths": 441,
+  "tags": {
+    "legacy-published-2026-09-30": "37c85a6ba1905eb5029d24bd9dba26f928c8f06b",
+    "legacy-workspace-2026-09-30": "39a7cdcb15db53f13c2082d71f91df01a7cf407c"
+  },
+  "archive_scope": "Current legacy code/tests/configuration/paper/governance; raw data, results, builds, caches and chat/data exports excluded.",
+  "local_legacy_directory_preserved": true,
+  "new_working_directory": "New Bpfeat",
+  "main_migration_status": "PREPARED_NOT_PUSHED",
+  "tag_push_status": "PUSHED_AND_REMOTE_VERIFIED",
+  "history_rewritten": false,
+  "tag_verification_utc": "2026-09-30T18:31:46.514128+00:00",
+  "remote_peeled_tag_commits": {
+    "legacy-published-2026-09-30": "37c85a6ba1905eb5029d24bd9dba26f928c8f06b",
+    "legacy-workspace-2026-09-30": "39a7cdcb15db53f13c2082d71f91df01a7cf407c"
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "taobao_raw": {
+    "path": "/Users/adi/Desktop/Projects/Using Older Factories/Project AMOS/data/raw/UserBehavior.csv",
+    "rows": 100150807,
+    "unique_users": 987994,
+    "behavior_counts": {
+      "pv": 89715946,
+      "fav": 2888258,
+      "buy": 2015839,
+      "cart": 5530446
+    },
+    "invalid_rows": 318,
+    "min_timestamp_seconds": 259,
+    "max_timestamp_seconds": 2122867355,
+    "max_category_id": 5162429,
+    "adjacent_same_user_time_regressions": 0,
+    "limits": "Schema/distribution profile; no provider authenticity or duplicate validation."
+  },
+  "ulb_raw": {
+    "path": "/Users/adi/Desktop/Projects/Using Older Factories/Project AMOS/data/raw/creditcard.csv",
+    "rows": 284807,
+    "label_counts": {
+      "0": 284315,
+      "1": 492
+    },
+    "invalid_numeric_rows": 0,
+    "limits": "Numeric/domain profile only; anonymous rows do not establish entity IDs."
+  },
+  "replays": [
+    {
+      "path": "/Users/adi/Desktop/Projects/Using Older Factories/Project AMOS/data/replay/replay_causal_demo.csv",
+      "rows": 36000,
+      "users": 100,
+      "label_valid_counts": {
+        "('1', '1')": 3577,
+        "('0', '1')": 32423
+      },
+      "nonincreasing_seq": 0,
+      "global_time_regressions": 0,
+      "per_key_time_regressions": 0,
+      "category_uint16_overflow_rows": 0
+    },
+    {
+      "path": "/Users/adi/Desktop/Projects/Using Older Factories/Project AMOS/data/replay/replay_taobao_10k.csv",
+      "rows": 980885,
+      "users": 9711,
+      "label_valid_counts": {
+        "('0', '1')": 863704,
+        "('1', '1')": 117170,
+        "('0', '0')": 11
+      },
+      "nonincreasing_seq": 0,
+      "global_time_regressions": 9710,
+      "per_key_time_regressions": 0,
+      "category_uint16_overflow_rows": 976984
+    },
+    {
+      "path": "/Users/adi/Desktop/Projects/Using Older Factories/Project AMOS/data/replay/replay_ulb.csv",
+      "rows": 284807,
+      "users": 1,
+      "label_valid_counts": {
+        "('0', '1')": 284315,
+        "('1', '1')": 492
+      },
+      "nonincreasing_seq": 0,
+      "global_time_regressions": 0,
+      "per_key_time_regressions": 0,
+      "category_uint16_overflow_rows": 0
+    }
+  ]
+}
