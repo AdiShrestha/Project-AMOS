@@ -1,40 +1,30 @@
-cmake_minimum_required(VERSION 3.16)
-project(KLStream VERSION 3.0.0 LANGUAGES CXX)
-
+cmake_minimum_required(VERSION 3.20)
+project(BPFeatResearchFoundation VERSION 0.1.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-
-# ── Compiler flags ────────────────────────────────────────────────────────────
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
-    add_compile_options(
-        -Wall -Wextra -Wpedantic
-        -O2
-        -fno-omit-frame-pointer
-    )
-endif()
-
-# ── Thread support ────────────────────────────────────────────────────────────
 find_package(Threads REQUIRED)
-
-# ── Interface library: klstream::klstream ─────────────────────────────────────
-# Pure-header library; consuming targets just link this target and get the
-# include path + pthread automatically — the exact CMake pattern described
-# in the KLStream Implementation Guide Section 9.1.
-add_library(klstream INTERFACE)
-add_library(klstream::klstream ALIAS klstream)
-target_include_directories(klstream INTERFACE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
-)
-target_link_libraries(klstream INTERFACE Threads::Threads)
-target_compile_features(klstream INTERFACE cxx_std_17)
-
-# ── Testing ──────────────────────────────────────────────────────────────────
-# enable_testing() must be at root scope so CTest can discover tests registered
-# by add_test() inside the tests/ subdirectory.
-enable_testing()
-
-# ── Sub-projects ──────────────────────────────────────────────────────────────
-add_subdirectory(feature_flow)
-add_subdirectory(tests)
+add_library(bpfeat INTERFACE)
+target_include_directories(bpfeat INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/source/include)
+target_link_libraries(bpfeat INTERFACE Threads::Threads)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    target_compile_options(bpfeat INTERFACE -Wall -Wextra -Wpedantic)
+endif()
+add_executable(bpfeat_engine source/apps/engine_main.cpp)
+target_link_libraries(bpfeat_engine PRIVATE bpfeat)
+option(BPFEAT_SANITIZERS "Enable address and undefined behavior sanitizers" OFF)
+if(BPFEAT_SANITIZERS)
+    target_compile_options(bpfeat INTERFACE -fsanitize=address,undefined -fno-omit-frame-pointer)
+    target_link_options(bpfeat INTERFACE -fsanitize=address,undefined)
+endif()
+include(CTest)
+if(BUILD_TESTING)
+    add_executable(test_engine tests/test_engine.cpp)
+    target_link_libraries(test_engine PRIVATE bpfeat)
+    add_test(NAME engine_counterexamples COMMAND test_engine)
+    set_tests_properties(engine_counterexamples PROPERTIES TIMEOUT 30)
+    find_package(Python3 COMPONENTS Interpreter REQUIRED)
+    add_test(NAME python_engine_checks COMMAND ${Python3_EXECUTABLE} -B -m unittest discover -s tests -p test_*.py)
+    set_tests_properties(python_engine_checks PROPERTIES WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        TIMEOUT 60 ENVIRONMENT "BPFEAT_ENGINE=$<TARGET_FILE:bpfeat_engine>")
+endif()
