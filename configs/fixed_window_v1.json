@@ -1,0 +1,15 @@
+{
+  "architecture_id": "fixed_window_v1",
+  "display_name": "Fixed window",
+  "data_artifact_id": "resolved_after_gate",
+  "model_artifact_id": "resolved_after_gate",
+  "feature_schema_id": "bpfeat.feature.v1",
+  "task_protocol_id": "bpfeat.prediction.v1",
+  "seed": 42,
+  "w_events": 32,
+  "workers": 1,
+  "queue_capacity": 1024,
+  "warmup_events": 1000,
+  "measurement_events": 10000,
+  "out_dir": "results/runs/chunk05"
+}

@@ -24,7 +24,7 @@ find_package(Threads REQUIRED)
 add_library(klstream INTERFACE)
 add_library(klstream::klstream ALIAS klstream)
 target_include_directories(klstream INTERFACE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/source/include>
     $<INSTALL_INTERFACE:include>
 )
 target_link_libraries(klstream INTERFACE Threads::Threads)
@@ -36,5 +36,5 @@ target_compile_features(klstream INTERFACE cxx_std_17)
 enable_testing()
 
 # ── Sub-projects ──────────────────────────────────────────────────────────────
-add_subdirectory(feature_flow)
+add_subdirectory(source/apps/feature_flow)
 add_subdirectory(tests)

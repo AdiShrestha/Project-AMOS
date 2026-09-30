@@ -58,4 +58,8 @@ pre_cleanup_inventory.txt
 audit_guide.md
 audit_report.md
 claude_data_export.md
-claude_final_results.md
+claude_final_results.mdfactory/
+project/
+bootstrap.sh
+DROP_HERE/
+TAKE_THIS/

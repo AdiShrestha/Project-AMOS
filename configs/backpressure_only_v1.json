@@ -1,0 +1,16 @@
+{
+  "architecture_id": "backpressure_only_v1",
+  "display_name": "Backpressure only",
+  "data_artifact_id": "resolved_after_gate",
+  "model_artifact_id": "resolved_after_gate",
+  "feature_schema_id": "bpfeat.feature.v1",
+  "task_protocol_id": "bpfeat.prediction.v1",
+  "seed": 42,
+  "w_events": 32,
+  "backpressure_threshold": 0.70,
+  "workers": 1,
+  "queue_capacity": 1024,
+  "warmup_events": 1000,
+  "measurement_events": 10000,
+  "out_dir": "results/runs/chunk05"
+}

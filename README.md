@@ -14,7 +14,7 @@
 
 ```
 KLStream/
-├── include/klstream/
+├── source/include/klstream/
 │   ├── core/          # config, event, spsc_queue, mpmc_queue, operator,
 │   │                  # pinning, metrics, backpressure, worker, runtime
 │   ├── operators/     # source, map, filter, aggregate, window, sink
@@ -22,24 +22,27 @@ KLStream/
 │   │                  # adaptive_feature_window_op, drift_adaptive_window_op,
 │   │                  # scoring_flush_op, behavior_source, result_sink
 │   └── model/         # logistic_model
-├── preprocessing/
+├── source/preprocessing/
 │   ├── preprocess_taobao.py
 │   ├── preprocess_ulb.py
 │   └── train_classifier.py
-├── feature_flow/
+├── source/apps/feature_flow/
 │   ├── CMakeLists.txt
 │   ├── main.cpp       # four-architecture wiring, CLI flags
 │   └── harness.cpp    # multi-run experiment driver
-├── analysis/
+├── source/analysis/
 │   ├── compute_metrics.py
 │   └── zdomain_feature_analysis.py
 ├── tests/
-│   ├── test_bpfeat_controller.cpp
-│   ├── test_alpha_controller.cpp
-│   ├── test_keyed_feature_extract_op.cpp
-│   ├── test_scoring_flush_op.cpp
-│   ├── test_drift_adaptive_window_op.cpp
-│   └── test_pipeline_integration.cpp
+│   ├── unit/
+│   │   ├── test_bpfeat_controller.cpp
+│   │   ├── test_alpha_controller.cpp
+│   │   ├── test_keyed_feature_extract_op.cpp
+│   │   ├── test_scoring_flush_op.cpp
+│   │   └── test_drift_adaptive_window_op.cpp
+│   └── integration/
+│       ├── test_ablation_architectures.cpp
+│       └── test_pipeline_integration.cpp
 ├── data/
 │   ├── raw/           # UserBehavior.csv, creditcard.csv (gitignored)
 │   └── replay/        # preprocessed CSV outputs
@@ -73,10 +76,10 @@ make -j$(nproc)
 cd build && cmake .. && make -j$(nproc)
 
 # Run adaptive architecture on synthetic data
-./build/feature_flow/feature_flow_main --arch adaptive --synthetic --out results/raw/adaptive_synthetic.csv
+./build/source/apps/feature_flow/feature_flow_main --arch adaptive --synthetic --out results/raw/adaptive_synthetic.csv
 
 # Run the full harness (all 7 architectures, 5 seeds) on synthetic data
-./build/feature_flow/feature_flow_harness --synthetic --seeds 5
+./build/source/apps/feature_flow/feature_flow_harness --synthetic --seeds 5
 ```
 
 ---
@@ -85,7 +88,7 @@ cd build && cmake .. && make -j$(nproc)
 
 To run the AIMD sensitivity sweep on synthetic data:
 ```bash
-./build/feature_flow/feature_flow_harness --synthetic --sweep
+./build/source/apps/feature_flow/feature_flow_harness --synthetic --sweep
 ```
 
 ---
@@ -96,7 +99,7 @@ To run the AIMD sensitivity sweep on synthetic data:
 1. Register at [Alibaba Tianchi](https://tianchi.aliyun.com/dataset/649) (free account required)
 2. Download `UserBehavior.csv` → `data/raw/UserBehavior.csv`
 3. ```bash
-   python preprocessing/preprocess_taobao.py \
+   python source/preprocessing/preprocess_taobao.py \
        --raw data/raw/UserBehavior.csv \
        --out data/replay/replay_taobao_10k.csv \
        --n-users 10000
@@ -105,14 +108,14 @@ To run the AIMD sensitivity sweep on synthetic data:
 ### ULB Credit Card Fraud (Secondary)
 1. Download from [Kaggle](https://www.kaggle.com/mlg-ulb/creditcardfraud) → `data/raw/creditcard.csv`
 2. ```bash
-   python preprocessing/preprocess_ulb.py \
+   python source/preprocessing/preprocess_ulb.py \
        --raw data/raw/creditcard.csv \
        --out data/replay/replay_ulb.csv
    ```
 
 ### Train the Oracle Classifier
 ```bash
-python preprocessing/train_classifier.py \
+python source/preprocessing/train_classifier.py \
     --replay data/replay/replay_taobao_10k.csv \
     --out models/classifier_weights.txt
 ```
@@ -124,7 +127,7 @@ python preprocessing/train_classifier.py \
 ```bash
 # 7 architectures, single run
 for arch in fixed drift throttle aonly bonly adaptive ralf; do
-    ./build/feature_flow/feature_flow_main \
+    ./build/source/apps/feature_flow/feature_flow_main \
         --arch $arch \
         --replay data/replay/replay_taobao_10k.csv \
         --model models/classifier_weights.txt \
@@ -147,7 +150,7 @@ All 6 tests should pass on synthetic data without any real dataset download.
 ## Computing Metrics
 
 ```bash
-python analysis/compute_metrics.py \
+python source/analysis/compute_metrics.py \
     --all-archs \
     --result-dir results/raw \
     --oracle-csv data/replay/oracle_scores.csv
@@ -158,7 +161,7 @@ python analysis/compute_metrics.py \
 ## Z-Domain Analysis (Experiment 6)
 
 ```bash
-python analysis/zdomain_feature_analysis.py \
+python source/analysis/zdomain_feature_analysis.py \
     --trace results/raw/trace_adaptive_seed0.csv \
     --out-heatmap results/figures/passband_narrowing_heatmap.png \
     --out-corr results/figures/wa_correlation.png \
