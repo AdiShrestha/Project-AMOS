@@ -12,12 +12,17 @@
   "archive_scope": "Current legacy code/tests/configuration/paper/governance; raw data, results, builds, caches and chat/data exports excluded.",
   "local_legacy_directory_preserved": true,
   "new_working_directory": "New Bpfeat",
-  "main_migration_status": "PREPARED_NOT_PUSHED",
+  "main_migration_status": "PUSHED_AND_REMOTE_VERIFIED",
   "tag_push_status": "PUSHED_AND_REMOTE_VERIFIED",
   "history_rewritten": false,
   "tag_verification_utc": "2026-09-30T18:31:46.514128+00:00",
   "remote_peeled_tag_commits": {
     "legacy-published-2026-09-30": "37c85a6ba1905eb5029d24bd9dba26f928c8f06b",
     "legacy-workspace-2026-09-30": "39a7cdcb15db53f13c2082d71f91df01a7cf407c"
-  }
+  },
+  "verified_foundation_commit": "3466f6a83a0ba693d7afe7d73fca9ab5ea53eac5",
+  "main_verification_utc": "2026-09-30T18:37:33.604676+00:00",
+  "verification_note": "The foundation commit was pushed by normal fast-forward and matched remote main. This verification record is committed subsequently as a descendant, so its own containing commit is not self-referenced.",
+  "active_tracked_files_at_foundation": 143,
+  "generated_raw_private_paths_tracked": []
 }
