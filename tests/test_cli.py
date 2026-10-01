@@ -8,6 +8,7 @@ from pathlib import Path
 import subprocess
 import tempfile
 import unittest
+from tools.verify_engine_diagnostics import verify, ReplayError
 
 
 class EngineCLITests(unittest.TestCase):
@@ -49,6 +50,58 @@ class EngineCLITests(unittest.TestCase):
         receipt = json.loads((self.root / "attempt/engine_receipt.json").read_text())
         self.assertEqual(receipt["written"], 3)
         self.assertIs(receipt["research_evidence"], False)
+        self.assertEqual(verify(self.root / "attempt", self.events, self.model)["rows"], 3)
+
+    def test_all_controller_modes_have_independently_replayable_diagnostics(self):
+        self.events.write_text("seq,event_ts_ns,key,item_id,category_id,behavior_code\n" + "".join(
+            f"{10+3*i},{i*1000000000},{i%3},{i},2520377,{i%4}\n" for i in range(97)))
+        for mode in ("fixed", "batch", "alpha", "joint"):
+            args = [self.binary, "--events", str(self.events), "--model", str(self.model), "--out-dir", str(self.root / mode),
+                    "--mode", mode, "--batch-size", "8", "--feature-slots", "2", "--batch-slots", "2"]
+            run = subprocess.run(args, capture_output=True, text=True, timeout=10)
+            self.assertEqual(run.returncode, 0, run.stderr)
+            self.assertEqual(verify(self.root / mode, self.events, self.model)["rows"], 97)
+
+    def test_replay_rejects_mutated_scores_gains_clocks_identities_and_batches(self):
+        self.assertEqual(self.run_engine().returncode, 0)
+        path = self.root / "attempt/predictions_unlabeled.csv"
+        original = path.read_text()
+        records = list(csv.DictReader(io.StringIO(original)))
+        for field, value in (("score", "0"), ("alpha_used", "0.3"), ("scored_ns", "0"), ("seq", "999"),
+                             ("item_id", "999"), ("batch_size", "999"), ("pressure_available", "2")):
+            modified = [dict(row) for row in records]
+            modified[0][field] = value
+            with path.open("w", newline="") as stream:
+                writer = csv.DictWriter(stream, fieldnames=records[0].keys())
+                writer.writeheader(); writer.writerows(modified)
+            with self.assertRaises(ReplayError, msg=field):
+                verify(self.root / "attempt", self.events, self.model)
+        path.write_text(original)
+        self.assertEqual(verify(self.root / "attempt", self.events, self.model)["rows"], 3)
+
+    def test_invalid_queue_is_rejected_before_attempt_creation(self):
+        self.assertNotEqual(self.run_engine(("--feature-slots", "3")).returncode, 0)
+        self.assertFalse((self.root / "attempt").exists())
+
+    def test_failed_input_attempt_is_retained_without_success_receipt(self):
+        self.events.write_text(self.events.read_text().replace("70,2000000000", "30,2000000000"))
+        run = self.run_engine()
+        self.assertNotEqual(run.returncode, 0)
+        directory = self.root / "attempt"
+        self.assertEqual(json.loads((directory / "engine_failure.json").read_text())["status"], "ENGINE_FAILED")
+        self.assertFalse((directory / "engine_receipt.json").exists())
+
+    def test_replay_rejects_parser_mismatches_and_unlisted_outputs(self):
+        self.assertEqual(self.run_engine().returncode, 0)
+        original = self.events.read_text()
+        for changed in (original.replace("10,0", '"10",0'), original + "\n"):
+            self.events.write_text(changed)
+            with self.assertRaises(ReplayError):
+                verify(self.root / "attempt", self.events, self.model)
+        self.events.write_text(original)
+        (self.root / "attempt/unlisted.txt").write_text("explicit mutation fixture")
+        with self.assertRaises(ReplayError):
+            verify(self.root / "attempt", self.events, self.model)
 
     def test_missing_model_never_becomes_zero_model(self):
         self.model.unlink()

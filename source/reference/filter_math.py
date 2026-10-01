@@ -36,18 +36,28 @@ def group_delay(alpha, omega):
 
 
 def variance_equivalent_span(alpha):
+    """Match steady-state variance to a length-L arithmetic mean.
+
+    L=(2-alpha)/alpha assumes constant gain, independent equal-variance input
+    noise and decay of initialization. L need not be integer. It is not a hard
+    memory window, elapsed-time horizon or a match for correlated inputs.
+    """
     validate_alpha(alpha)
-    return (2 - alpha) / alpha
+    value = (2 - alpha) / alpha
+    if not math.isfinite(value):
+        raise ValueError("variance-equivalent span exceeds floating-point range")
+    return value
 
 
 def exact_weights(alphas):
     """Return (weights on x[0..n-1], remaining weight on initial state).
 
     y[n] = product(1-alpha) * y[-1] + sum(weights[i] * x[i]).
-    These weights are valid for a supplied gain trajectory; feedback makes the
-    complete adaptive system nonlinear, even though conditioned recursion is
-    linear in x.
+    These weights are valid for a supplied gain trajectory. Dependence of that
+    trajectory on inputs/state can make the complete system nonlinear; an
+    externally specified trajectory gives a linear time-varying recursion.
     """
+    alphas = list(alphas)
     for alpha in alphas:
         validate_alpha(alpha)
     weights = [0.0] * len(alphas)

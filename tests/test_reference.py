@@ -38,6 +38,14 @@ class FilterMathematicsTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 response(alpha, 0)
 
+    def test_unrepresentable_span_fails_instead_of_emitting_infinity(self):
+        with self.assertRaises(ValueError):
+            variance_equivalent_span(1e-320)
+
+    def test_generator_gain_history_preserves_exact_kernel(self):
+        expected = exact_weights([0.1, 0.3, 1.0])
+        self.assertEqual(exact_weights(a for a in [0.1, 0.3, 1.0]), expected)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -36,6 +36,15 @@ class LabelTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             future_purchase_labels([self.event("a", 0, 1, 0), self.event("a", 1, 1, 3)], 10, 20)
 
+    def test_cross_key_global_time_regression_rejected(self):
+        with self.assertRaises(ValueError):
+            future_purchase_labels([self.event("a", 10, 1, 0), self.event("b", 0, 2, 3)], 10, 20)
+
+    def test_empty_or_padded_source_identity_rejected(self):
+        for identifier in (" ", " a", "a "):
+            with self.assertRaises(ValueError):
+                future_purchase_labels([self.event(identifier, 0, 1, 0)], 10, 20)
+
 
 if __name__ == "__main__":
     unittest.main()

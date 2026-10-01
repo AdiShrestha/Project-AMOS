@@ -100,6 +100,24 @@ int main() {
         struct FailedBuffer : std::streambuf { int overflow(int) override { return traits_type::eof(); } } buffer;
         std::ostream failing(&buffer);
         rejects([&] { run_pipeline([](RawEvent&) { return false; }, model, failing, trace, PipelineConfig{}); }, "sink failure accepted");
+        struct FlushFailure : std::stringbuf { int sync() override { return -1; } } flush_buffer;
+        std::ostream flush_failure(&flush_buffer);
+        rejects([&] { run_pipeline([](RawEvent&) { return false; }, model, flush_failure, trace, PipelineConfig{}); }, "final flush failure accepted");
+        struct CommaLocale : std::numpunct<char> { char do_decimal_point() const override { return ','; } };
+        std::ostringstream polluted, clean_trace;
+        polluted.imbue(std::locale(std::locale::classic(), new CommaLocale));
+        polluted << std::hex << std::showpos << std::boolalpha << std::scientific;
+        bool produced = false;
+        auto formatting_stats = run_pipeline([&](RawEvent& event) {
+            if (produced) return false;
+            produced = true; event = {30, 10, 1, 1, 1, 0}; return true;
+        }, model, polluted, clean_trace, PipelineConfig{});
+        require(formatting_stats.written == 1, "formatting fixture lost");
+        std::istringstream formatted(polluted.str());
+        std::string header, row;
+        std::getline(formatted, header); std::getline(formatted, row);
+        auto cells = csv_cells(row);
+        require(cells.size() == csv_cells(header).size() && cells[0] == "30" && cells[7] == "0", "caller formatting corrupted diagnostics");
         std::cout << "Engine fixture counterexamples passed; no research claims.\n";
         return 0;
     } catch (const std::exception& error) { std::cerr << error.what() << '\n'; return 1; }
