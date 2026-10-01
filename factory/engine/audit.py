@@ -7,7 +7,7 @@ import math
 from collections import Counter, defaultdict
 from pathlib import Path
 from statistics import mean
-from .io import read_json,read_csv,inside,sha,digest,inventory
+from .io import read_json,read_csv,inside,sha,digest,inventory,merkle_root
 from .metrics import binary_metrics,paired_inference,holm,number,quantile,EvidenceError
 from .plan import validate,need,REVIEW_TOPICS
 
@@ -28,6 +28,8 @@ class Audit:
         except (EvidenceError,ValueError,KeyError,TypeError,IndexError,OSError,OverflowError) as e:self.error(name,e)
     def frozen(self):
         need(inventory(self.root,self.p['frozen_paths'])==self.freeze['files'],'frozen input changed, including added/deleted source files')
+        need(self.freeze.get('snapshot_algorithm')=='sha256_binary_merkle_v1','unsupported snapshot algorithm; use original verifier or a new epoch')
+        need(merkle_root(self.freeze['files'])==self.freeze.get('snapshot_merkle_root'),'snapshot root does not match frozen inventory')
         need(sha(self.root/'project/research_plan.json')==self.freeze['plan_sha256'],'plan changed after freeze')
         need(self.engine_hash==self.freeze['engine_sha256'],'active factory code changed after freeze')
         self.bindings.update(self.freeze['files'])
@@ -63,6 +65,7 @@ class Audit:
             need(r['split'] in ('train','validation','test','ood'),'unsupported split')
             src=r['source_ids'].split('|')
             need(bool(r['source_ids']) and set(src)<=set(origins),'phantom source record or missing source IDs')
+            need(len(src)==len(set(src)),'duplicate source identity inside cohort sample')
             group_splits[r['group_id']].add(r['split'])
             for s in src:source_splits[s].add(r['split'])
             for ent in filter(None,r.get('entity_ids','').split('|')):entities[ent].add(r['split'])
@@ -86,20 +89,31 @@ class Audit:
     def experiment(self,e):
         eid=e['id'];base=self.epoch/'runs'/eid
         attempts=sorted(base.glob('attempt*')) if base.exists() else []
+        index=self.j(str((self.epoch/'attempt_index.json').relative_to(self.root)))
+        need(index.get('schema')=='factory.attempt_index.v1' and set(index.get('experiments',{}))=={x['id'] for x in self.p['experiments']},'invalid attempt index')
+        entries=index['experiments'][eid]
+        need(isinstance(entries,list) and [x.get('attempt') for x in entries]==[a.name for a in attempts],eid+': attempt membership differs from retained index')
         need(bool(attempts),eid+': no execution receipt')
         good=[]
         for a in attempts:
             rel=str((a/'execution.json').relative_to(self.root));r=self.j(rel)
             need(r.get('experiment_id')==eid and r.get('seed')==e['seed'],eid+': execution identity mismatch')
+            need(r.get('run_nonce')==next(x['run_nonce'] for x in entries if x['attempt']==a.name),eid+': attempt index nonce mismatch')
             need(r.get('freeze_sha256')==sha(self.epoch/'freeze.json'),eid+': stale freeze binding')
             need(r.get('inputs_before')==self.freeze['files'],eid+': pre-execution input binding mismatch')
             need(r.get('inputs_after')==self.freeze['files'],eid+': source/data changed during run')
             need(r.get('engine_sha256')==self.engine_hash,eid+': code binding mismatch')
-            expected=[arg.replace('{run_dir}',str(a.resolve())).replace('{seed}',str(e['seed'])).replace('{experiment_id}',eid) for arg in e['command']]
+            if e.get('execution_contract'):
+                from .contract import resolve_contract,validate_contract
+                validate_contract(e['execution_contract'],self.root,e['code_paths'])
+                expected,_,_=resolve_contract(e['execution_contract'],a,e['seed'],eid)
+            else:
+                expected=[arg.replace('{run_dir}',str(a.resolve())).replace('{seed}',str(e['seed'])).replace('{experiment_id}',eid) for arg in e['command']]
             need(r.get('argv')==expected,eid+': executed command differs from plan')
             outputs=inventory(self.root,[str(a.relative_to(self.root))]);outputs.pop(rel,None)
             need(outputs==r.get('outputs'),eid+': output hash/membership changed since execution')
             self.bindings.update(outputs)
+            self.receipt_binding(e,r)  # Failed attempts also need authentic local bindings.
             if r.get('exit_code')==0 and not r.get('record_error'):good.append(a)
             else:self.diagnostic('FAILED_ATTEMPT',f'{eid}: {a.name}, exit {r.get("exit_code")}; retained; no silent deletion')
         need(len(good)==1,eid+': needs exactly one successful attempt; duplicate successes are not independent evidence')
@@ -133,6 +147,40 @@ class Audit:
         self.training(e,r,a)
         self.computed[eid]={'metrics':out,'seed':e['seed'],'model':e['model'],'predictions_sha256':sha(predpath),'result_path':str((a/'result.json').relative_to(self.root))}
         self.observed[eid]=data;self.reports[eid]=r
+    def receipt_binding(self,e,execution):
+        """Verify signature AND current execution bindings; not key isolation."""
+        from .supervisor import verify_receipt_signature
+        receipt=execution.get('supervisor_receipt')
+        need(isinstance(receipt,dict),'missing local signed execution record')
+        verify_receipt_signature(receipt)
+        expected={'project_id':self.p['project_id'],'epoch':self.freeze['epoch'],
+                  'experiment_id':e['id'],'seed':e['seed'],
+                  'run_nonce':execution['run_nonce'],
+                  'snapshot_merkle_root':self.freeze['snapshot_merkle_root'],
+                  'input_root':digest(self.freeze['files']),
+                  'output_root':digest(execution['outputs']),
+                  'dependency_lock_hash':sha(self.root/self.p['dependency_lock']),
+                  'interpreter_hash':execution['runtime_attestation']['interpreter_hash'],
+                  'runtime_id':e.get('execution_contract',{}).get('runtime_id','python-cpu-v1'),
+                  'launch_spec':digest(execution['argv']),
+                  'exit_status':execution['exit_code'],
+                  'started_at':execution['started_at'],'finished_at':execution['finished_at']}
+        for key,value in expected.items():
+            need(type(receipt.get(key)) is type(value) and receipt[key]==value,'signed receipt binding mismatch: '+key)
+        # Unmeasured values must remain unknown, never wall time or a zero.
+        resources=receipt.get('resource_observations',{})
+        need(isinstance(resources,dict) and set(resources)=={'cpu_time_seconds','memory_peak_bytes'} and
+             resources['cpu_time_seconds'] is None and resources['memory_peak_bytes'] is None,
+             'local runner does not measure CPU time or peak memory')
+        import datetime
+        try:
+            started=datetime.datetime.fromisoformat(execution['started_at'])
+            finished=datetime.datetime.fromisoformat(execution['finished_at'])
+            need(started.tzinfo is not None and finished.tzinfo is not None and started<=finished,
+                 'invalid execution UTC clock envelope')
+        except (TypeError,ValueError) as ex:
+            raise EvidenceError('malformed execution timestamps') from ex
+        need(number(execution['duration_sec'])>=0,'negative execution wall duration')
     def training(self,e,result,a):
         t=e['training'];eid=e['id']
         if t['mode']=='deterministic':
@@ -258,17 +306,27 @@ class Audit:
         rows=self.table(str(base/result['hardware_trials']),{'phase','warmup','duration_sec','samples','batch_size','elapsed_sec'})
         measured=[r for r in rows if r['warmup']=='0'];need(measured and any(r['warmup']=='1' for r in rows),'measured trials and excluded warmup needed')
         for r in rows:
+            need(r['warmup'] in ('0','1') and r['phase'] in ('train','inference'),'unknown hardware phase/warmup flag')
+            need(r['samples'].isascii() and r['samples'].isdigit() and int(r['samples'])>0,'samples must be a positive integer')
+            need(r['batch_size'].isascii() and r['batch_size'].isdigit() and int(r['batch_size'])>0,'batch size must be a positive integer')
             need(number(r['duration_sec'])>0 and number(r['samples'])>0,'invalid measured duration/sample count')
+            need(number(r['elapsed_sec'])>=0,'negative hardware elapsed clock')
+            if r['phase']=='inference':need(int(r['samples'])==int(r['batch_size']),'latency trial must measure one actual inference batch')
+        need(all(number(a['elapsed_sec'])<=number(b['elapsed_sec']) for a,b in zip(rows,rows[1:])),'hardware elapsed clock regressed')
         batch1=[number(r['duration_sec'])*1000 for r in measured if int(r['batch_size'])==1 and r['phase']=='inference']
         need(len(batch1)>=h['min_trials'],'batch-one latency trials below preregistered minimum')
-        total_time=sum(number(r['duration_sec']) for r in measured if r['phase']=='inference')
-        total_samples=sum(number(r['samples']) for r in measured if r['phase']=='inference')
-        span=max(number(r['elapsed_sec']) for r in measured)-min(number(r['elapsed_sec']) for r in measured)
-        need(span>=number(h['minimum_sustained_seconds']),'sustained measurement shorter than registered duration')
-        self.hardware_results={'latency_ms':{str(q):quantile(batch1,q) for q in (.5,.9,.99)},'throughput_samples_sec':total_samples/total_time,'sustained_span_sec':span}
+        inference=[r for r in measured if r['phase']=='inference']
+        total_time=number(sum(number(r['duration_sec']) for r in inference))
+        total_samples=sum(int(r['samples']) for r in inference)
+        span=max(number(r['elapsed_sec']) for r in inference)-min(number(r['elapsed_sec']) for r in inference)
+        need(span>=number(h['minimum_sustained_seconds']),'inference clock span shorter than registered duration')
+        self.hardware_results={'latency_ms':{str(q):quantile(batch1,q) for q in (.5,.9,.99)},'inference_service_samples_per_sec':number(total_samples/total_time),'observed_inference_clock_span_sec':span,
+                               'scope':'one-batch trial duration; service-time rate is not offered-load or wall-clock throughput; clock span does not establish continuous load'}
         if h.get('energy_claim'):
             need(all('energy_joules' in r for r in measured),'energy claim needs measured joules per trial')
-            self.hardware_results['joules_per_sample']=sum(number(r['energy_joules']) for r in measured)/sum(number(r['samples']) for r in measured)
+            need(all(number(r['energy_joules'])>=0 for r in measured),'negative measured energy')
+            energy=number(sum(number(r['energy_joules']) for r in inference))
+            self.hardware_results['joules_per_inference_sample']=number(energy/total_samples)
         if h.get('memory_claim'):
             for phase in ('train','inference'):
                 vals=[number(r['peak_memory_bytes']) for r in measured if r['phase']==phase]

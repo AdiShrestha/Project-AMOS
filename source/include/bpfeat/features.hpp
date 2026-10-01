@@ -20,6 +20,7 @@ struct FeatureSnapshot {
     double alpha{0};
     PressureObservation pressure_used;
     std::uint64_t created_ns{0};
+    std::uint64_t pressure_loaded_ns{0};
 };
 struct UserState {
     double engagement_ema{0}, gap_ema{0};

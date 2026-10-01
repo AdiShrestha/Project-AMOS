@@ -14,7 +14,15 @@
     "independent metrics, inference and adversarial checks",
     "prospectively frozen real experiments and venue review"
   ],
-  "next_contracts": ["AMOS-01", "AMOS-02", "AMOS-03"],
+  "next_contracts": [
+    "AMOS-01",
+    "AMOS-02",
+    "AMOS-03"
+  ],
   "authority": "plan.md and the human research-integrity brief",
-  "scope_note": "This is planning metadata, not a factory receipt, external review or release certificate."
+  "scope_note": "This is planning metadata, not a factory receipt, external review or release certificate.",
+  "factory_local_version": "3.3.1-amos.1",
+  "reaudit_report": "docs/audit/reaudit_2026_10_01/report.md",
+  "diagnostic_replay_available": true,
+  "independent_scientific_review_complete": false
 }

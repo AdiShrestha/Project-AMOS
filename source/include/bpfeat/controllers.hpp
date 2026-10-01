@@ -3,6 +3,7 @@
 #include <cmath>
 #include <cstdint>
 #include <mutex>
+#include <limits>
 #include <stdexcept>
 
 namespace bpfeat {
@@ -25,6 +26,8 @@ public:
         std::lock_guard<std::mutex> lock(mu_);
         if (observation_.available && sampled_ns < observation_.sampled_ns)
             throw std::invalid_argument("pressure sample time decreased");
+        if (observation_.generation == std::numeric_limits<std::uint64_t>::max())
+            throw std::overflow_error("pressure generation overflow");
         observation_ = {value, observation_.generation + 1, sampled_ns, true};
     }
     PressureObservation load() const {

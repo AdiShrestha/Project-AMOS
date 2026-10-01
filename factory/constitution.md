@@ -53,7 +53,7 @@ Comparative claims require recorded convergence evidence for each trained model;
 **Enforcement Level:** A — Mandatory
 **Related Rules:** C01, C04
 
-Below-chance results and unsupported sample sizes are Stop Conditions unless explicitly investigated and reported as null results.
+Below-chance results and unsupported sample sizes require explicit investigation. A valid negative, harmful or inconclusive outcome is retained with its actual interpretation; it must not be relabeled null or improved to satisfy a gate.
 
 # C74 — Suspiciously Perfect Evidence Requires Investigation, Not Celebration
 
@@ -189,3 +189,7 @@ The audit report and release certification declare an explicit assurance level (
 **Related Rules:** C71, C78
 
 The attack registry lists 18 concrete attacks with invariant, implementation, fixture, and expected transition. A release candidate is blocked until every listed attack fails through the complete lifecycle.
+
+## AMOS local repair boundary (3.3.1-amos.1)
+
+C85–C92 describe intended properties beyond this local implementation. Same-user signed byte records do not implement an inaccessible signing key or sealed evaluation. The local assurance ceiling is STRUCTURALLY_VALIDATED; a human-review handoff status does not raise it. Registry validation checks mappings, while the full suite separately exercises concrete cases. Future adapters must establish stronger prerequisites with actual evidence.

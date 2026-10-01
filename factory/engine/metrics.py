@@ -12,7 +12,7 @@ def number(x):
         raise EvidenceError('boolean is not a numeric measurement')
     try:
         v = float(x)
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, OverflowError):
         raise EvidenceError(f'not numeric: {x!r}')
     if not math.isfinite(v):
         raise EvidenceError('non-finite measurement; never sanitize into a score')
@@ -62,40 +62,65 @@ def binary_metrics(labels, scores, threshold=0.5):
                              (1-a)*math.log(min(1-eps,max(eps,1-b))) for a,b in zip(y,s))}
 
 def quantile(values, q):
+    q = number(q)
     a = sorted(map(number, values))
     if not a or not 0 <= q <= 1:
         raise EvidenceError('invalid quantile')
     x = (len(a)-1) * q
     i = int(x)
-    return a[i] if i == len(a)-1 else a[i] + (x-i)*(a[i+1]-a[i])
+    if i == len(a)-1:
+        return a[i]
+    t = x-i
+    # Opposite-sign endpoints can overflow their difference although the
+    # convex combination is finite. Same-sign differences remain in range.
+    value = ((1-t)*a[i] + t*a[i+1] if a[i] <= 0 <= a[i+1]
+             else a[i] + t*(a[i+1]-a[i]))
+    return number(value)
 
 def paired_inference(a, b, *, seed=314159, draws=10000, alpha=0.05):
     """Paired mean difference, percentile CI, two-sided sign-flip randomization test.
 
-    Units must be exchangeable under the null; inference is conditional on those
-    units. Does not turn repeated predictions into independent population samples.
+    Sign flips require within-pair exchangeability under a sharp null, or joint
+    invariance of the differences under independent sign changes (for example
+    independent symmetric differences). Independent seeds alone do not imply
+    this. Percentile bootstrap coverage also needs a justified unit/resampling
+    model. Five units have minimum two-sided exact p=2/32, above .05. These
+    calculations do not establish assumptions or population independence.
     """
     if len(a) != len(b) or len(a) < 2:
         raise EvidenceError('paired inference needs >=2 aligned independent units')
-    d = [number(x)-number(y) for x,y in zip(a,b)]
+    d = [number(number(x)-number(y)) for x,y in zip(a,b)]
     n = len(d); observed = mean(d)
-    if not 0 < alpha < 1 or draws < 1000:
+    alpha = number(alpha)
+    if not 0 < alpha < 1 or type(draws) is not int or draws < 1000 or type(seed) is not int or seed < 0:
         raise EvidenceError('invalid inference settings')
     rng = random.Random(seed)
     boot = [mean(rng.choices(d, k=n)) for _ in range(draws)]
+    # Every finite binary float is an exact rational with a power-of-two
+    # denominator. Use common-denominator integers for the tail comparison.
+    # An absolute epsilon would change the test under unit rescaling and
+    # rounded floating sums can mishandle ties. The mean's divisor cancels.
+    ratios = [x.as_integer_ratio() for x in d]
+    denominator = max(q for _, q in ratios)
+    integers = [p*(denominator//q) for p,q in ratios]
+    threshold = abs(sum(integers))
     if n <= 16:
-        extreme = sum(abs(sum(x*t for x,t in zip(d,signs))/n) >= abs(observed)-1e-14
+        extreme = sum(abs(sum(x*t for x,t in zip(integers,signs))) >= threshold
                       for signs in itertools.product((-1,1), repeat=n))
         p = extreme / (2**n)
         method = 'exact_two_sided_paired_sign_flip'
     else:
-        extreme = sum(abs(sum(x*rng.choice((-1,1)) for x in d)/n) >= abs(observed)-1e-14
+        extreme = sum(abs(sum(x*rng.choice((-1,1)) for x in integers)) >= threshold
                       for _ in range(draws))
         p = (extreme+1)/(draws+1)
         method = 'monte_carlo_two_sided_paired_sign_flip_plus_one'
-    sd = stdev(d)
+    try:
+        sd = number(stdev(d))
+        effect_size = number(observed/sd) if sd > 0 else None
+    except OverflowError as ex:
+        raise EvidenceError('inference exceeds floating-point range') from ex
     return {'effect': observed, 'ci': [quantile(boot,alpha/2),quantile(boot,1-alpha/2)],
-            'p_raw': p, 'paired_dz': observed/sd if sd > 0 else None,
+            'p_raw': p, 'paired_dz': effect_size,
             'n_units': n, 'test': method, 'ci_method': 'paired_percentile_bootstrap',
             'degenerate_variance': sd == 0, 'draws': draws, 'analysis_seed': seed}
 

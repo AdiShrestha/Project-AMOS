@@ -249,19 +249,19 @@ class SnapshotTests(unittest.TestCase):
                 inside(root, 'project/./file.txt')
 
     def test_merkle_root_deterministic(self):
-        files = {'a/b.py': 'abc123', 'a/c.py': 'def456'}
+        files = {'a/b.py': hashlib.sha256(b'fixture-a').hexdigest(), 'a/c.py': hashlib.sha256(b'fixture-b').hexdigest()}
         root1 = merkle_root(files)
         root2 = merkle_root(files)
         self.assertEqual(root1, root2)
 
     def test_merkle_root_changes_on_mutation(self):
-        files1 = {'a/b.py': 'abc123'}
-        files2 = {'a/b.py': 'abc124'}
+        files1 = {'a/b.py': hashlib.sha256(b'fixture-a').hexdigest()}
+        files2 = {'a/b.py': hashlib.sha256(b'fixture-c').hexdigest()}
         self.assertNotEqual(merkle_root(files1), merkle_root(files2))
 
     def test_merkle_root_changes_on_path_change(self):
-        files1 = {'a/b.py': 'abc123'}
-        files2 = {'a/c.py': 'abc123'}
+        files1 = {'a/b.py': hashlib.sha256(b'fixture-a').hexdigest()}
+        files2 = {'a/c.py': hashlib.sha256(b'fixture-a').hexdigest()}
         self.assertNotEqual(merkle_root(files1), merkle_root(files2))
 
     def test_freeze_includes_merkle_root(self):
@@ -382,7 +382,7 @@ class RecursivePlausibilityTests(unittest.TestCase):
         obj = {
             'derived_analyses': {
                 'sensitivity': {
-                    'results': [{'metric': 'accuracy', 'value': 0.3, 'verdict': 'SUPPORTED'}]
+                    'results': [{'metric': 'accuracy', 'value': 0.3, 'chance_reference': 0.5, 'verdict': 'SUPPORTED'}]
                 }
             }
         }
@@ -406,15 +406,15 @@ class AssuranceLevelTests(unittest.TestCase):
         out = {'errors': [], 'checks_executed': ['X'], 'computed_runs': {}}
         self.assertEqual(g._compute_assurance_level(out), 'STRUCTURALLY_VALIDATED')
 
-    def test_sealed_evaluation_with_receipts(self):
+    def test_result_path_does_not_establish_sealed_evaluation(self):
         out = {'errors': [], 'checks_executed': ['X'],
                'computed_runs': {'exp1': {'result_path': 'some/path'}}}
-        self.assertEqual(g._compute_assurance_level(out), 'SEALED_EVALUATION_ATTESTED')
+        self.assertEqual(g._compute_assurance_level(out), 'STRUCTURALLY_VALIDATED')
 
-    def test_review_promotes_assurance(self):
+    def test_review_presence_does_not_establish_independence(self):
         self.assertEqual(
             g._assurance_with_review('SEALED_EVALUATION_ATTESTED', True),
-            'INDEPENDENT_REVIEW_COMPLETE'
+            'STRUCTURALLY_VALIDATED'
         )
 
     def test_blocked_stays_blocked_with_review(self):
@@ -600,12 +600,17 @@ class AttackTests(unittest.TestCase):
             fixture(root)
             redir = contextlib.redirect_stdout(io.StringIO())
             redir.__enter__()
-            (root / 'source/run.py').write_text('raise RuntimeError("intentional")')
+            (root / 'source/run.py').write_text('from pathlib import Path\nimport sys\nif Path(sys.argv[1]).name == "attempt0001":\n    raise RuntimeError("intentional fixture failure")\n' + SCRIPT)
             g.freeze(root)
             self.assertNotEqual(g.run_exp(root, 'known'), 0)
+            self.assertEqual(g.run_exp(root, 'known'), 0)
             _, ep, _ = g.active(root)
             attempt = ep / 'runs/known/attempt0001'
             self.assertTrue(attempt.exists(), 'Failed attempt must be retained')
+            shutil.rmtree(attempt)  # Explicit mutation of a private fixture only.
+            from tests.test_v3 import evaluate
+            result = evaluate(root)
+            self.assertTrue(any('attempt membership differs' in e['detail'] for e in result['errors']))
             redir.__exit__(None, None, None)
 
     # ATK-010
@@ -669,14 +674,18 @@ class AttackTests(unittest.TestCase):
                 'role': 'reproduction', 'reproduces': 'known',
                 'command': p['experiments'][0]['command'],
                 'code_paths': p['experiments'][0]['code_paths'],
-                'config': {'different': True},
+                'config': {},
                 'threshold': .5, 'evaluation_splits': ['validation', 'test'],
                 'training': {'mode': 'deterministic', 'rationale': 'test'}
             })
             write_json(root / g.ROOT_PLAN, p)
-            # The plan validation may catch this or the audit will
-            # Here we just verify the principle: model mismatch
-            self.assertNotEqual(p['experiments'][0]['model'], p['experiments'][1]['model'])
+            with contextlib.redirect_stdout(io.StringIO()):
+                g.freeze(root)
+                self.assertEqual(g.run_exp(root, 'known'), 0)
+                self.assertEqual(g.run_exp(root, 'repro'), 0)
+                from tests.test_v3 import evaluate
+                result = evaluate(root)
+            self.assertTrue(any('reproduction model identity mismatch' in e['detail'] for e in result['errors']))
 
     # ATK-015
     def test_phantom_prediction_blocked(self):
@@ -700,12 +709,20 @@ class AttackTests(unittest.TestCase):
 
     # ATK-016
     def test_runtime_substitution_detected(self):
-        """Runtime attestation captures interpreter hash."""
-        from engine.supervisor import runtime_attestation
-        rt = runtime_attestation()
-        self.assertIn('interpreter_hash', rt)
-        self.assertIn('python_version', rt)
-        self.assertIn('platform_system', rt)
+        """Changing the outer runtime hash must fail the actual audit."""
+        with tempfile.TemporaryDirectory() as td, contextlib.redirect_stdout(io.StringIO()):
+            root = Path(td)
+            fixture(root)
+            g.freeze(root)
+            self.assertEqual(g.run_exp(root, 'known'), 0)
+            _, epoch, _ = g.active(root)
+            execution = epoch / 'runs/known/attempt0001/execution.json'
+            record = read_json(execution)
+            record['runtime_attestation']['interpreter_hash'] = '0' * 64
+            write_json(execution, record)
+            from tests.test_v3 import evaluate
+            result = evaluate(root)
+            self.assertTrue(any('binding mismatch: interpreter_hash' in e['detail'] for e in result['errors']))
 
     # ATK-017
     def test_bundle_tampering_detected(self):
@@ -770,8 +787,9 @@ class LifecycleV33Tests(unittest.TestCase):
         self.assertIn('run_nonce', rec)
         self.assertTrue(len(rec['run_nonce']) > 10)
 
-    def test_version_is_3_3_0(self):
-        self.assertEqual(g.VERSION, '3.3.0')
+    def test_local_patch_version_matches_version_file(self):
+        self.assertEqual(g.VERSION, (FACTORY / 'VERSION').read_text().strip())
+        self.assertEqual(g.VERSION, '3.3.1-amos.1')
 
 
 class StandaloneVerifierTests(unittest.TestCase):
@@ -857,4 +875,3 @@ class StandaloneVerifierTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-

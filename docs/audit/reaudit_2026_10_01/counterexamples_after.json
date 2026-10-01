@@ -1,0 +1,26 @@
+{
+  "scope": "mathematical and software counterexamples; no research measurements",
+  "sign_flip_scaled": {
+    "1.0": 0.0625,
+    "1e-16": 0.0625,
+    "1e+100": 0.0625,
+    "1e-300": 0.0625
+  },
+  "extreme_midpoint": 0.0,
+  "generator_kernel": [
+    [
+      0.055999999999999994,
+      0.13999999999999999,
+      0.3
+    ],
+    0.504
+  ],
+  "supplied_time_decay_constant_signal": 1.25,
+  "subnormal_span_rejection": "variance-equivalent span exceeds floating-point range",
+  "global_time_rejection": "global event time regression",
+  "empty_research_template": {
+    "status": "EXPECTED_BLOCK",
+    "reason": "project_id must be meaningful text",
+    "freeze_or_certification_executed": false
+  }
+}

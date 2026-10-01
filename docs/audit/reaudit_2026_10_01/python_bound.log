@@ -1,0 +1,32 @@
+test_all_controller_modes_have_independently_replayable_diagnostics (test_cli.EngineCLITests.test_all_controller_modes_have_independently_replayable_diagnostics) ... ok
+test_bad_input_has_no_success_receipt (test_cli.EngineCLITests.test_bad_input_has_no_success_receipt) ... ok
+test_existing_attempt_is_retained (test_cli.EngineCLITests.test_existing_attempt_is_retained) ... ok
+test_failed_input_attempt_is_retained_without_success_receipt (test_cli.EngineCLITests.test_failed_input_attempt_is_retained_without_success_receipt) ... ok
+test_invalid_queue_is_rejected_before_attempt_creation (test_cli.EngineCLITests.test_invalid_queue_is_rejected_before_attempt_creation) ... ok
+test_labels_and_sequence_duplicates_are_rejected (test_cli.EngineCLITests.test_labels_and_sequence_duplicates_are_rejected) ... ok
+test_missing_model_never_becomes_zero_model (test_cli.EngineCLITests.test_missing_model_never_becomes_zero_model) ... ok
+test_partial_duplicate_unknown_and_nan_models_rejected (test_cli.EngineCLITests.test_partial_duplicate_unknown_and_nan_models_rejected) ... ok
+test_raw_predictions_match_independent_feature_and_score_reference (test_cli.EngineCLITests.test_raw_predictions_match_independent_feature_and_score_reference) ... ok
+test_replay_rejects_mutated_scores_gains_clocks_identities_and_batches (test_cli.EngineCLITests.test_replay_rejects_mutated_scores_gains_clocks_identities_and_batches) ... ok
+test_replay_rejects_parser_mismatches_and_unlisted_outputs (test_cli.EngineCLITests.test_replay_rejects_parser_mismatches_and_unlisted_outputs) ... ok
+test_unknown_duplicate_and_invalid_options_rejected (test_cli.EngineCLITests.test_unknown_duplicate_and_invalid_options_rejected) ... ok
+test_censored_label_is_unknown_even_when_buy_observed (test_labels.LabelTests.test_censored_label_is_unknown_even_when_buy_observed) ... ok
+test_cross_key_global_time_regression_rejected (test_labels.LabelTests.test_cross_key_global_time_regression_rejected) ... ok
+test_current_buy_and_same_time_buy_excluded (test_labels.LabelTests.test_current_buy_and_same_time_buy_excluded) ... ok
+test_duplicate_identity_rejected (test_labels.LabelTests.test_duplicate_identity_rejected) ... ok
+test_empty_or_padded_source_identity_rejected (test_labels.LabelTests.test_empty_or_padded_source_identity_rejected) ... ok
+test_future_endpoint_included_and_witness_preserved (test_labels.LabelTests.test_future_endpoint_included_and_witness_preserved) ... ok
+test_generator_cohort_is_not_lost_between_passes (test_labels.LabelTests.test_generator_cohort_is_not_lost_between_passes) ... ok
+test_no_cross_key_witness (test_labels.LabelTests.test_no_cross_key_witness) ... ok
+test_dc_identity_with_small_gains (test_reference.FilterMathematicsTests.test_dc_identity_with_small_gains) ... ok
+test_exact_time_varying_kernel_matches_recursion (test_reference.FilterMathematicsTests.test_exact_time_varying_kernel_matches_recursion) ... ok
+test_generator_gain_history_preserves_exact_kernel (test_reference.FilterMathematicsTests.test_generator_gain_history_preserves_exact_kernel) ... ok
+test_group_delay_against_phase_derivative (test_reference.FilterMathematicsTests.test_group_delay_against_phase_derivative) ... ok
+test_invalid_math_inputs_rejected (test_reference.FilterMathematicsTests.test_invalid_math_inputs_rejected) ... ok
+test_span_is_variance_match_for_constant_alpha (test_reference.FilterMathematicsTests.test_span_is_variance_match_for_constant_alpha) ... ok
+test_unrepresentable_span_fails_instead_of_emitting_infinity (test_reference.FilterMathematicsTests.test_unrepresentable_span_fails_instead_of_emitting_infinity) ... ok
+
+----------------------------------------------------------------------
+Ran 27 tests in 0.085s
+
+OK

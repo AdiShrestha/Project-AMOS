@@ -5,19 +5,131 @@
   "review_mode": "same_session_self_review",
   "evidence_digest": "copy from project/audit_report.json",
   "checks": [
-    {"topic":"method_identity","verdict":"acceptable","reasoning":"At least 80 characters of concrete reasoning.","evidence":[{"path":"project/methodology.md","sha256":"hash"}]},
-    {"topic":"data_and_leakage","verdict":"acceptable","reasoning":"At least 80 characters of concrete reasoning.","evidence":[{"path":"project/methodology.md","sha256":"hash"}]},
-    {"topic":"training_sufficiency","verdict":"acceptable","reasoning":"At least 80 characters of concrete reasoning.","evidence":[{"path":"project/methodology.md","sha256":"hash"}]},
-    {"topic":"statistics","verdict":"acceptable","reasoning":"At least 80 characters of concrete reasoning.","evidence":[{"path":"project/methodology.md","sha256":"hash"}]},
-    {"topic":"baseline_fairness","verdict":"acceptable","reasoning":"At least 80 characters of concrete reasoning.","evidence":[{"path":"project/methodology.md","sha256":"hash"}]},
-    {"topic":"ablation_sensitivity","verdict":"acceptable","reasoning":"At least 80 characters of concrete reasoning.","evidence":[{"path":"project/methodology.md","sha256":"hash"}]},
-    {"topic":"generalization_failures","verdict":"acceptable","reasoning":"At least 80 characters of concrete reasoning.","evidence":[{"path":"project/methodology.md","sha256":"hash"}]},
-    {"topic":"reproducibility","verdict":"acceptable","reasoning":"At least 80 characters of concrete reasoning.","evidence":[{"path":"project/methodology.md","sha256":"hash"}]},
-    {"topic":"claims_and_venue","verdict":"acceptable","reasoning":"At least 80 characters of concrete reasoning.","evidence":[{"path":"project/methodology.md","sha256":"hash"}]}
+    {
+      "topic": "method_identity",
+      "verdict": "unresolved",
+      "reasoning": "At least 80 characters of concrete reasoning.",
+      "evidence": [
+        {
+          "path": "project/methodology.md",
+          "sha256": "hash"
+        }
+      ]
+    },
+    {
+      "topic": "data_and_leakage",
+      "verdict": "unresolved",
+      "reasoning": "At least 80 characters of concrete reasoning.",
+      "evidence": [
+        {
+          "path": "project/methodology.md",
+          "sha256": "hash"
+        }
+      ]
+    },
+    {
+      "topic": "training_sufficiency",
+      "verdict": "unresolved",
+      "reasoning": "At least 80 characters of concrete reasoning.",
+      "evidence": [
+        {
+          "path": "project/methodology.md",
+          "sha256": "hash"
+        }
+      ]
+    },
+    {
+      "topic": "statistics",
+      "verdict": "unresolved",
+      "reasoning": "At least 80 characters of concrete reasoning.",
+      "evidence": [
+        {
+          "path": "project/methodology.md",
+          "sha256": "hash"
+        }
+      ]
+    },
+    {
+      "topic": "baseline_fairness",
+      "verdict": "unresolved",
+      "reasoning": "At least 80 characters of concrete reasoning.",
+      "evidence": [
+        {
+          "path": "project/methodology.md",
+          "sha256": "hash"
+        }
+      ]
+    },
+    {
+      "topic": "ablation_sensitivity",
+      "verdict": "unresolved",
+      "reasoning": "At least 80 characters of concrete reasoning.",
+      "evidence": [
+        {
+          "path": "project/methodology.md",
+          "sha256": "hash"
+        }
+      ]
+    },
+    {
+      "topic": "generalization_failures",
+      "verdict": "unresolved",
+      "reasoning": "At least 80 characters of concrete reasoning.",
+      "evidence": [
+        {
+          "path": "project/methodology.md",
+          "sha256": "hash"
+        }
+      ]
+    },
+    {
+      "topic": "reproducibility",
+      "verdict": "unresolved",
+      "reasoning": "At least 80 characters of concrete reasoning.",
+      "evidence": [
+        {
+          "path": "project/methodology.md",
+          "sha256": "hash"
+        }
+      ]
+    },
+    {
+      "topic": "claims_and_venue",
+      "verdict": "unresolved",
+      "reasoning": "At least 80 characters of concrete reasoning.",
+      "evidence": [
+        {
+          "path": "project/methodology.md",
+          "sha256": "hash"
+        }
+      ]
+    }
   ],
   "diagnostic_resolutions": [],
-  "objections": [{"objection":"specific objection one","resolution":"fixed","reasoning":"At least 80 characters describing the objection, evidence, and exact fix."},{"objection":"specific objection two","resolution":"claim_narrowed","reasoning":"At least 80 characters describing the objection, evidence, and exact narrowing."},{"objection":"specific objection three","resolution":"disclosed_limitation","reasoning":"At least 80 characters describing the objection and disclosed limitation."}],
-  "limitations": ["Specific limitation, affected population, and consequence."],
-  "venue_sources": ["primary venue guideline URL and retrieval date"],
-  "unresolved_blockers": []
+  "objections": [
+    {
+      "objection": "specific objection one",
+      "resolution": "unresolved",
+      "reasoning": "At least 80 characters describing the objection, evidence, and exact fix."
+    },
+    {
+      "objection": "specific objection two",
+      "resolution": "unresolved",
+      "reasoning": "At least 80 characters describing the objection, evidence, and exact narrowing."
+    },
+    {
+      "objection": "specific objection three",
+      "resolution": "unresolved",
+      "reasoning": "At least 80 characters describing the objection and disclosed limitation."
+    }
+  ],
+  "limitations": [
+    "Specific limitation, affected population, and consequence."
+  ],
+  "venue_sources": [
+    "primary venue guideline URL and retrieval date"
+  ],
+  "unresolved_blockers": [
+    "Template only: actual evidence inspection, diagnostic resolution and review are pending."
+  ]
 }

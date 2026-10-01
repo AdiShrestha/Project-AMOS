@@ -12,27 +12,34 @@ def future_purchase_labels(events, horizon_ns, observation_end_ns):
 
     A censored outcome has label=None, never a negative label. The producing
     buy source ID is retained for every positive; current/same-time purchases
-    are excluded even when source order differs. Per-key histories are checked.
+    are excluded even when source order differs. Global ordering is checked.
+
+    observation_end_ns is a declared end of COMPLETE observation coverage for
+    the admitted population, not a user's last event. This function cannot
+    establish that coverage. Missing capture intervals or unknown dropout
+    require a different censoring contract; silence alone does not prove a
+    negative. Retain censored positives as unknown under this complete-window
+    cohort convention rather than changing the denominator by outcome.
     """
     if type(horizon_ns) is not int or horizon_ns <= 0:
         raise ValueError("positive integer horizon required")
-    if type(observation_end_ns) is not int or observation_end_ns < 0:
-        raise ValueError("nonnegative observation end required")
+    if type(observation_end_ns) is not int or not 0 <= observation_end_ns <= 2**64-1:
+        raise ValueError("uint64 observation end required")
     events = list(events)  # Both passes see the same cohort, including generators.
-    buys, previous, seen = defaultdict(list), {}, set()
+    buys, previous_time, seen = defaultdict(list), None, set()
     for event in events:
         identifier = event["source_id"]
         timestamp, key, behavior = event["event_ts_ns"], event["key"], event["behavior_code"]
-        if not isinstance(identifier, str) or not identifier or identifier in seen:
+        if not isinstance(identifier, str) or not identifier.strip() or identifier != identifier.strip() or identifier in seen:
             raise ValueError("missing or duplicate source identity")
         if type(timestamp) is not int or not 0 <= timestamp <= observation_end_ns:
             raise ValueError("invalid event timestamp")
-        if type(key) is not int or key < 0 or type(behavior) is not int or behavior not in range(4):
+        if type(key) is not int or not 0 <= key <= 2**64-1 or type(behavior) is not int or behavior not in range(4):
             raise ValueError("invalid key/behavior")
-        if key in previous and timestamp < previous[key]:
-            raise ValueError("per-key time regression")
+        if previous_time is not None and timestamp < previous_time:
+            raise ValueError("global event time regression")
         seen.add(identifier)
-        previous[key] = timestamp
+        previous_time = timestamp
         if behavior == 3:
             buys[key].append((timestamp, identifier))
     times = {key: [timestamp for timestamp, _ in records] for key, records in buys.items()}

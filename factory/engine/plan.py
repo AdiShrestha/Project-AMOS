@@ -21,7 +21,7 @@ def integer(x,name,minimum):
 def validate(root,p):
     need(isinstance(p,dict),'plan must be object')
     need(p.get('schema_version')==3,'schema_version must be 3')
-    need(p.get('factory_version') in ('3.0.0','3.0.1','3.1.0','3.1.1','3.2.0','3.3.0'),'factory_version must be 3.0.0, 3.0.1, 3.1.0, 3.1.1, 3.2.0, or 3.3.0')
+    need(p.get('factory_version') in ('3.0.0','3.0.1','3.1.0','3.1.1','3.2.0','3.3.0','3.3.1-amos.1'),'unsupported factory_version')
     text(p.get('project_id'),'project_id')
     need(p.get('profile')=='binary_classification','UNSUPPORTED_PROFILE: use reviewed domain adapter; never reuse binary checks for another task')
     need(p.get('intent') in ('research','fixture'),'intent must be research or fixture')
@@ -86,6 +86,7 @@ def validate(root,p):
         seq(c.get('pairs'),'comparison pairs')
         need(len(c['pairs'])>=policy['min_seeds'],'comparisons need planned independent seed pairs')
         for pair in c['pairs']:need(isinstance(pair,list) and len(pair)==2 and set(pair)<=ids and pair[0]!=pair[1],'comparison pair IDs invalid')
+        need(len({tuple(pair) for pair in c['pairs']})==len(c['pairs']),'duplicate comparison pairs are not independent units')
         need(c.get('metric') in METRICS,'unknown metric; AUPRC is ambiguous: specify average_precision')
         need(c.get('sampling_unit')=='seed_fixed_test','built-in comparison inference is conditional on fixed test corpus across seeds')
         need(c.get('assertion') in ('superiority','inferiority','inconclusive','estimate'),'unsupported assertion; equivalence is not non-significance')
@@ -109,6 +110,8 @@ def validate(root,p):
     need(isinstance(p.get('analyses'),dict),'analyses object required (empty allowed)')
     if p.get('hardware'):
         h=p['hardware']; need(isinstance(h,dict),'hardware must be an object')
+        for key in ('energy_claim','memory_claim'):
+            if key in h:need(type(h[key]) is bool,'hardware.'+key+' must be boolean')
         for k in ('experiment_id','min_trials','minimum_sustained_seconds'): need(k in h,'hardware missing '+k)
         need(h['experiment_id'] in ids,'hardware experiment unknown'); integer(h['min_trials'],'hardware.min_trials',5); need(number(h['minimum_sustained_seconds'])>=30,'hardware sustained duration must be >=30 seconds')
     # Unknown analysis kinds are not silently ignored.

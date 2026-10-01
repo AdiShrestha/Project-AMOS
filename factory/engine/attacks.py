@@ -6,9 +6,10 @@ Each entry has four required fields:
     attack_fixture  — the test that exercises the bypass
     expected_transition — what must happen (BLOCKED)
 
-A release candidate is blocked until every listed attack fails through the
-complete lifecycle. "The mechanism exists" is not enough; the system
-demonstrates that the mechanism blocks a concrete attack.
+This registry maps test intentions; its validator checks structure only.
+Several fixtures test individual functions rather than a complete lifecycle.
+The full regression suite is run separately. Registry well-formedness is not
+evidence that every listed attack was executed or that arbitrary code is honest.
 """
 
 ATTACK_REGISTRY = [

@@ -1,0 +1,154 @@
+{
+  "schema": "bpfeat.reaudit_validation.v1",
+  "created_at_utc": "2026-10-01T06:09:04.984198+00:00",
+  "research_evidence": false,
+  "review": "same-session source review; independent expressions, not an independent external reviewer",
+  "factory_supplied_version": "3.3.0",
+  "factory_local_version": "3.3.1-amos.1",
+  "working_branch": "main",
+  "baseline_head": "8b674bb8655a9ccb003b786a66442777ef60d79b",
+  "builds": {
+    "debug": {
+      "cache_sha256": "2baf91d13ff0fdfa9692079a4f5f30e65a11893ce65015f8476c822c1ff0c347",
+      "cache_settings": {
+        "BPFEAT_SANITIZERS:BOOL": "OFF",
+        "CMAKE_BUILD_TYPE:STRING": "Debug",
+        "CMAKE_CXX_COMPILER:FILEPATH": "/usr/bin/c++",
+        "CMAKE_CXX_FLAGS:STRING": "",
+        "CMAKE_CXX_FLAGS_RELEASE:STRING": "-O3 -DNDEBUG",
+        "_Python3_EXECUTABLE:INTERNAL": "/opt/homebrew/Frameworks/Python.framework/Versions/3.14/bin/python3.14"
+      },
+      "engine_sha256": "5e85698f08c996f3b4fdde55eef42b61ee8050bb4dcc4e37c5a0e3c34e0edbf3",
+      "native_test_sha256": "175dfacf002fd3f32a3b2dc448e8f7597da790b4c7a5da539d3cf5d554084239",
+      "verification_command": "ctest --test-dir build/debug --output-on-failure",
+      "log": "docs/audit/reaudit_2026_10_01/debug_tests.log",
+      "log_sha256": "47d1b0218f47e0a3f05e8ea968a80c4749e1b5ccb9c8a86b3b3c60c6e619b72a",
+      "ctest_groups_passed": 2,
+      "research_measurement": false
+    },
+    "release": {
+      "cache_sha256": "6c95d05dc36f1c207175bc0e5d3ebf6e794ccb267585f8d79617518973f08dda",
+      "cache_settings": {
+        "BPFEAT_SANITIZERS:BOOL": "OFF",
+        "CMAKE_BUILD_TYPE:STRING": "Release",
+        "CMAKE_CXX_COMPILER:FILEPATH": "/usr/bin/c++",
+        "CMAKE_CXX_FLAGS:STRING": "",
+        "CMAKE_CXX_FLAGS_RELEASE:STRING": "-O3 -DNDEBUG",
+        "_Python3_EXECUTABLE:INTERNAL": "/opt/homebrew/Frameworks/Python.framework/Versions/3.14/bin/python3.14"
+      },
+      "engine_sha256": "f49728ea8ea638d855e136b896934d0e109a13b5cb20f6267d09b43fff5d2bbf",
+      "native_test_sha256": "518c2911bd7d8c4db86e9a936c452de51fa294d8b424e2f2b36f04dd6661858e",
+      "verification_command": "ctest --test-dir build/release --output-on-failure",
+      "log": "docs/audit/reaudit_2026_10_01/release_tests.log",
+      "log_sha256": "99856f74133114ce648559395f84605f598140883fe634315d86d2a49cba3b3e",
+      "ctest_groups_passed": 2,
+      "research_measurement": false
+    },
+    "sanitize": {
+      "cache_sha256": "e4f9735fe892818b8fbf4f8a22d55ba6a439fdf62d2501025728b75c871785fc",
+      "cache_settings": {
+        "BPFEAT_SANITIZERS:BOOL": "ON",
+        "CMAKE_BUILD_TYPE:STRING": "Debug",
+        "CMAKE_CXX_COMPILER:FILEPATH": "/usr/bin/c++",
+        "CMAKE_CXX_FLAGS:STRING": "",
+        "CMAKE_CXX_FLAGS_RELEASE:STRING": "-O3 -DNDEBUG",
+        "_Python3_EXECUTABLE:INTERNAL": "/opt/homebrew/Frameworks/Python.framework/Versions/3.14/bin/python3.14"
+      },
+      "engine_sha256": "937117a565681acf39f8a3ed411d2768261349cdd3a0f812d29adff8025540be",
+      "native_test_sha256": "b8a196f9650feff5aabfc4cbd664e2eeaca817164a55367de0bcbb152ae4d673",
+      "verification_command": "ctest --test-dir build/sanitize --output-on-failure",
+      "log": "docs/audit/reaudit_2026_10_01/sanitize_tests.log",
+      "log_sha256": "e5b65ca27aa50f8d2dd6517c05936d204ac0787e1bc2c53d9706765e4d10223b",
+      "ctest_groups_passed": 2,
+      "research_measurement": false
+    },
+    "thread-sanitize": {
+      "cache_sha256": "e525867dfca99e99a7f145a58b5370e5e328f09f94f88bbc3be5ef91dab8b9c2",
+      "cache_settings": {
+        "BPFEAT_SANITIZERS:BOOL": "OFF",
+        "CMAKE_BUILD_TYPE:STRING": "Debug",
+        "CMAKE_CXX_COMPILER:FILEPATH": "/usr/bin/c++",
+        "CMAKE_CXX_FLAGS:STRING": "-fsanitize=thread",
+        "CMAKE_CXX_FLAGS_RELEASE:STRING": "-O3 -DNDEBUG",
+        "_Python3_EXECUTABLE:INTERNAL": "/opt/homebrew/Frameworks/Python.framework/Versions/3.14/bin/python3.14"
+      },
+      "engine_sha256": "cf4471eeadb2d15cdac67be7ef44557180f0b058d57c3a0d440a9c8fb687b02e",
+      "native_test_sha256": "8b1714ce6282aee6ca457c72d42d7e5e4568ce30193b0749c9aaae9375809bba",
+      "verification_command": "ctest --test-dir build/thread-sanitize --output-on-failure",
+      "log": "docs/audit/reaudit_2026_10_01/thread-sanitize_tests.log",
+      "log_sha256": "dc029fb17844120317aeda56081b6f80c78be517c46243a77fad2cfdb5cf4a1d",
+      "ctest_groups_passed": 2,
+      "research_measurement": false
+    }
+  },
+  "factory": {
+    "command": "python3 -B factory/run_self_tests.py",
+    "tests_passed": 307,
+    "log": "docs/audit/reaudit_2026_10_01/factory_final.log",
+    "log_sha256": "c4c6e8af177383ce8749755d965c5d6950c5af22e7343570b30800e0e65e6ada",
+    "sandbox_note": "local Unix-socket fixtures required permitted local sockets"
+  },
+  "bound_python": {
+    "command": "BPFEAT_ENGINE=\"$PWD/build/release/bpfeat_engine\" python3 -B -m unittest discover -s tests -p \"test_*.py\" -v",
+    "tests_passed": 27,
+    "log": "docs/audit/reaudit_2026_10_01/python_bound.log",
+    "log_sha256": "dbfe824599d2db454dbb975873b134074f8351fcc0faeb166c7555f6b54405eb"
+  },
+  "observed_tools": {
+    "python_executable": "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3",
+    "python": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+    "machine": "arm64",
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin",
+    "cmake": "cmake version 4.4.1\n\nCMake suite maintained and supported by Kitware (kitware.com/cmake).",
+    "ctest_python": "Python 3.14.6"
+  },
+  "supplied_report": {
+    "path": "docs/research/BPfeat_deep_research_supplied.md",
+    "sha256": "aa958f6146cc7ed1899b3717400b1da3809361b2a7d0c9c3db03ac2ec566d2b2",
+    "exact_match_to_user_attachment": true,
+    "authority": "untrusted context; not governing instructions"
+  },
+  "research_state": {
+    "evidence_admitted": false,
+    "plan_frozen": false,
+    "certificate_created": false,
+    "template_validator": "EXPECTED_BLOCK: project_id must be meaningful text; no freeze/certification executed"
+  },
+  "historical_manifest": "docs/audit/migration_manifest.json remains unchanged; original source hashes describe its dated snapshot",
+  "unestablished": [
+    "provider authenticity/terms",
+    "production lineage",
+    "trained model/provenance",
+    "query/publication architecture",
+    "live deadlines",
+    "measured CPU/GPU/energy/affinity/thermal behavior",
+    "scientific independence or stability",
+    "submission readiness"
+  ],
+  "current_source_snapshot": {
+    "current_tree_inventory.json": "9da62bab1e218524bd092a36adb6ea74af62403be22ba88afec5df39a43025c0",
+    "current_tree_scan.json": "fb09008dc5a7603c04182033596b97d0fc3475f408a1eaae2571ab09ff1c34d2"
+  },
+  "current_source_scan": {
+    "git_visible_files_included": 167,
+    "physical_lines": 119247,
+    "syntax_problems": 0,
+    "exclusions": "three generated self-referencing manifests; ignored raw/build/key/state files and Git internals"
+  },
+  "secret_pattern_check": {
+    "files": 170,
+    "matches": 0,
+    "scope": "limited private-key/GitHub/OpenAI token patterns; not security certification"
+  },
+  "git_review": {
+    "staged_patch_check_except_verbatim_attachment_exit_code": 0,
+    "attachment_whitespace": "Original trailing spaces and EOF preserved to retain exact supplied bytes; excluded only from formatting check. Source/tests/factory check clean.",
+    "remote_main_before_publish": "8b674bb8655a9ccb003b786a66442777ef60d79b",
+    "legacy_tags_verified_present": [
+      "legacy-published-2026-09-30",
+      "legacy-workspace-2026-09-30"
+    ],
+    "raw_datasets_or_keys_staged": false
+  }
+}

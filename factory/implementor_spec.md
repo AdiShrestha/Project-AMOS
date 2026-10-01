@@ -1,6 +1,6 @@
 # Implementor role — Factory v3.3.0
 
-Implement only what the frozen plan specifies. Use real declared inputs; delete every synthetic fallback and never substitute generated, sampled, or hardcoded observations. Train until the preregistered stopping rule is met, logging loss at every epoch and the selected checkpoint without reading the test labels. Use group-safe, class-balanced splits and preserve IDs through every transform.
+Implement only what the frozen plan specifies. Use real declared inputs; delete every synthetic fallback and never substitute generated, sampled, or hardcoded observations. Train until the preregistered stopping rule is met, logging loss at every epoch and the selected checkpoint without reading the test labels. Use the reviewed group/time split and preserve IDs through every transform. Keep natural evaluation prevalence; training balancing requires a declared method and calibration review, and must not erase temporal order or censoring.
 
 For each seed, write `run_meta.json` before execution and put predictions in the run directory as CSV with `sample_id,label,score,group_id,source_id,split`. Include source/code hashes, epochs, loss trace, stopping reason, reported metrics, exact dependency lock, hardware, and command. Never overwrite an attempt. A failed attempt is evidence and must remain. Call `gatekeeper.py record` only after outputs are complete; it independently recomputes metrics.
 

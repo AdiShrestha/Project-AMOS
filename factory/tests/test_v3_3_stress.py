@@ -2,8 +2,9 @@
 
 These tests go BEYOND the attack registry. They attempt to find gaps,
 race conditions, edge cases, and novel bypasses that the v3.3.0
-hardening might have missed. Every test that passes means the factory
-is secure; every failure is a real loophole.
+hardening might have missed. A passing test verifies its concrete case and
+does not prove general security or scientific validity. Failures require
+investigation, including environment restrictions and test defects.
 """
 import contextlib
 import hashlib

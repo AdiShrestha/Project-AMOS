@@ -1,12 +1,12 @@
 """Trusted supervisor: receipt signing, key management, runtime attestation.
 
-The supervisor owns the signing key and generates receipts. The worker process
-cannot access the private key. Receipts are cryptographically authentic and
-bind all 16 fields specified by the trust model.
+The local process generates signed byte records. Workers run as the same OS
+user; this implementation does not isolate keys or seal evaluation. A signature
+does not establish that telemetry is true or that a worker could not forge it.
 
-Uses Ed25519 via the standard library's hashlib + hmac as a baseline. When
-the ``cryptography`` package is available, real Ed25519 signatures are used.
-Otherwise, falls back to HMAC-SHA256 keyed receipts with a clear disclosure.
+Ed25519 requires cryptography. The HMAC fallback is a shared-secret integrity
+record; its historical .pub file contains that shared secret, not a public key.
+Never redistribute that file or interpret HMAC as public-verifier authenticity.
 """
 import base64
 import hashlib
@@ -102,6 +102,7 @@ def init_supervisor_keys(force=False):
         priv.write_bytes(secret)
         os.chmod(priv, 0o600)
         pub.write_text(f'# {SCHEME_HMAC_SHA256}\n{base64.b64encode(secret).decode()}\n')
+        os.chmod(pub, 0o600)  # This fallback verification material is a secret.
         return priv, pub, SCHEME_HMAC_SHA256
 
 
@@ -179,6 +180,8 @@ def verify_receipt_signature(receipt_dict):
     payload = canonical(to_verify)
 
     _, pub_data, stored_scheme = _load_keys()
+    if scheme != stored_scheme:
+        raise EvidenceError('receipt signature scheme differs from stored key scheme')
 
     # Verify key identity
     expected_id = hashlib.sha256(pub_data).hexdigest()[:16]

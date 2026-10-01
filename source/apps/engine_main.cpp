@@ -8,7 +8,20 @@
 #include <string>
 
 namespace fs = std::filesystem;
+std::string json_string(const std::string& text) {
+    std::ostringstream out;
+    out << '"';
+    for (unsigned char c : text) {
+        if (c == '"' || c == '\\') out << '\\' << c;
+        else if (c < 32) out << "\\u" << std::hex << std::setw(4) << std::setfill('0') << static_cast<unsigned>(c) << std::dec;
+        else out << c;
+    }
+    out << '"';
+    return out.str();
+}
 int main(int argc, char** argv) {
+    fs::path owned_directory;
+    std::string phase = "preflight";
     try {
         const std::set<std::string> allowed = {"--events", "--model", "--out-dir", "--mode", "--batch-size",
             "--batch-min", "--batch-max", "--alpha", "--alpha-min", "--alpha-max", "--alpha-delta",
@@ -32,10 +45,7 @@ int main(int argc, char** argv) {
         };
         auto real = [&](const char* key, double fallback) {
             if (!options.count(key)) return fallback;
-            std::size_t end = 0;
-            double value = std::stod(options.at(key), &end);
-            if (end != options.at(key).size() || !std::isfinite(value)) throw std::invalid_argument("invalid numeric option");
-            return value;
+            return bpfeat::finite_decimal(options.at(key));
         };
         auto u32 = [&](const char* key, std::uint32_t fallback) {
             auto value = integer(key, fallback);
@@ -75,23 +85,56 @@ int main(int argc, char** argv) {
         bpfeat::ReplayReader reader(input);
         const fs::path directory = options.at("--out-dir");
         if (!fs::create_directory(directory)) throw std::runtime_error("output directory already exists or cannot be created");
+        owned_directory = directory;
+        phase = "execution";
         std::ofstream predictions(directory / "predictions_unlabeled.csv");
         std::ofstream trace(directory / "batch_controller.csv");
         auto stats = bpfeat::run_pipeline([&](bpfeat::RawEvent& event) { return reader.next(event); }, model, predictions, trace, config);
-        std::ofstream receipt(directory / "engine_receipt.json");
-        receipt << "{\n  \"schema\": \"bpfeat.engine.receipt.v2\",\n  \"status\": \"ENGINE_COMPLETED\",\n"
+        phase = "output_close";
+        predictions.close();
+        trace.close();
+        if (!predictions || !trace) throw std::runtime_error("engine output close failed");
+        phase = "receipt";
+        const auto pending_receipt = directory / "engine_receipt.pending.json";
+        std::ofstream receipt(pending_receipt);
+        bpfeat::diagnostic_format(receipt);
+        receipt << "{\n  \"schema\": \"bpfeat.engine.receipt.v3\",\n  \"status\": \"ENGINE_COMPLETED\",\n"
                    "  \"research_evidence\": false,\n  \"feature_schema\": \"bpfeat.taobao.features.v2\",\n"
                 << "  \"mode\": \"" << mode << "\",\n  \"read\": " << stats.read << ",\n  \"extracted\": " << stats.extracted
                 << ",\n  \"batched\": " << stats.batched << ",\n  \"scored\": " << stats.scored << ",\n  \"written\": " << stats.written
                 << ",\n  \"batches\": " << stats.batches << ",\n  \"tail_batches\": " << stats.tails
                 << ",\n  \"source_block_retries\": " << stats.source_block_retries << ",\n  \"batch_block_retries\": " << stats.batch_block_retries
                 << ",\n  \"batch_actions\": " << stats.batch_actions << ",\n  \"direction_changes\": " << stats.direction_changes
-                << ",\n  \"started_monotonic_ns\": " << stats.started_ns << ",\n  \"finished_monotonic_ns\": " << stats.finished_ns << "\n}\n";
+                << ",\n  \"started_monotonic_ns\": " << stats.started_ns << ",\n  \"finished_monotonic_ns\": " << stats.finished_ns
+                << ",\n  \"config\": {\"batch_initial\": " << config.batch_initial
+                << ", \"batch_min\": " << config.batch_min << ", \"batch_max\": " << config.batch_max
+                << ", \"alpha_initial\": " << config.alpha_initial << ", \"alpha_min\": " << config.alpha_min
+                << ", \"alpha_max\": " << config.alpha_max << ", \"alpha_delta\": " << config.alpha_delta
+                << ", \"occupancy_gain\": " << config.occupancy_gain << ", \"low\": " << config.low << ", \"high\": " << config.high
+                << ", \"shrink\": " << config.shrink << ", \"grow\": " << config.grow
+                << ", \"feature_slots\": " << config.feature_slots << ", \"batch_slots\": " << config.batch_slots
+                << ", \"max_keys\": " << config.max_keys << ", \"timeout_seconds\": " << config.timeout_seconds << "},\n"
+                << "  \"model_parameters\": {\"bias\": " << model.bias() << ", \"weights\": [";
+        for (std::size_t i = 0; i < model.weights().size(); ++i)
+            receipt << (i ? ", " : "") << model.weights()[i];
+        receipt << "]},\n  \"scope\": \"CPU diagnostic execution; no input authenticity, sealed evaluation or research certification\"\n}\n";
         receipt.flush();
         if (!receipt) throw std::runtime_error("engine receipt write failed");
+        receipt.close();
+        if (!receipt) throw std::runtime_error("engine receipt close failed");
+        fs::rename(pending_receipt, directory / "engine_receipt.json");
         std::cout << "ENGINE_COMPLETED rows=" << stats.written << " research_evidence=false\n";
         return 0;
     } catch (const std::exception& error) {
+        if (!owned_directory.empty()) {
+            // Preserve the failed attempt and distinguish it from completion.
+            // Failure-report I/O can itself fail; never mask the original error.
+            std::ofstream failure(owned_directory / "engine_failure.json");
+            failure << "{\"schema\":\"bpfeat.engine.failure.v1\",\"status\":\"ENGINE_FAILED\",\"research_evidence\":false,\"phase\":"
+                    << json_string(phase) << ",\"error\":" << json_string(error.what()) << "}\n";
+            failure.close();
+            if (!failure) std::cerr << "Failure record could not be written; retain this attempt directory.\n";
+        }
         std::cerr << "ENGINE_FAILED: " << error.what() << '\n';
         return 2;
     }

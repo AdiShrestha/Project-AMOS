@@ -33,6 +33,8 @@ struct Batch {
     std::array<FeatureSnapshot, MAX_BATCH> items{};
     std::uint32_t count{0};
     PressureObservation pressure_at_start;
+    double raw_pressure{0};
+    std::uint32_t target{0};
 };
 struct PipelineStats {
     std::uint64_t read{0}, extracted{0}, batched{0}, scored{0}, written{0}, batches{0}, tails{0};
@@ -46,6 +48,9 @@ inline void validate(const PipelineConfig& config) {
         throw std::invalid_argument("invalid pipeline resource or batch bounds");
     if (config.mode != Mode::Fixed && config.mode != Mode::BatchOnly && config.mode != Mode::AlphaOnly && config.mode != Mode::Joint)
         throw std::invalid_argument("unknown pipeline mode");
+    for (auto slots : {config.feature_slots, config.batch_slots})
+        if (slots < 2 || (slots & (slots - 1)))
+            throw std::invalid_argument("queue slots must be a power of two >= 2");
     AlphaController alpha(config.alpha_min, config.alpha_max, config.alpha_delta, config.alpha_initial);
     MultiplicativeBatchController batch(config.batch_min, config.batch_max, config.low, config.high,
                                          config.shrink, config.grow, config.batch_initial);
@@ -81,12 +86,13 @@ inline PipelineStats run_pipeline(std::function<bool(RawEvent&)> next, const Log
         return true;
     };
     auto pause = [] { std::this_thread::yield(); };
+    diagnostic_format(predictions);
+    diagnostic_format(controller_trace);
     predictions << "seq,event_ts_ns,key,score,alpha_used,pressure_used,pressure_generation_used,pressure_available,"
                    "source_created_ns,scored_ns,latency_ns,batch_size,batch_pressure,batch_pressure_generation";
     for (std::size_t i = 0; i < FEATURE_DIMENSION; ++i) predictions << ",x" << i;
-    predictions << '\n' << std::setprecision(std::numeric_limits<double>::max_digits10);
-    controller_trace << "generation,sampled_ns,occupancy_slots,occupancy_ema,batch_target\n"
-                     << std::setprecision(std::numeric_limits<double>::max_digits10);
+    predictions << ",item_id,category_id,behavior_code,pressure_sampled_ns,pressure_loaded_ns\n";
+    controller_trace << "generation,sampled_ns,occupancy_slots,occupancy_ema,batch_target,first_seq,last_seq,actual_count,is_tail\n";
     if (!predictions || !controller_trace) throw std::runtime_error("cannot write engine headers");
     std::vector<std::thread> workers;
     workers.reserve(3);
@@ -115,7 +121,9 @@ inline PipelineStats run_pipeline(std::function<bool(RawEvent&)> next, const Log
                                 << ',' << batch.count << ',' << batch.pressure_at_start.value
                                 << ',' << batch.pressure_at_start.generation;
                     for (auto value : snapshot.x) predictions << ',' << value;
-                    predictions << '\n';
+                    predictions << ',' << snapshot.event.item_id << ',' << snapshot.event.category_id
+                                << ',' << static_cast<unsigned>(snapshot.event.behavior_code)
+                                << ',' << snapshot.pressure_used.sampled_ns << ',' << snapshot.pressure_loaded_ns << '\n';
                     if (!predictions) throw std::runtime_error("prediction write failed");
                     ++stats.written;
                 }
@@ -129,8 +137,13 @@ inline PipelineStats run_pipeline(std::function<bool(RawEvent&)> next, const Log
                                                       config.shrink, config.grow, config.batch_initial);
             Batch batch;
             std::uint32_t target = config.batch_initial;
-            auto flush = [&]() {
+            auto flush = [&](bool tail = false) {
                 if (!batch.count) return true;
+                controller_trace << batch.pressure_at_start.generation << ',' << batch.pressure_at_start.sampled_ns
+                                 << ',' << batch.raw_pressure << ',' << batch.pressure_at_start.value << ',' << batch.target
+                                 << ',' << batch.items[0].event.seq << ',' << batch.items[batch.count-1].event.seq
+                                 << ',' << batch.count << ',' << tail << '\n';
+                if (!controller_trace) throw std::runtime_error("controller trace write failed");
                 while (!batches.try_push(batch)) {
                     if (!check()) return false;
                     ++stats.batch_block_retries;
@@ -155,16 +168,15 @@ inline PipelineStats run_pipeline(std::function<bool(RawEvent&)> next, const Log
                     batch.pressure_at_start = signal.load();
                     target = (config.mode == Mode::BatchOnly || config.mode == Mode::Joint)
                         ? controller.update(pressure) : config.batch_initial;
-                    controller_trace << batch.pressure_at_start.generation << ',' << batch.pressure_at_start.sampled_ns
-                                     << ',' << raw_pressure << ',' << pressure << ',' << target << '\n';
-                    if (!controller_trace) throw std::runtime_error("controller trace write failed");
+                    batch.raw_pressure = raw_pressure;
+                    batch.target = target;
                 }
                 batch.items[batch.count++] = snapshot;
                 ++stats.batched;
                 if (batch.count == target && !flush()) return;
             }
             if (cancelled.load(std::memory_order_acquire)) return;
-            if (batch.count) { ++stats.tails; if (!flush()) return; }
+            if (batch.count) { ++stats.tails; if (!flush(true)) return; }
             controller_trace.flush();
             if (!controller_trace) throw std::runtime_error("controller trace final flush failed");
             stats.batch_actions = controller.actions();
@@ -186,12 +198,14 @@ inline PipelineStats run_pipeline(std::function<bool(RawEvent&)> next, const Log
                 previous_event_ns = event.event_ts_ns;
                 auto created_ns = monotonic_ns();
                 auto observation = signal.load();
+                auto pressure_loaded_ns = monotonic_ns();
                 // No observation is recorded as available until the first real
                 // batch-start sample. Hold the declared initial alpha before it.
                 auto value = config.alpha_initial;
                 if (config.mode == Mode::AlphaOnly || config.mode == Mode::Joint)
                     value = observation.available ? alpha.update(observation.value) : alpha.current();
                 auto snapshot = extractor.update(event, value, created_ns, observation);
+                snapshot.pressure_loaded_ns = pressure_loaded_ns;
                 ++stats.extracted;
                 while (!features.try_push(snapshot)) {
                     if (!check()) return;

@@ -162,15 +162,26 @@ def inventory(root, paths, *, reject_dangerous_ext=True):
     return out
 
 def merkle_root(file_hashes):
-    """Compute a Merkle root over a dict of {path: sha256_hex}.
+    """Domain-separated binary Merkle tree over canonical path/SHA-256 leaves.
 
-    Files are sorted by path to produce a deterministic root.
-    Returns the hex digest of the Merkle root.
+    Paths are length-framed, sorted and unique. Odd nodes are promoted unchanged;
+    a final root frame includes the leaf count. This version replaces the old
+    unframed flat concatenation; old freezes require an explicit new epoch.
     """
     if not file_hashes:
         raise EvidenceError('cannot compute merkle root of empty inventory')
-    h = hashlib.sha256()
-    for path in sorted(file_hashes.keys()):
-        h.update(path.encode('utf-8'))
-        h.update(bytes.fromhex(file_hashes[path]))
-    return h.hexdigest()
+    import re
+    leaves=[]
+    for path in sorted(file_hashes):
+        if not isinstance(path,str) or not path or _normalize_path(path)!=path:
+            raise EvidenceError('invalid snapshot path')
+        value=file_hashes[path]
+        if not isinstance(value,str) or re.fullmatch('[0-9a-f]{64}',value) is None:
+            raise EvidenceError('snapshot requires canonical full SHA-256 values')
+        encoded=path.encode('utf-8')
+        leaves.append(hashlib.sha256(b'factory.snapshot.leaf.v1\0'+len(encoded).to_bytes(8,'big')+encoded+bytes.fromhex(value)).digest())
+    count=len(leaves)
+    while len(leaves)>1:
+        leaves=[hashlib.sha256(b'factory.snapshot.node.v1\0'+leaves[i]+leaves[i+1]).digest()
+                if i+1<len(leaves) else leaves[i] for i in range(0,len(leaves),2)]
+    return hashlib.sha256(b'factory.snapshot.root.v1\0'+count.to_bytes(8,'big')+leaves[0]).hexdigest()

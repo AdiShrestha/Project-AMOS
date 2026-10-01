@@ -1,0 +1,8 @@
+{
+  "scope": "explicit mathematical counterexamples; no research measurements",
+  "sign_flip_original_scale": 0.0625,
+  "sign_flip_scaled": 1.0,
+  "extreme_midpoint": "inf",
+  "subnormal_span": "inf",
+  "globally_reversed_labels_accepted": true
+}

@@ -1,0 +1,6 @@
+[ 50%] Building CXX object CMakeFiles/test_engine.dir/tests/test_engine.cpp.o
+[ 50%] Building CXX object CMakeFiles/bpfeat_engine.dir/source/apps/engine_main.cpp.o
+[ 75%] Linking CXX executable test_engine
+[ 75%] Built target test_engine
+[100%] Linking CXX executable bpfeat_engine
+[100%] Built target bpfeat_engine

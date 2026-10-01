@@ -36,9 +36,16 @@ def evaluate(r):
  p=g.plan_at(r);_,ep,f=g.active(r);return Audit(r,p,ep,f,g.engine_hash()).run()
 
 def forged_output_rehash(r):
+ # Cooperative local threat: a writer can access the same-user signing key.
+ # Rebind/re-sign fixture bytes so semantic tests reach their intended layer.
+ from engine.io import digest
+ from engine.supervisor import sign_receipt
  _,ep,f=g.active(r);a=ep/'runs/known/attempt0001';rec=read_json(a/'execution.json')
  files=inventory(r,[str(a.relative_to(r))]);files.pop(str((a/'execution.json').relative_to(r)))
- rec['outputs']=files;write_json(a/'execution.json',rec)
+ rec['outputs']=files
+ rec['supervisor_receipt']['output_root']=digest(files)
+ rec['supervisor_receipt']=sign_receipt(rec['supervisor_receipt'])
+ write_json(a/'execution.json',rec)
 
 class MetricTests(unittest.TestCase):
  def test_perfect_direction(self):self.assertEqual(binary_metrics([0,1],[.1,.9])['auroc'],1.)

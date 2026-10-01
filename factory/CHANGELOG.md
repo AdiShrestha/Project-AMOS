@@ -1,4 +1,21 @@
-# CHANGELOG — Factory v3.3.0
+# CHANGELOG — Factory v3.3 with the AMOS local integrity repair
+
+## 3.3.1-amos.1 — 1 October 2026 local integrity repair
+
+Same-session reviewed contract: `docs/audit/reaudit_2026_10_01/contract.md`; findings and limits: `docs/audit/reaudit_2026_10_01/report.md`. This is not external review, a streaming adapter, sealed evaluation or scientific certification. Supplied 3.3.0 claims below are historical release text; this entry and the active README disclose current capabilities and correct unsupported claims in that text.
+
+- Exact common-denominator sign-flip tail comparisons replace the scale-dependent absolute epsilon; finite convex quantile interpolation and typed inference settings reject unsupported ranges. Independent rational/pairwise/threshold references exercise inference, AUROC and average precision. Sign-flip exchangeability and bootstrap coverage still require a scientific design.
+- Signed receipt verification runs on the actual audit path and checks current outer field bindings, worker runtime and clock envelopes. CPU time and peak memory are unmeasured `null`; wall duration is not CPU time. Same-user signing keys/state provide cooperative integrity only. Local assurance is capped at `STRUCTURALLY_VALIDATED`; handoff readiness does not establish independence or isolation.
+- A domain-separated, framed binary Merkle tree with full SHA-256 leaves replaces unframed flat concatenation. Freeze declares `sha256_binary_merkle_v1`. Earlier root algorithms require original versioned verification or a new prospective epoch, not replacement receipts.
+- Freeze/run/audit maintain an attempt index and reconcile exact folder membership/nonces, including signed failed attempts. Audits recompute the snapshot root against the frozen inventory. This catches directory deletion against retained state; it is not an externally immutable history.
+- Runtime resolution verifies the worker is the supported Python interpreter. Unsupported requested resource controls fail. Disabled network remains a declaration without OS isolation; native runtimes still need a reviewed adapter. Typed argument-key ordering remains the declared positional ABI.
+- Hardware analysis uses inference-only energy and names summed-service-time rates as service rates, not wall-clock offered throughput. Inference clock span excludes training and does not establish continuous load. Strict phase/warmup/sample/batch and timestamp domains reject malformed hardware records. Fixture energy is not laptop measurement.
+- Plausibility requires typed finite p-values and ordered CIs; chance values are semantic or explicitly supplied, not fabricated for F1/accuracy. Unit-dependent absolute narrow-CI heuristics and negative-verdict substring confusion are removed. Explicit unresolved investigations block; written explanations still require review.
+- Counts are integer-typed; duplicate comparison pairs and boolean claim fields are checked. Review templates begin with unresolved decisions instead of filled positive approvals.
+- Standalone bundle verification supports actual nested signed receipts, strict JSON and path/membership binding without factory imports. Manifest assurance is declared metadata, not standalone proof. HMAC verification material is secret; the historical `.pub` filename does not make it a public key.
+- Complete discovery now runs the five previously omitted function fixtures and refuses optimized Python with disabled fixture assertions. Reproduction/runtime/deletion attacks execute actual fixture freeze/run/audit paths. The registry's certification check still validates structure rather than running all attack tests.
+
+Validation: 307 complete factory tests passed, with independent metric/snapshot checks and actual-path mutations. Earlier failures and the supplied 276-test baseline remain recorded. Current native diagnostics additionally pass Debug/Release/ASan+UBSan/ThreadSanitizer checks and 27 bound Python tests. These are software tests, not scientific experiments. v3.0–v3.3 plan declarations remain accepted; the empty AMOS research template remains unfrozen and uncertified.
 
 ## v3.3.0 — trust-boundary hardening
 

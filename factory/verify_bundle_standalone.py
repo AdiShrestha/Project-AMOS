@@ -19,7 +19,7 @@ import hmac
 import json
 import sys
 import zipfile
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 MANIFEST = 'BUNDLE_MANIFEST.json'
 
@@ -29,7 +29,23 @@ def sha256_bytes(data):
 
 
 def canonical(obj):
-    return json.dumps(obj, sort_keys=True, separators=(',', ':')).encode()
+    return json.dumps(obj, sort_keys=True, separators=(',', ':'), allow_nan=False).encode()
+
+
+def strict_json(data):
+    def unique(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result: raise ValueError('duplicate JSON key: '+key)
+            result[key] = value
+        return result
+    def reject(value): raise ValueError('nonfinite JSON constant: '+value)
+    def finite(value):
+        import math
+        result=float(value)
+        if not math.isfinite(result): raise ValueError('nonfinite JSON number')
+        return result
+    return json.loads(data, object_pairs_hook=unique, parse_constant=reject, parse_float=finite)
 
 
 def _verify_receipt_sig(receipt_data, pub_key_bytes, scheme):
@@ -41,8 +57,10 @@ def _verify_receipt_sig(receipt_data, pub_key_bytes, scheme):
         return False, "receipt missing supervisor signature or scheme"
     if rec_scheme != scheme:
         return False, f"signature scheme mismatch: receipt has {rec_scheme}, key is {scheme}"
+    if receipt_data.get('public_key_id') != hashlib.sha256(pub_key_bytes).hexdigest()[:16]:
+        return False, 'receipt key identity mismatch'
     try:
-        sig = base64.b64decode(sig_b64)
+        sig = base64.b64decode(sig_b64, validate=True)
     except Exception:
         return False, "malformed base64 signature"
     to_verify = {k: v for k, v in receipt_data.items()
@@ -80,7 +98,8 @@ def verify_bundle(path, public_key_path=None):
 
             # Check for unsafe names
             for name in names:
-                if not name or '..' in name or name.startswith('/') or '\\' in name:
+                p = PurePosixPath(name)
+                if not name or '..' in p.parts or p.is_absolute() or '\\' in name or ':' in name or str(p) != name or name == '.':
                     errors.append(f'unsafe member name: {name}')
 
             # Duplicates
@@ -106,8 +125,8 @@ def verify_bundle(path, public_key_path=None):
             # Parse manifest
             raw = archive.read(MANIFEST)
             try:
-                manifest = json.loads(raw)
-            except json.JSONDecodeError as e:
+                manifest = strict_json(raw)
+            except (ValueError, TypeError) as e:
                 errors.append(f'invalid manifest JSON: {e}')
                 return {'status': 'FAIL', 'errors': errors}
 
@@ -163,8 +182,26 @@ def verify_bundle(path, public_key_path=None):
                         for name in archive_members:
                             if name.endswith('execution.json'):
                                 try:
-                                    receipt_json = json.loads(archive.read(name))
+                                    if archive.getinfo(name).file_size > 16*1024*1024:
+                                        raise ValueError('execution record exceeds 16 MiB')
+                                    execution = strict_json(archive.read(name))
+                                    receipt_json = execution.get('supervisor_receipt', execution)
                                     ok, msg = _verify_receipt_sig(receipt_json, pub_bytes, scheme)
+                                    if ok and 'supervisor_receipt' in execution:
+                                        expected = {k:execution[k] for k in ('run_nonce','epoch','experiment_id','seed','snapshot_merkle_root','started_at','finished_at')}
+                                        expected.update(input_root=sha256_bytes(canonical(execution['inputs_before'])),
+                                                        output_root=sha256_bytes(canonical(execution['outputs'])),
+                                                        launch_spec=sha256_bytes(canonical(execution['argv'])),
+                                                        exit_status=execution['exit_code'],
+                                                        interpreter_hash=execution['runtime_attestation']['interpreter_hash'],
+                                                        dependency_lock_hash=execution['dependency_lock_hash'])
+                                        if 'project/research_plan.json' in archive_members:
+                                            plan = strict_json(archive.read('project/research_plan.json'))
+                                            expected['project_id'] = plan['project_id']
+                                        for key,value in expected.items():
+                                            if type(receipt_json.get(key)) is not type(value) or receipt_json[key] != value:
+                                                ok,msg=False,'signed/outer execution binding mismatch: '+key
+                                                break
                                     if not ok:
                                         errors.append(f'invalid receipt signature in {name}: {msg}')
                                     else:
@@ -185,7 +222,8 @@ def verify_bundle(path, public_key_path=None):
         'release_status': manifest.get('release_status', 'unknown'),
         'factory_version': manifest.get('factory_version', 'unknown'),
         'assurance_level': manifest.get('assurance_level', 'unknown'),
-        'scope': 'standalone verification: membership, byte integrity, and supervisor signatures',
+        'assurance_verified': 'bundle membership/bytes and local signature bindings only',
+        'scope': 'declared release_status/assurance_level are metadata, not independently certified; no key isolation, sealed evaluation or scientific validity; HMAC verification requires a secret',
     }
 
     return result

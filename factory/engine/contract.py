@@ -76,7 +76,6 @@ def validate_contract(contract, root, frozen_code_paths):
     # arguments — only well-known placeholders
     args = contract.get('arguments', {})
     expect_dict(args, 'execution_contract.arguments')
-    allowed_arg_values = {'supervisor_bound', 'plan_seed', 'plan_id'}
     for k, v in args.items():
         expect_str(v, f'execution_contract.arguments.{k}')
 
@@ -149,15 +148,9 @@ def _build_preexec(contract):
         if cpu:
             resource.setrlimit(resource.RLIMIT_CPU, (cpu, cpu))
         if mem:
-            try:
-                resource.setrlimit(resource.RLIMIT_AS, (mem, mem))
-            except (ValueError, OSError):
-                pass  # RLIMIT_AS not available on all platforms
+            resource.setrlimit(resource.RLIMIT_AS, (mem, mem))
         if nproc:
-            try:
-                resource.setrlimit(resource.RLIMIT_NPROC, (nproc, nproc))
-            except (ValueError, OSError):
-                pass  # RLIMIT_NPROC not available on all platforms
+            resource.setrlimit(resource.RLIMIT_NPROC, (nproc, nproc))
 
     return _set_limits
 
