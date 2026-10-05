@@ -1,0 +1,1787 @@
+{
+  "metadata": {
+    "contract": "AMOS-07",
+    "study": "workload_and_mechanism_pilot",
+    "total_events_per_trial": 27000,
+    "total_queries_per_trial": 5000,
+    "grid_configurations": 12,
+    "all_trials_conserved": true
+  },
+  "actuator_sign_verification": {
+    "actuator_sign_verified": true,
+    "monotonic_publication_decrease": true,
+    "monotonic_staleness_increase": true,
+    "monotonic_feature_error_increase": true,
+    "observations": {
+      "U=1": {
+        "publications": 27000,
+        "mean_staleness": 0.0,
+        "mean_feature_error": 0.0
+      },
+      "U=5": {
+        "publications": 4626,
+        "mean_staleness": 1.7748,
+        "mean_feature_error": 547.6537825498516
+      },
+      "U=20": {
+        "publications": 682,
+        "mean_staleness": 6.0618,
+        "mean_feature_error": 959.6107916710998
+      }
+    }
+  },
+  "grid_results": [
+    {
+      "config": {
+        "policy": "ExactFresh",
+        "u": "1",
+        "batch_size": 8,
+        "alpha": 0.1
+      },
+      "aggregate_accounting": {
+        "scheduled_events": 27000,
+        "admitted_events": 27000,
+        "dropped_events": 0,
+        "published_updates": 27000,
+        "coalesced_updates": 0,
+        "scheduled_queries": 5000,
+        "completed_queries": 5000,
+        "overall_conservation_verified": true
+      },
+      "aggregate_telemetry": {
+        "mean_staleness": 0.0,
+        "max_staleness": 0,
+        "mean_feature_error": 0.0,
+        "p95_feature_error": 0.0,
+        "max_feature_error": 0.0,
+        "mean_loss_gap": 0.0,
+        "mean_query_latency_us": 2.3967182,
+        "p95_query_latency_us": 2.875
+      },
+      "phases": {
+        "warm_up": {
+          "accounting": {
+            "scheduled_events": 2000,
+            "admitted_events": 2000,
+            "dropped_events": 0,
+            "published_updates": 2000,
+            "coalesced_updates": 0,
+            "scheduled_queries": 0,
+            "completed_queries": 0,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 413957.23035291716,
+            "query_rate_served_hz": 0.0,
+            "duration_seconds": 0.004831417
+          },
+          "telemetry": {
+            "mean_staleness": 0.0,
+            "max_staleness": 0,
+            "mean_feature_error": 0.0,
+            "p95_feature_error": 0.0,
+            "max_feature_error": 0.0,
+            "mean_loss_gap": 0.0,
+            "mean_query_latency_us": 0.0,
+            "p95_query_latency_us": 0.0
+          }
+        },
+        "baseline": {
+          "accounting": {
+            "scheduled_events": 5000,
+            "admitted_events": 5000,
+            "dropped_events": 0,
+            "published_updates": 5000,
+            "coalesced_updates": 0,
+            "scheduled_queries": 1000,
+            "completed_queries": 1000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 323067.8523256847,
+            "query_rate_served_hz": 64613.57046513694,
+            "duration_seconds": 0.015476625
+          },
+          "telemetry": {
+            "mean_staleness": 0.0,
+            "max_staleness": 0,
+            "mean_feature_error": 0.0,
+            "p95_feature_error": 0.0,
+            "max_feature_error": 0.0,
+            "mean_loss_gap": 0.0,
+            "mean_query_latency_us": 2.479534,
+            "p95_query_latency_us": 2.916
+          }
+        },
+        "stress": {
+          "accounting": {
+            "scheduled_events": 15000,
+            "admitted_events": 15000,
+            "dropped_events": 0,
+            "published_updates": 15000,
+            "coalesced_updates": 0,
+            "scheduled_queries": 3000,
+            "completed_queries": 3000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 327590.49004807393,
+            "query_rate_served_hz": 65518.09800961478,
+            "duration_seconds": 0.045788875
+          },
+          "telemetry": {
+            "mean_staleness": 0.0,
+            "max_staleness": 0,
+            "mean_feature_error": 0.0,
+            "p95_feature_error": 0.0,
+            "max_feature_error": 0.0,
+            "mean_loss_gap": 0.0,
+            "mean_query_latency_us": 2.377955,
+            "p95_query_latency_us": 2.875
+          }
+        },
+        "recovery": {
+          "accounting": {
+            "scheduled_events": 5000,
+            "admitted_events": 5000,
+            "dropped_events": 0,
+            "published_updates": 5000,
+            "coalesced_updates": 0,
+            "scheduled_queries": 1000,
+            "completed_queries": 1000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 330903.94685682614,
+            "query_rate_served_hz": 66180.78937136523,
+            "duration_seconds": 0.015110125
+          },
+          "telemetry": {
+            "mean_staleness": 0.0,
+            "max_staleness": 0,
+            "mean_feature_error": 0.0,
+            "p95_feature_error": 0.0,
+            "max_feature_error": 0.0,
+            "mean_loss_gap": 0.0,
+            "mean_query_latency_us": 2.370192,
+            "p95_query_latency_us": 2.875
+          }
+        }
+      }
+    },
+    {
+      "config": {
+        "policy": "ExactFresh",
+        "u": "1",
+        "batch_size": 32,
+        "alpha": 0.1
+      },
+      "aggregate_accounting": {
+        "scheduled_events": 27000,
+        "admitted_events": 27000,
+        "dropped_events": 0,
+        "published_updates": 27000,
+        "coalesced_updates": 0,
+        "scheduled_queries": 5000,
+        "completed_queries": 5000,
+        "overall_conservation_verified": true
+      },
+      "aggregate_telemetry": {
+        "mean_staleness": 0.0,
+        "max_staleness": 0,
+        "mean_feature_error": 0.0,
+        "p95_feature_error": 0.0,
+        "max_feature_error": 0.0,
+        "mean_loss_gap": 0.0,
+        "mean_query_latency_us": 2.3926466,
+        "p95_query_latency_us": 2.875
+      },
+      "phases": {
+        "warm_up": {
+          "accounting": {
+            "scheduled_events": 2000,
+            "admitted_events": 2000,
+            "dropped_events": 0,
+            "published_updates": 2000,
+            "coalesced_updates": 0,
+            "scheduled_queries": 0,
+            "completed_queries": 0,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 442833.0242727851,
+            "query_rate_served_hz": 0.0,
+            "duration_seconds": 0.004516375
+          },
+          "telemetry": {
+            "mean_staleness": 0.0,
+            "max_staleness": 0,
+            "mean_feature_error": 0.0,
+            "p95_feature_error": 0.0,
+            "max_feature_error": 0.0,
+            "mean_loss_gap": 0.0,
+            "mean_query_latency_us": 0.0,
+            "p95_query_latency_us": 0.0
+          }
+        },
+        "baseline": {
+          "accounting": {
+            "scheduled_events": 5000,
+            "admitted_events": 5000,
+            "dropped_events": 0,
+            "published_updates": 5000,
+            "coalesced_updates": 0,
+            "scheduled_queries": 1000,
+            "completed_queries": 1000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 329019.5146080387,
+            "query_rate_served_hz": 65803.90292160775,
+            "duration_seconds": 0.015196667
+          },
+          "telemetry": {
+            "mean_staleness": 0.0,
+            "max_staleness": 0,
+            "mean_feature_error": 0.0,
+            "p95_feature_error": 0.0,
+            "max_feature_error": 0.0,
+            "mean_loss_gap": 0.0,
+            "mean_query_latency_us": 2.3764969999999996,
+            "p95_query_latency_us": 2.834
+          }
+        },
+        "stress": {
+          "accounting": {
+            "scheduled_events": 15000,
+            "admitted_events": 15000,
+            "dropped_events": 0,
+            "published_updates": 15000,
+            "coalesced_updates": 0,
+            "scheduled_queries": 3000,
+            "completed_queries": 3000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 330400.1145387064,
+            "query_rate_served_hz": 66080.02290774127,
+            "duration_seconds": 0.0453995
+          },
+          "telemetry": {
+            "mean_staleness": 0.0,
+            "max_staleness": 0,
+            "mean_feature_error": 0.0,
+            "p95_feature_error": 0.0,
+            "max_feature_error": 0.0,
+            "mean_loss_gap": 0.0,
+            "mean_query_latency_us": 2.371764333333333,
+            "p95_query_latency_us": 2.833
+          }
+        },
+        "recovery": {
+          "accounting": {
+            "scheduled_events": 5000,
+            "admitted_events": 5000,
+            "dropped_events": 0,
+            "published_updates": 5000,
+            "coalesced_updates": 0,
+            "scheduled_queries": 1000,
+            "completed_queries": 1000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 327522.5376446217,
+            "query_rate_served_hz": 65504.50752892433,
+            "duration_seconds": 0.015266125
+          },
+          "telemetry": {
+            "mean_staleness": 0.0,
+            "max_staleness": 0,
+            "mean_feature_error": 0.0,
+            "p95_feature_error": 0.0,
+            "max_feature_error": 0.0,
+            "mean_loss_gap": 0.0,
+            "mean_query_latency_us": 2.4714430000000003,
+            "p95_query_latency_us": 2.917
+          }
+        }
+      }
+    },
+    {
+      "config": {
+        "policy": "ExactFresh",
+        "u": "1",
+        "batch_size": 128,
+        "alpha": 0.1
+      },
+      "aggregate_accounting": {
+        "scheduled_events": 27000,
+        "admitted_events": 27000,
+        "dropped_events": 0,
+        "published_updates": 27000,
+        "coalesced_updates": 0,
+        "scheduled_queries": 5000,
+        "completed_queries": 5000,
+        "overall_conservation_verified": true
+      },
+      "aggregate_telemetry": {
+        "mean_staleness": 0.0,
+        "max_staleness": 0,
+        "mean_feature_error": 0.0,
+        "p95_feature_error": 0.0,
+        "max_feature_error": 0.0,
+        "mean_loss_gap": 0.0,
+        "mean_query_latency_us": 2.3611056,
+        "p95_query_latency_us": 2.834
+      },
+      "phases": {
+        "warm_up": {
+          "accounting": {
+            "scheduled_events": 2000,
+            "admitted_events": 2000,
+            "dropped_events": 0,
+            "published_updates": 2000,
+            "coalesced_updates": 0,
+            "scheduled_queries": 0,
+            "completed_queries": 0,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 430230.9522774921,
+            "query_rate_served_hz": 0.0,
+            "duration_seconds": 0.004648666
+          },
+          "telemetry": {
+            "mean_staleness": 0.0,
+            "max_staleness": 0,
+            "mean_feature_error": 0.0,
+            "p95_feature_error": 0.0,
+            "max_feature_error": 0.0,
+            "mean_loss_gap": 0.0,
+            "mean_query_latency_us": 0.0,
+            "p95_query_latency_us": 0.0
+          }
+        },
+        "baseline": {
+          "accounting": {
+            "scheduled_events": 5000,
+            "admitted_events": 5000,
+            "dropped_events": 0,
+            "published_updates": 5000,
+            "coalesced_updates": 0,
+            "scheduled_queries": 1000,
+            "completed_queries": 1000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 323539.093196277,
+            "query_rate_served_hz": 64707.8186392554,
+            "duration_seconds": 0.015454083
+          },
+          "telemetry": {
+            "mean_staleness": 0.0,
+            "max_staleness": 0,
+            "mean_feature_error": 0.0,
+            "p95_feature_error": 0.0,
+            "max_feature_error": 0.0,
+            "mean_loss_gap": 0.0,
+            "mean_query_latency_us": 2.345329,
+            "p95_query_latency_us": 2.833
+          }
+        },
+        "stress": {
+          "accounting": {
+            "scheduled_events": 15000,
+            "admitted_events": 15000,
+            "dropped_events": 0,
+            "published_updates": 15000,
+            "coalesced_updates": 0,
+            "scheduled_queries": 3000,
+            "completed_queries": 3000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 331361.7310336829,
+            "query_rate_served_hz": 66272.34620673658,
+            "duration_seconds": 0.04526775
+          },
+          "telemetry": {
+            "mean_staleness": 0.0,
+            "max_staleness": 0,
+            "mean_feature_error": 0.0,
+            "p95_feature_error": 0.0,
+            "max_feature_error": 0.0,
+            "mean_loss_gap": 0.0,
+            "mean_query_latency_us": 2.3680266666666667,
+            "p95_query_latency_us": 2.875
+          }
+        },
+        "recovery": {
+          "accounting": {
+            "scheduled_events": 5000,
+            "admitted_events": 5000,
+            "dropped_events": 0,
+            "published_updates": 5000,
+            "coalesced_updates": 0,
+            "scheduled_queries": 1000,
+            "completed_queries": 1000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 332143.1536992444,
+            "query_rate_served_hz": 66428.63073984887,
+            "duration_seconds": 0.01505375
+          },
+          "telemetry": {
+            "mean_staleness": 0.0,
+            "max_staleness": 0,
+            "mean_feature_error": 0.0,
+            "p95_feature_error": 0.0,
+            "max_feature_error": 0.0,
+            "mean_loss_gap": 0.0,
+            "mean_query_latency_us": 2.356119,
+            "p95_query_latency_us": 2.833
+          }
+        }
+      }
+    },
+    {
+      "config": {
+        "policy": "FixedCadence",
+        "u": "5",
+        "batch_size": 8,
+        "alpha": 0.1
+      },
+      "aggregate_accounting": {
+        "scheduled_events": 27000,
+        "admitted_events": 27000,
+        "dropped_events": 0,
+        "published_updates": 4626,
+        "coalesced_updates": 22374,
+        "scheduled_queries": 5000,
+        "completed_queries": 5000,
+        "overall_conservation_verified": true
+      },
+      "aggregate_telemetry": {
+        "mean_staleness": 1.7748,
+        "max_staleness": 4,
+        "mean_feature_error": 547.6537825498516,
+        "p95_feature_error": 3274.2004235241966,
+        "max_feature_error": 7680.0155886538205,
+        "mean_loss_gap": 3.5252183650795445e-05,
+        "mean_query_latency_us": 2.8316358,
+        "p95_query_latency_us": 3.333
+      },
+      "phases": {
+        "warm_up": {
+          "accounting": {
+            "scheduled_events": 2000,
+            "admitted_events": 2000,
+            "dropped_events": 0,
+            "published_updates": 347,
+            "coalesced_updates": 1653,
+            "scheduled_queries": 0,
+            "completed_queries": 0,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 613622.480427744,
+            "query_rate_served_hz": 0.0,
+            "duration_seconds": 0.003259333
+          },
+          "telemetry": {
+            "mean_staleness": 0.0,
+            "max_staleness": 0,
+            "mean_feature_error": 0.0,
+            "p95_feature_error": 0.0,
+            "max_feature_error": 0.0,
+            "mean_loss_gap": 0.0,
+            "mean_query_latency_us": 0.0,
+            "p95_query_latency_us": 0.0
+          }
+        },
+        "baseline": {
+          "accounting": {
+            "scheduled_events": 5000,
+            "admitted_events": 5000,
+            "dropped_events": 0,
+            "published_updates": 856,
+            "coalesced_updates": 4144,
+            "scheduled_queries": 1000,
+            "completed_queries": 1000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 393159.03282877925,
+            "query_rate_served_hz": 78631.80656575585,
+            "duration_seconds": 0.0127175
+          },
+          "telemetry": {
+            "mean_staleness": 1.768,
+            "max_staleness": 4,
+            "mean_feature_error": 558.3272208430274,
+            "p95_feature_error": 3319.9955508650232,
+            "max_feature_error": 6767.455273999424,
+            "mean_loss_gap": 3.651189381369319e-05,
+            "mean_query_latency_us": 2.751254,
+            "p95_query_latency_us": 3.167
+          }
+        },
+        "stress": {
+          "accounting": {
+            "scheduled_events": 15000,
+            "admitted_events": 15000,
+            "dropped_events": 0,
+            "published_updates": 2576,
+            "coalesced_updates": 12424,
+            "scheduled_queries": 3000,
+            "completed_queries": 3000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 393198.9685080393,
+            "query_rate_served_hz": 78639.79370160786,
+            "duration_seconds": 0.038148625
+          },
+          "telemetry": {
+            "mean_staleness": 1.754,
+            "max_staleness": 4,
+            "mean_feature_error": 532.4886400726898,
+            "p95_feature_error": 3017.500496313639,
+            "max_feature_error": 7555.550198215419,
+            "mean_loss_gap": 3.4402181258200954e-05,
+            "mean_query_latency_us": 2.8215100000000004,
+            "p95_query_latency_us": 3.292
+          }
+        },
+        "recovery": {
+          "accounting": {
+            "scheduled_events": 5000,
+            "admitted_events": 5000,
+            "dropped_events": 0,
+            "published_updates": 847,
+            "coalesced_updates": 4153,
+            "scheduled_queries": 1000,
+            "completed_queries": 1000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 312338.13076373166,
+            "query_rate_served_hz": 62467.626152746336,
+            "duration_seconds": 0.016008292
+          },
+          "telemetry": {
+            "mean_staleness": 1.844,
+            "max_staleness": 4,
+            "mean_feature_error": 582.4757716881612,
+            "p95_feature_error": 3510.719577240628,
+            "max_feature_error": 7680.0155886538205,
+            "mean_loss_gap": 3.6542480665681164e-05,
+            "mean_query_latency_us": 2.942395,
+            "p95_query_latency_us": 3.542
+          }
+        }
+      }
+    },
+    {
+      "config": {
+        "policy": "FixedCadence",
+        "u": "5",
+        "batch_size": 32,
+        "alpha": 0.1
+      },
+      "aggregate_accounting": {
+        "scheduled_events": 27000,
+        "admitted_events": 27000,
+        "dropped_events": 0,
+        "published_updates": 4626,
+        "coalesced_updates": 22374,
+        "scheduled_queries": 5000,
+        "completed_queries": 5000,
+        "overall_conservation_verified": true
+      },
+      "aggregate_telemetry": {
+        "mean_staleness": 1.7748,
+        "max_staleness": 4,
+        "mean_feature_error": 547.6537825498516,
+        "p95_feature_error": 3274.2004235241966,
+        "max_feature_error": 7680.0155886538205,
+        "mean_loss_gap": 3.5252183650795445e-05,
+        "mean_query_latency_us": 2.6577764,
+        "p95_query_latency_us": 3.083
+      },
+      "phases": {
+        "warm_up": {
+          "accounting": {
+            "scheduled_events": 2000,
+            "admitted_events": 2000,
+            "dropped_events": 0,
+            "published_updates": 347,
+            "coalesced_updates": 1653,
+            "scheduled_queries": 0,
+            "completed_queries": 0,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 617387.2295921107,
+            "query_rate_served_hz": 0.0,
+            "duration_seconds": 0.003239458
+          },
+          "telemetry": {
+            "mean_staleness": 0.0,
+            "max_staleness": 0,
+            "mean_feature_error": 0.0,
+            "p95_feature_error": 0.0,
+            "max_feature_error": 0.0,
+            "mean_loss_gap": 0.0,
+            "mean_query_latency_us": 0.0,
+            "p95_query_latency_us": 0.0
+          }
+        },
+        "baseline": {
+          "accounting": {
+            "scheduled_events": 5000,
+            "admitted_events": 5000,
+            "dropped_events": 0,
+            "published_updates": 856,
+            "coalesced_updates": 4144,
+            "scheduled_queries": 1000,
+            "completed_queries": 1000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 400556.7739157429,
+            "query_rate_served_hz": 80111.35478314858,
+            "duration_seconds": 0.012482625
+          },
+          "telemetry": {
+            "mean_staleness": 1.768,
+            "max_staleness": 4,
+            "mean_feature_error": 558.3272208430274,
+            "p95_feature_error": 3319.9955508650232,
+            "max_feature_error": 6767.455273999424,
+            "mean_loss_gap": 3.651189381369319e-05,
+            "mean_query_latency_us": 2.646124,
+            "p95_query_latency_us": 3.084
+          }
+        },
+        "stress": {
+          "accounting": {
+            "scheduled_events": 15000,
+            "admitted_events": 15000,
+            "dropped_events": 0,
+            "published_updates": 2576,
+            "coalesced_updates": 12424,
+            "scheduled_queries": 3000,
+            "completed_queries": 3000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 375757.78132365085,
+            "query_rate_served_hz": 75151.55626473017,
+            "duration_seconds": 0.039919333
+          },
+          "telemetry": {
+            "mean_staleness": 1.754,
+            "max_staleness": 4,
+            "mean_feature_error": 532.4886400726898,
+            "p95_feature_error": 3017.500496313639,
+            "max_feature_error": 7555.550198215419,
+            "mean_loss_gap": 3.4402181258200954e-05,
+            "mean_query_latency_us": 2.6662076666666663,
+            "p95_query_latency_us": 3.084
+          }
+        },
+        "recovery": {
+          "accounting": {
+            "scheduled_events": 5000,
+            "admitted_events": 5000,
+            "dropped_events": 0,
+            "published_updates": 847,
+            "coalesced_updates": 4153,
+            "scheduled_queries": 1000,
+            "completed_queries": 1000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 407197.92368149926,
+            "query_rate_served_hz": 81439.58473629985,
+            "duration_seconds": 0.012279041
+          },
+          "telemetry": {
+            "mean_staleness": 1.844,
+            "max_staleness": 4,
+            "mean_feature_error": 582.4757716881612,
+            "p95_feature_error": 3510.719577240628,
+            "max_feature_error": 7680.0155886538205,
+            "mean_loss_gap": 3.6542480665681164e-05,
+            "mean_query_latency_us": 2.6441350000000003,
+            "p95_query_latency_us": 3.0440499999999977
+          }
+        }
+      }
+    },
+    {
+      "config": {
+        "policy": "FixedCadence",
+        "u": "5",
+        "batch_size": 128,
+        "alpha": 0.1
+      },
+      "aggregate_accounting": {
+        "scheduled_events": 27000,
+        "admitted_events": 27000,
+        "dropped_events": 0,
+        "published_updates": 4626,
+        "coalesced_updates": 22374,
+        "scheduled_queries": 5000,
+        "completed_queries": 5000,
+        "overall_conservation_verified": true
+      },
+      "aggregate_telemetry": {
+        "mean_staleness": 1.7748,
+        "max_staleness": 4,
+        "mean_feature_error": 547.6537825498516,
+        "p95_feature_error": 3274.2004235241966,
+        "max_feature_error": 7680.0155886538205,
+        "mean_loss_gap": 3.5252183650795445e-05,
+        "mean_query_latency_us": 2.7239970000000002,
+        "p95_query_latency_us": 3.166
+      },
+      "phases": {
+        "warm_up": {
+          "accounting": {
+            "scheduled_events": 2000,
+            "admitted_events": 2000,
+            "dropped_events": 0,
+            "published_updates": 347,
+            "coalesced_updates": 1653,
+            "scheduled_queries": 0,
+            "completed_queries": 0,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 620732.4643078833,
+            "query_rate_served_hz": 0.0,
+            "duration_seconds": 0.003222
+          },
+          "telemetry": {
+            "mean_staleness": 0.0,
+            "max_staleness": 0,
+            "mean_feature_error": 0.0,
+            "p95_feature_error": 0.0,
+            "max_feature_error": 0.0,
+            "mean_loss_gap": 0.0,
+            "mean_query_latency_us": 0.0,
+            "p95_query_latency_us": 0.0
+          }
+        },
+        "baseline": {
+          "accounting": {
+            "scheduled_events": 5000,
+            "admitted_events": 5000,
+            "dropped_events": 0,
+            "published_updates": 856,
+            "coalesced_updates": 4144,
+            "scheduled_queries": 1000,
+            "completed_queries": 1000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 396747.9994775622,
+            "query_rate_served_hz": 79349.59989551244,
+            "duration_seconds": 0.012602458
+          },
+          "telemetry": {
+            "mean_staleness": 1.768,
+            "max_staleness": 4,
+            "mean_feature_error": 558.3272208430274,
+            "p95_feature_error": 3319.9955508650232,
+            "max_feature_error": 6767.455273999424,
+            "mean_loss_gap": 3.651189381369319e-05,
+            "mean_query_latency_us": 2.690818,
+            "p95_query_latency_us": 3.125
+          }
+        },
+        "stress": {
+          "accounting": {
+            "scheduled_events": 15000,
+            "admitted_events": 15000,
+            "dropped_events": 0,
+            "published_updates": 2576,
+            "coalesced_updates": 12424,
+            "scheduled_queries": 3000,
+            "completed_queries": 3000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 399194.0644420043,
+            "query_rate_served_hz": 79838.81288840086,
+            "duration_seconds": 0.037575709
+          },
+          "telemetry": {
+            "mean_staleness": 1.754,
+            "max_staleness": 4,
+            "mean_feature_error": 532.4886400726898,
+            "p95_feature_error": 3017.500496313639,
+            "max_feature_error": 7555.550198215419,
+            "mean_loss_gap": 3.4402181258200954e-05,
+            "mean_query_latency_us": 2.7228973333333335,
+            "p95_query_latency_us": 3.167
+          }
+        },
+        "recovery": {
+          "accounting": {
+            "scheduled_events": 5000,
+            "admitted_events": 5000,
+            "dropped_events": 0,
+            "published_updates": 847,
+            "coalesced_updates": 4153,
+            "scheduled_queries": 1000,
+            "completed_queries": 1000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 404308.57088887726,
+            "query_rate_served_hz": 80861.71417777544,
+            "duration_seconds": 0.012366792
+          },
+          "telemetry": {
+            "mean_staleness": 1.844,
+            "max_staleness": 4,
+            "mean_feature_error": 582.4757716881612,
+            "p95_feature_error": 3510.719577240628,
+            "max_feature_error": 7680.0155886538205,
+            "mean_loss_gap": 3.6542480665681164e-05,
+            "mean_query_latency_us": 2.760475,
+            "p95_query_latency_us": 3.167
+          }
+        }
+      }
+    },
+    {
+      "config": {
+        "policy": "FixedCadence",
+        "u": "20",
+        "batch_size": 8,
+        "alpha": 0.1
+      },
+      "aggregate_accounting": {
+        "scheduled_events": 27000,
+        "admitted_events": 27000,
+        "dropped_events": 0,
+        "published_updates": 682,
+        "coalesced_updates": 26318,
+        "scheduled_queries": 5000,
+        "completed_queries": 5000,
+        "overall_conservation_verified": true
+      },
+      "aggregate_telemetry": {
+        "mean_staleness": 6.0618,
+        "max_staleness": 19,
+        "mean_feature_error": 959.6107916710998,
+        "p95_feature_error": 3926.520381413174,
+        "max_feature_error": 7845.880779006312,
+        "mean_loss_gap": 7.221564307371395e-05,
+        "mean_query_latency_us": 2.9388726,
+        "p95_query_latency_us": 3.25
+      },
+      "phases": {
+        "warm_up": {
+          "accounting": {
+            "scheduled_events": 2000,
+            "admitted_events": 2000,
+            "dropped_events": 0,
+            "published_updates": 51,
+            "coalesced_updates": 1949,
+            "scheduled_queries": 0,
+            "completed_queries": 0,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 671122.0220638076,
+            "query_rate_served_hz": 0.0,
+            "duration_seconds": 0.002980084
+          },
+          "telemetry": {
+            "mean_staleness": 0.0,
+            "max_staleness": 0,
+            "mean_feature_error": 0.0,
+            "p95_feature_error": 0.0,
+            "max_feature_error": 0.0,
+            "mean_loss_gap": 0.0,
+            "mean_query_latency_us": 0.0,
+            "p95_query_latency_us": 0.0
+          }
+        },
+        "baseline": {
+          "accounting": {
+            "scheduled_events": 5000,
+            "admitted_events": 5000,
+            "dropped_events": 0,
+            "published_updates": 130,
+            "coalesced_updates": 4870,
+            "scheduled_queries": 1000,
+            "completed_queries": 1000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 413184.72456073295,
+            "query_rate_served_hz": 82636.94491214659,
+            "duration_seconds": 0.012101125
+          },
+          "telemetry": {
+            "mean_staleness": 5.943,
+            "max_staleness": 19,
+            "mean_feature_error": 994.5110002007999,
+            "p95_feature_error": 3875.5186283493645,
+            "max_feature_error": 6824.774620750558,
+            "mean_loss_gap": 7.398822542398858e-05,
+            "mean_query_latency_us": 2.960472,
+            "p95_query_latency_us": 3.25
+          }
+        },
+        "stress": {
+          "accounting": {
+            "scheduled_events": 15000,
+            "admitted_events": 15000,
+            "dropped_events": 0,
+            "published_updates": 385,
+            "coalesced_updates": 14615,
+            "scheduled_queries": 3000,
+            "completed_queries": 3000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 414314.56833600916,
+            "query_rate_served_hz": 82862.91366720184,
+            "duration_seconds": 0.036204375
+          },
+          "telemetry": {
+            "mean_staleness": 6.099,
+            "max_staleness": 19,
+            "mean_feature_error": 950.3084896677047,
+            "p95_feature_error": 3927.243698914632,
+            "max_feature_error": 7845.880779006312,
+            "mean_loss_gap": 7.233843731176055e-05,
+            "mean_query_latency_us": 2.9352489999999998,
+            "p95_query_latency_us": 3.209
+          }
+        },
+        "recovery": {
+          "accounting": {
+            "scheduled_events": 5000,
+            "admitted_events": 5000,
+            "dropped_events": 0,
+            "published_updates": 116,
+            "coalesced_updates": 4884,
+            "scheduled_queries": 1000,
+            "completed_queries": 1000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 412311.6251262704,
+            "query_rate_served_hz": 82462.32502525409,
+            "duration_seconds": 0.01212675
+          },
+          "telemetry": {
+            "mean_staleness": 6.069,
+            "max_staleness": 19,
+            "mean_feature_error": 952.6174891515847,
+            "p95_feature_error": 3900.2812923395836,
+            "max_feature_error": 7692.8607253591435,
+            "mean_loss_gap": 7.007467800929951e-05,
+            "mean_query_latency_us": 2.9281439999999996,
+            "p95_query_latency_us": 3.25
+          }
+        }
+      }
+    },
+    {
+      "config": {
+        "policy": "FixedCadence",
+        "u": "20",
+        "batch_size": 32,
+        "alpha": 0.1
+      },
+      "aggregate_accounting": {
+        "scheduled_events": 27000,
+        "admitted_events": 27000,
+        "dropped_events": 0,
+        "published_updates": 682,
+        "coalesced_updates": 26318,
+        "scheduled_queries": 5000,
+        "completed_queries": 5000,
+        "overall_conservation_verified": true
+      },
+      "aggregate_telemetry": {
+        "mean_staleness": 6.0618,
+        "max_staleness": 19,
+        "mean_feature_error": 959.6107916710998,
+        "p95_feature_error": 3926.520381413174,
+        "max_feature_error": 7845.880779006312,
+        "mean_loss_gap": 7.221564307371395e-05,
+        "mean_query_latency_us": 2.910438,
+        "p95_query_latency_us": 3.25
+      },
+      "phases": {
+        "warm_up": {
+          "accounting": {
+            "scheduled_events": 2000,
+            "admitted_events": 2000,
+            "dropped_events": 0,
+            "published_updates": 51,
+            "coalesced_updates": 1949,
+            "scheduled_queries": 0,
+            "completed_queries": 0,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 653960.0057679273,
+            "query_rate_served_hz": 0.0,
+            "duration_seconds": 0.003058291
+          },
+          "telemetry": {
+            "mean_staleness": 0.0,
+            "max_staleness": 0,
+            "mean_feature_error": 0.0,
+            "p95_feature_error": 0.0,
+            "max_feature_error": 0.0,
+            "mean_loss_gap": 0.0,
+            "mean_query_latency_us": 0.0,
+            "p95_query_latency_us": 0.0
+          }
+        },
+        "baseline": {
+          "accounting": {
+            "scheduled_events": 5000,
+            "admitted_events": 5000,
+            "dropped_events": 0,
+            "published_updates": 130,
+            "coalesced_updates": 4870,
+            "scheduled_queries": 1000,
+            "completed_queries": 1000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 414476.26323453797,
+            "query_rate_served_hz": 82895.25264690758,
+            "duration_seconds": 0.012063417
+          },
+          "telemetry": {
+            "mean_staleness": 5.943,
+            "max_staleness": 19,
+            "mean_feature_error": 994.5110002007999,
+            "p95_feature_error": 3875.5186283493645,
+            "max_feature_error": 6824.774620750558,
+            "mean_loss_gap": 7.398822542398858e-05,
+            "mean_query_latency_us": 2.875042,
+            "p95_query_latency_us": 3.167
+          }
+        },
+        "stress": {
+          "accounting": {
+            "scheduled_events": 15000,
+            "admitted_events": 15000,
+            "dropped_events": 0,
+            "published_updates": 385,
+            "coalesced_updates": 14615,
+            "scheduled_queries": 3000,
+            "completed_queries": 3000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 418073.3091547603,
+            "query_rate_served_hz": 83614.66183095206,
+            "duration_seconds": 0.035878875
+          },
+          "telemetry": {
+            "mean_staleness": 6.099,
+            "max_staleness": 19,
+            "mean_feature_error": 950.3084896677047,
+            "p95_feature_error": 3927.243698914632,
+            "max_feature_error": 7845.880779006312,
+            "mean_loss_gap": 7.233843731176055e-05,
+            "mean_query_latency_us": 2.911916333333333,
+            "p95_query_latency_us": 3.25
+          }
+        },
+        "recovery": {
+          "accounting": {
+            "scheduled_events": 5000,
+            "admitted_events": 5000,
+            "dropped_events": 0,
+            "published_updates": 116,
+            "coalesced_updates": 4884,
+            "scheduled_queries": 1000,
+            "completed_queries": 1000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 416028.2020525833,
+            "query_rate_served_hz": 83205.64041051666,
+            "duration_seconds": 0.012018416
+          },
+          "telemetry": {
+            "mean_staleness": 6.069,
+            "max_staleness": 19,
+            "mean_feature_error": 952.6174891515847,
+            "p95_feature_error": 3900.2812923395836,
+            "max_feature_error": 7692.8607253591435,
+            "mean_loss_gap": 7.007467800929951e-05,
+            "mean_query_latency_us": 2.941399,
+            "p95_query_latency_us": 3.25
+          }
+        }
+      }
+    },
+    {
+      "config": {
+        "policy": "FixedCadence",
+        "u": "20",
+        "batch_size": 128,
+        "alpha": 0.1
+      },
+      "aggregate_accounting": {
+        "scheduled_events": 27000,
+        "admitted_events": 27000,
+        "dropped_events": 0,
+        "published_updates": 682,
+        "coalesced_updates": 26318,
+        "scheduled_queries": 5000,
+        "completed_queries": 5000,
+        "overall_conservation_verified": true
+      },
+      "aggregate_telemetry": {
+        "mean_staleness": 6.0618,
+        "max_staleness": 19,
+        "mean_feature_error": 959.6107916710998,
+        "p95_feature_error": 3926.520381413174,
+        "max_feature_error": 7845.880779006312,
+        "mean_loss_gap": 7.221564307371395e-05,
+        "mean_query_latency_us": 3.8597318,
+        "p95_query_latency_us": 3.833
+      },
+      "phases": {
+        "warm_up": {
+          "accounting": {
+            "scheduled_events": 2000,
+            "admitted_events": 2000,
+            "dropped_events": 0,
+            "published_updates": 51,
+            "coalesced_updates": 1949,
+            "scheduled_queries": 0,
+            "completed_queries": 0,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 658084.1525110023,
+            "query_rate_served_hz": 0.0,
+            "duration_seconds": 0.003039125
+          },
+          "telemetry": {
+            "mean_staleness": 0.0,
+            "max_staleness": 0,
+            "mean_feature_error": 0.0,
+            "p95_feature_error": 0.0,
+            "max_feature_error": 0.0,
+            "mean_loss_gap": 0.0,
+            "mean_query_latency_us": 0.0,
+            "p95_query_latency_us": 0.0
+          }
+        },
+        "baseline": {
+          "accounting": {
+            "scheduled_events": 5000,
+            "admitted_events": 5000,
+            "dropped_events": 0,
+            "published_updates": 130,
+            "coalesced_updates": 4870,
+            "scheduled_queries": 1000,
+            "completed_queries": 1000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 411587.5731175034,
+            "query_rate_served_hz": 82317.51462350067,
+            "duration_seconds": 0.012148083
+          },
+          "telemetry": {
+            "mean_staleness": 5.943,
+            "max_staleness": 19,
+            "mean_feature_error": 994.5110002007999,
+            "p95_feature_error": 3875.5186283493645,
+            "max_feature_error": 6824.774620750558,
+            "mean_loss_gap": 7.398822542398858e-05,
+            "mean_query_latency_us": 2.958329,
+            "p95_query_latency_us": 3.167
+          }
+        },
+        "stress": {
+          "accounting": {
+            "scheduled_events": 15000,
+            "admitted_events": 15000,
+            "dropped_events": 0,
+            "published_updates": 385,
+            "coalesced_updates": 14615,
+            "scheduled_queries": 3000,
+            "completed_queries": 3000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 400385.7048957162,
+            "query_rate_served_hz": 80077.14097914324,
+            "duration_seconds": 0.037463875
+          },
+          "telemetry": {
+            "mean_staleness": 6.099,
+            "max_staleness": 19,
+            "mean_feature_error": 950.3084896677047,
+            "p95_feature_error": 3927.243698914632,
+            "max_feature_error": 7845.880779006312,
+            "mean_loss_gap": 7.233843731176055e-05,
+            "mean_query_latency_us": 3.102745,
+            "p95_query_latency_us": 3.459
+          }
+        },
+        "recovery": {
+          "accounting": {
+            "scheduled_events": 5000,
+            "admitted_events": 5000,
+            "dropped_events": 0,
+            "published_updates": 116,
+            "coalesced_updates": 4884,
+            "scheduled_queries": 1000,
+            "completed_queries": 1000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 290779.39695377176,
+            "query_rate_served_hz": 58155.87939075435,
+            "duration_seconds": 0.017195166
+          },
+          "telemetry": {
+            "mean_staleness": 6.069,
+            "max_staleness": 19,
+            "mean_feature_error": 952.6174891515847,
+            "p95_feature_error": 3900.2812923395836,
+            "max_feature_error": 7692.8607253591435,
+            "mean_loss_gap": 7.007467800929951e-05,
+            "mean_query_latency_us": 7.032095,
+            "p95_query_latency_us": 4.458
+          }
+        }
+      }
+    },
+    {
+      "config": {
+        "policy": "AdaptivePressure",
+        "u": "adaptive",
+        "batch_size": 8,
+        "alpha": 0.1
+      },
+      "aggregate_accounting": {
+        "scheduled_events": 27000,
+        "admitted_events": 27000,
+        "dropped_events": 0,
+        "published_updates": 6259,
+        "coalesced_updates": 20741,
+        "scheduled_queries": 5000,
+        "completed_queries": 5000,
+        "overall_conservation_verified": true
+      },
+      "aggregate_telemetry": {
+        "mean_staleness": 3.0546,
+        "max_staleness": 16,
+        "mean_feature_error": 546.2104247684961,
+        "p95_feature_error": 2924.380958639997,
+        "max_feature_error": 7845.880779006312,
+        "mean_loss_gap": 3.9335097458642985e-05,
+        "mean_query_latency_us": 2.7566412000000002,
+        "p95_query_latency_us": 3.25
+      },
+      "phases": {
+        "warm_up": {
+          "accounting": {
+            "scheduled_events": 2000,
+            "admitted_events": 2000,
+            "dropped_events": 0,
+            "published_updates": 957,
+            "coalesced_updates": 1043,
+            "scheduled_queries": 0,
+            "completed_queries": 0,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 452126.3729382472,
+            "query_rate_served_hz": 0.0,
+            "duration_seconds": 0.004423542
+          },
+          "telemetry": {
+            "mean_staleness": 0.0,
+            "max_staleness": 0,
+            "mean_feature_error": 0.0,
+            "p95_feature_error": 0.0,
+            "max_feature_error": 0.0,
+            "mean_loss_gap": 0.0,
+            "mean_query_latency_us": 0.0,
+            "p95_query_latency_us": 0.0
+          }
+        },
+        "baseline": {
+          "accounting": {
+            "scheduled_events": 5000,
+            "admitted_events": 5000,
+            "dropped_events": 0,
+            "published_updates": 2398,
+            "coalesced_updates": 2602,
+            "scheduled_queries": 1000,
+            "completed_queries": 1000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 327021.8123548841,
+            "query_rate_served_hz": 65404.36247097682,
+            "duration_seconds": 0.0152895
+          },
+          "telemetry": {
+            "mean_staleness": 0.517,
+            "max_staleness": 1,
+            "mean_feature_error": 193.98803494879147,
+            "p95_feature_error": 808.7707116937706,
+            "max_feature_error": 6804.247374861045,
+            "mean_loss_gap": 1.1241964846040287e-05,
+            "mean_query_latency_us": 2.481004,
+            "p95_query_latency_us": 2.958
+          }
+        },
+        "stress": {
+          "accounting": {
+            "scheduled_events": 15000,
+            "admitted_events": 15000,
+            "dropped_events": 0,
+            "published_updates": 507,
+            "coalesced_updates": 14493,
+            "scheduled_queries": 3000,
+            "completed_queries": 3000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 371085.0526940775,
+            "query_rate_served_hz": 74217.01053881549,
+            "duration_seconds": 0.040422
+          },
+          "telemetry": {
+            "mean_staleness": 3.828333333333333,
+            "max_staleness": 16,
+            "mean_feature_error": 665.1745301544172,
+            "p95_feature_error": 3236.9245254587217,
+            "max_feature_error": 7845.880779006312,
+            "mean_loss_gap": 4.878614641873946e-05,
+            "mean_query_latency_us": 2.848478333333333,
+            "p95_query_latency_us": 3.292
+          }
+        },
+        "recovery": {
+          "accounting": {
+            "scheduled_events": 5000,
+            "admitted_events": 5000,
+            "dropped_events": 0,
+            "published_updates": 2397,
+            "coalesced_updates": 2603,
+            "scheduled_queries": 1000,
+            "completed_queries": 1000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 326979.93873442285,
+            "query_rate_served_hz": 65395.987746884566,
+            "duration_seconds": 0.015291458
+          },
+          "telemetry": {
+            "mean_staleness": 3.271,
+            "max_staleness": 16,
+            "mean_feature_error": 541.5404984304373,
+            "p95_feature_error": 2888.2213048235208,
+            "max_feature_error": 7555.550198215419,
+            "mean_loss_gap": 3.907508319095626e-05,
+            "mean_query_latency_us": 2.756767,
+            "p95_query_latency_us": 3.166
+          }
+        }
+      }
+    },
+    {
+      "config": {
+        "policy": "AdaptivePressure",
+        "u": "adaptive",
+        "batch_size": 32,
+        "alpha": 0.1
+      },
+      "aggregate_accounting": {
+        "scheduled_events": 27000,
+        "admitted_events": 27000,
+        "dropped_events": 0,
+        "published_updates": 6259,
+        "coalesced_updates": 20741,
+        "scheduled_queries": 5000,
+        "completed_queries": 5000,
+        "overall_conservation_verified": true
+      },
+      "aggregate_telemetry": {
+        "mean_staleness": 3.0546,
+        "max_staleness": 16,
+        "mean_feature_error": 546.2104247684961,
+        "p95_feature_error": 2924.380958639997,
+        "max_feature_error": 7845.880779006312,
+        "mean_loss_gap": 3.9335097458642985e-05,
+        "mean_query_latency_us": 2.7431584,
+        "p95_query_latency_us": 3.167
+      },
+      "phases": {
+        "warm_up": {
+          "accounting": {
+            "scheduled_events": 2000,
+            "admitted_events": 2000,
+            "dropped_events": 0,
+            "published_updates": 957,
+            "coalesced_updates": 1043,
+            "scheduled_queries": 0,
+            "completed_queries": 0,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 451335.73940416006,
+            "query_rate_served_hz": 0.0,
+            "duration_seconds": 0.004431291
+          },
+          "telemetry": {
+            "mean_staleness": 0.0,
+            "max_staleness": 0,
+            "mean_feature_error": 0.0,
+            "p95_feature_error": 0.0,
+            "max_feature_error": 0.0,
+            "mean_loss_gap": 0.0,
+            "mean_query_latency_us": 0.0,
+            "p95_query_latency_us": 0.0
+          }
+        },
+        "baseline": {
+          "accounting": {
+            "scheduled_events": 5000,
+            "admitted_events": 5000,
+            "dropped_events": 0,
+            "published_updates": 2398,
+            "coalesced_updates": 2602,
+            "scheduled_queries": 1000,
+            "completed_queries": 1000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 327252.8017421368,
+            "query_rate_served_hz": 65450.56034842737,
+            "duration_seconds": 0.015278708
+          },
+          "telemetry": {
+            "mean_staleness": 0.517,
+            "max_staleness": 1,
+            "mean_feature_error": 193.98803494879147,
+            "p95_feature_error": 808.7707116937706,
+            "max_feature_error": 6804.247374861045,
+            "mean_loss_gap": 1.1241964846040287e-05,
+            "mean_query_latency_us": 2.5386770000000003,
+            "p95_query_latency_us": 3.041
+          }
+        },
+        "stress": {
+          "accounting": {
+            "scheduled_events": 15000,
+            "admitted_events": 15000,
+            "dropped_events": 0,
+            "published_updates": 507,
+            "coalesced_updates": 14493,
+            "scheduled_queries": 3000,
+            "completed_queries": 3000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 371317.76242827164,
+            "query_rate_served_hz": 74263.55248565433,
+            "duration_seconds": 0.040396667
+          },
+          "telemetry": {
+            "mean_staleness": 3.828333333333333,
+            "max_staleness": 16,
+            "mean_feature_error": 665.1745301544172,
+            "p95_feature_error": 3236.9245254587217,
+            "max_feature_error": 7845.880779006312,
+            "mean_loss_gap": 4.878614641873946e-05,
+            "mean_query_latency_us": 2.810998,
+            "p95_query_latency_us": 3.209
+          }
+        },
+        "recovery": {
+          "accounting": {
+            "scheduled_events": 5000,
+            "admitted_events": 5000,
+            "dropped_events": 0,
+            "published_updates": 2397,
+            "coalesced_updates": 2603,
+            "scheduled_queries": 1000,
+            "completed_queries": 1000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 328732.8918362934,
+            "query_rate_served_hz": 65746.57836725868,
+            "duration_seconds": 0.015209917
+          },
+          "telemetry": {
+            "mean_staleness": 3.271,
+            "max_staleness": 16,
+            "mean_feature_error": 541.5404984304373,
+            "p95_feature_error": 2888.2213048235208,
+            "max_feature_error": 7555.550198215419,
+            "mean_loss_gap": 3.907508319095626e-05,
+            "mean_query_latency_us": 2.7441210000000003,
+            "p95_query_latency_us": 3.125
+          }
+        }
+      }
+    },
+    {
+      "config": {
+        "policy": "AdaptivePressure",
+        "u": "adaptive",
+        "batch_size": 128,
+        "alpha": 0.1
+      },
+      "aggregate_accounting": {
+        "scheduled_events": 27000,
+        "admitted_events": 27000,
+        "dropped_events": 0,
+        "published_updates": 6259,
+        "coalesced_updates": 20741,
+        "scheduled_queries": 5000,
+        "completed_queries": 5000,
+        "overall_conservation_verified": true
+      },
+      "aggregate_telemetry": {
+        "mean_staleness": 3.0546,
+        "max_staleness": 16,
+        "mean_feature_error": 546.2104247684961,
+        "p95_feature_error": 2924.380958639997,
+        "max_feature_error": 7845.880779006312,
+        "mean_loss_gap": 3.9335097458642985e-05,
+        "mean_query_latency_us": 2.7258662,
+        "p95_query_latency_us": 3.167
+      },
+      "phases": {
+        "warm_up": {
+          "accounting": {
+            "scheduled_events": 2000,
+            "admitted_events": 2000,
+            "dropped_events": 0,
+            "published_updates": 957,
+            "coalesced_updates": 1043,
+            "scheduled_queries": 0,
+            "completed_queries": 0,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 455589.47925439134,
+            "query_rate_served_hz": 0.0,
+            "duration_seconds": 0.004389917
+          },
+          "telemetry": {
+            "mean_staleness": 0.0,
+            "max_staleness": 0,
+            "mean_feature_error": 0.0,
+            "p95_feature_error": 0.0,
+            "max_feature_error": 0.0,
+            "mean_loss_gap": 0.0,
+            "mean_query_latency_us": 0.0,
+            "p95_query_latency_us": 0.0
+          }
+        },
+        "baseline": {
+          "accounting": {
+            "scheduled_events": 5000,
+            "admitted_events": 5000,
+            "dropped_events": 0,
+            "published_updates": 2398,
+            "coalesced_updates": 2602,
+            "scheduled_queries": 1000,
+            "completed_queries": 1000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 331639.2097037633,
+            "query_rate_served_hz": 66327.84194075265,
+            "duration_seconds": 0.015076625
+          },
+          "telemetry": {
+            "mean_staleness": 0.517,
+            "max_staleness": 1,
+            "mean_feature_error": 193.98803494879147,
+            "p95_feature_error": 808.7707116937706,
+            "max_feature_error": 6804.247374861045,
+            "mean_loss_gap": 1.1241964846040287e-05,
+            "mean_query_latency_us": 2.501087,
+            "p95_query_latency_us": 3.0
+          }
+        },
+        "stress": {
+          "accounting": {
+            "scheduled_events": 15000,
+            "admitted_events": 15000,
+            "dropped_events": 0,
+            "published_updates": 507,
+            "coalesced_updates": 14493,
+            "scheduled_queries": 3000,
+            "completed_queries": 3000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 372978.1507161441,
+            "query_rate_served_hz": 74595.63014322883,
+            "duration_seconds": 0.040216833
+          },
+          "telemetry": {
+            "mean_staleness": 3.828333333333333,
+            "max_staleness": 16,
+            "mean_feature_error": 665.1745301544172,
+            "p95_feature_error": 3236.9245254587217,
+            "max_feature_error": 7845.880779006312,
+            "mean_loss_gap": 4.878614641873946e-05,
+            "mean_query_latency_us": 2.7729263333333334,
+            "p95_query_latency_us": 3.208
+          }
+        },
+        "recovery": {
+          "accounting": {
+            "scheduled_events": 5000,
+            "admitted_events": 5000,
+            "dropped_events": 0,
+            "published_updates": 2397,
+            "coalesced_updates": 2603,
+            "scheduled_queries": 1000,
+            "completed_queries": 1000,
+            "expired_queries": 0,
+            "rejected_queries": 0,
+            "conservation_verified": true
+          },
+          "throughput": {
+            "event_rate_admitted_hz": 319092.9387540672,
+            "query_rate_served_hz": 63818.587750813436,
+            "duration_seconds": 0.015669416
+          },
+          "telemetry": {
+            "mean_staleness": 3.271,
+            "max_staleness": 16,
+            "mean_feature_error": 541.5404984304373,
+            "p95_feature_error": 2888.2213048235208,
+            "max_feature_error": 7555.550198215419,
+            "mean_loss_gap": 3.907508319095626e-05,
+            "mean_query_latency_us": 2.8094650000000003,
+            "p95_query_latency_us": 3.208
+          }
+        }
+      }
+    }
+  ]
+}
