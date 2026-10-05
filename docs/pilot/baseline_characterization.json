@@ -1,0 +1,482 @@
+{
+  "metadata": {
+    "contract": "AMOS-08",
+    "study": "comparative_baseline_suite",
+    "total_events": 27000,
+    "total_queries": 5000,
+    "tuned_u_star": 20
+  },
+  "tuning_results": {
+    "selected_u_star": 20,
+    "candidates_evaluated": [
+      {
+        "u": 2,
+        "published_updates": 12959,
+        "work_ratio": 0.479962962962963,
+        "mean_loss_gap": 9.489044540147185e-06,
+        "objective_value": 0.024007637192688298
+      },
+      {
+        "u": 3,
+        "published_updates": 8320,
+        "work_ratio": 0.30814814814814817,
+        "mean_loss_gap": 1.9550394017714178e-05,
+        "objective_value": 0.015426957801425124
+      },
+      {
+        "u": 5,
+        "published_updates": 4626,
+        "work_ratio": 0.17133333333333334,
+        "mean_loss_gap": 3.5252183650795445e-05,
+        "objective_value": 0.008601918850317462
+      },
+      {
+        "u": 8,
+        "published_updates": 2612,
+        "work_ratio": 0.09674074074074074,
+        "mean_loss_gap": 4.582169011148764e-05,
+        "objective_value": 0.004882858727148525
+      },
+      {
+        "u": 10,
+        "published_updates": 1944,
+        "work_ratio": 0.072,
+        "mean_loss_gap": 5.457485002228873e-05,
+        "objective_value": 0.0036545748500222885
+      },
+      {
+        "u": 15,
+        "published_updates": 1085,
+        "work_ratio": 0.040185185185185185,
+        "mean_loss_gap": 6.572203401247788e-05,
+        "objective_value": 0.0020749812932717372
+      },
+      {
+        "u": 20,
+        "published_updates": 682,
+        "work_ratio": 0.02525925925925926,
+        "mean_loss_gap": 7.220859360857916e-05,
+        "objective_value": 0.0013351715565715423
+      }
+    ]
+  },
+  "budget_matching": {
+    "joint_adaptive_publications": 6259,
+    "budget_matched_publications": 6259,
+    "absolute_difference": 0,
+    "relative_difference_pct": 0.0,
+    "matched_within_1pct": true
+  },
+  "signatures": {
+    "exact_fresh": {
+      "published_updates": 27000,
+      "coalesced_updates": 0,
+      "mean_staleness": 0.0,
+      "mean_feature_error": 0.0,
+      "stress_published": 15000,
+      "stress_staleness": 0.0
+    },
+    "tuned_static": {
+      "published_updates": 682,
+      "coalesced_updates": 26318,
+      "mean_staleness": 6.0618,
+      "mean_feature_error": 959.6108,
+      "stress_published": 385,
+      "stress_staleness": 6.099
+    },
+    "budget_matched": {
+      "published_updates": 6259,
+      "coalesced_updates": 20741,
+      "mean_staleness": 1.3768,
+      "mean_feature_error": 425.4215,
+      "stress_published": 3477,
+      "stress_staleness": 1.3887
+    },
+    "alpha_only": {
+      "published_updates": 682,
+      "coalesced_updates": 26318,
+      "mean_staleness": 6.0618,
+      "mean_feature_error": 1176.617,
+      "stress_published": 385,
+      "stress_staleness": 6.099
+    },
+    "pub_only": {
+      "published_updates": 6259,
+      "coalesced_updates": 20741,
+      "mean_staleness": 3.0546,
+      "mean_feature_error": 546.2104,
+      "stress_published": 507,
+      "stress_staleness": 3.8283
+    },
+    "joint_adaptive": {
+      "published_updates": 6259,
+      "coalesced_updates": 20741,
+      "mean_staleness": 3.0546,
+      "mean_feature_error": 943.6112,
+      "stress_published": 507,
+      "stress_staleness": 3.8283
+    }
+  },
+  "configurations": [
+    {
+      "name": "exact_fresh",
+      "accounting": {
+        "processed_updates": 27000,
+        "published_updates": 27000,
+        "coalesced_updates": 0,
+        "scheduled_queries": 5000,
+        "completed_queries": 5000,
+        "conservation_verified": true
+      },
+      "telemetry": {
+        "mean_staleness": 0.0,
+        "max_staleness": 0,
+        "mean_feature_error": 0.0,
+        "p95_feature_error": 0.0,
+        "max_feature_error": 0.0,
+        "mean_paired_loss_gap": 0.0,
+        "p95_paired_loss_gap": 0.0,
+        "mean_latency_us": 2.3963286,
+        "p95_latency_us": 2.833
+      },
+      "phases": {
+        "warm_up": {
+          "published_updates": 2000,
+          "coalesced_updates": 0,
+          "completed_queries": 0,
+          "mean_staleness": 0.0,
+          "mean_feature_error": 0.0,
+          "mean_loss_gap": 0.0,
+          "mean_latency_us": 0.0
+        },
+        "baseline": {
+          "published_updates": 5000,
+          "coalesced_updates": 0,
+          "completed_queries": 1000,
+          "mean_staleness": 0.0,
+          "mean_feature_error": 0.0,
+          "mean_loss_gap": 0.0,
+          "mean_latency_us": 2.409654
+        },
+        "stress": {
+          "published_updates": 15000,
+          "coalesced_updates": 0,
+          "completed_queries": 3000,
+          "mean_staleness": 0.0,
+          "mean_feature_error": 0.0,
+          "mean_loss_gap": 0.0,
+          "mean_latency_us": 2.3949623333333334
+        },
+        "recovery": {
+          "published_updates": 5000,
+          "coalesced_updates": 0,
+          "completed_queries": 1000,
+          "mean_staleness": 0.0,
+          "mean_feature_error": 0.0,
+          "mean_loss_gap": 0.0,
+          "mean_latency_us": 2.387102
+        }
+      }
+    },
+    {
+      "name": "tuned_static",
+      "accounting": {
+        "processed_updates": 27000,
+        "published_updates": 682,
+        "coalesced_updates": 26318,
+        "scheduled_queries": 5000,
+        "completed_queries": 5000,
+        "conservation_verified": true
+      },
+      "telemetry": {
+        "mean_staleness": 6.0618,
+        "max_staleness": 19,
+        "mean_feature_error": 959.6107916710998,
+        "p95_feature_error": 3926.520381413174,
+        "max_feature_error": 7845.880779006312,
+        "mean_paired_loss_gap": 7.221564307371395e-05,
+        "p95_paired_loss_gap": 0.00027313540108586665,
+        "mean_latency_us": 3.1418232,
+        "p95_latency_us": 3.5020500000000077
+      },
+      "phases": {
+        "warm_up": {
+          "published_updates": 51,
+          "coalesced_updates": 1949,
+          "completed_queries": 0,
+          "mean_staleness": 0.0,
+          "mean_feature_error": 0.0,
+          "mean_loss_gap": 0.0,
+          "mean_latency_us": 0.0
+        },
+        "baseline": {
+          "published_updates": 130,
+          "coalesced_updates": 4870,
+          "completed_queries": 1000,
+          "mean_staleness": 5.943,
+          "mean_feature_error": 994.5110002007999,
+          "mean_loss_gap": 7.398822542398858e-05,
+          "mean_latency_us": 3.201547
+        },
+        "stress": {
+          "published_updates": 385,
+          "coalesced_updates": 14615,
+          "completed_queries": 3000,
+          "mean_staleness": 6.099,
+          "mean_feature_error": 950.3084896677047,
+          "mean_loss_gap": 7.233843731176055e-05,
+          "mean_latency_us": 3.0969823333333335
+        },
+        "recovery": {
+          "published_updates": 116,
+          "coalesced_updates": 4884,
+          "completed_queries": 1000,
+          "mean_staleness": 6.069,
+          "mean_feature_error": 952.6174891515847,
+          "mean_loss_gap": 7.007467800929951e-05,
+          "mean_latency_us": 3.2166219999999996
+        }
+      }
+    },
+    {
+      "name": "budget_matched",
+      "accounting": {
+        "processed_updates": 27000,
+        "published_updates": 6259,
+        "coalesced_updates": 20741,
+        "scheduled_queries": 5000,
+        "completed_queries": 5000,
+        "conservation_verified": true
+      },
+      "telemetry": {
+        "mean_staleness": 1.3768,
+        "max_staleness": 4,
+        "mean_feature_error": 425.42148393963146,
+        "p95_feature_error": 2605.2892872055036,
+        "max_feature_error": 7766.8305732257995,
+        "mean_paired_loss_gap": 2.6210976027704657e-05,
+        "p95_paired_loss_gap": 0.00020695544525184154,
+        "mean_latency_us": 2.869438,
+        "p95_latency_us": 3.458
+      },
+      "phases": {
+        "warm_up": {
+          "published_updates": 463,
+          "coalesced_updates": 1537,
+          "completed_queries": 0,
+          "mean_staleness": 0.0,
+          "mean_feature_error": 0.0,
+          "mean_loss_gap": 0.0,
+          "mean_latency_us": 0.0
+        },
+        "baseline": {
+          "published_updates": 1159,
+          "coalesced_updates": 3841,
+          "completed_queries": 1000,
+          "mean_staleness": 1.341,
+          "mean_feature_error": 430.0940078671655,
+          "mean_loss_gap": 2.612820501451235e-05,
+          "mean_latency_us": 2.8158380000000003
+        },
+        "stress": {
+          "published_updates": 3477,
+          "coalesced_updates": 11523,
+          "completed_queries": 3000,
+          "mean_staleness": 1.3886666666666667,
+          "mean_feature_error": 415.7783173636054,
+          "mean_loss_gap": 2.603978991389046e-05,
+          "mean_latency_us": 2.883872666666667
+        },
+        "recovery": {
+          "published_updates": 1160,
+          "coalesced_updates": 3840,
+          "completed_queries": 1000,
+          "mean_staleness": 1.377,
+          "mean_feature_error": 449.6784597401755,
+          "mean_loss_gap": 2.6807305382339553e-05,
+          "mean_latency_us": 2.879734
+        }
+      }
+    },
+    {
+      "name": "alpha_only",
+      "accounting": {
+        "processed_updates": 27000,
+        "published_updates": 682,
+        "coalesced_updates": 26318,
+        "scheduled_queries": 5000,
+        "completed_queries": 5000,
+        "conservation_verified": true
+      },
+      "telemetry": {
+        "mean_staleness": 6.0618,
+        "max_staleness": 19,
+        "mean_feature_error": 1176.6170479264954,
+        "p95_feature_error": 6017.334197065919,
+        "max_feature_error": 20168.377251657428,
+        "mean_paired_loss_gap": 7.418541611805864e-05,
+        "p95_paired_loss_gap": 0.00027313540108586665,
+        "mean_latency_us": 3.3051002,
+        "p95_latency_us": 3.459
+      },
+      "phases": {
+        "warm_up": {
+          "published_updates": 51,
+          "coalesced_updates": 1949,
+          "completed_queries": 0,
+          "mean_staleness": 0.0,
+          "mean_feature_error": 0.0,
+          "mean_loss_gap": 0.0,
+          "mean_latency_us": 0.0
+        },
+        "baseline": {
+          "published_updates": 130,
+          "coalesced_updates": 4870,
+          "completed_queries": 1000,
+          "mean_staleness": 5.943,
+          "mean_feature_error": 540.8751685772987,
+          "mean_loss_gap": 7.540542897677899e-05,
+          "mean_latency_us": 3.84772
+        },
+        "stress": {
+          "published_updates": 385,
+          "coalesced_updates": 14615,
+          "completed_queries": 3000,
+          "mean_staleness": 6.099,
+          "mean_feature_error": 1383.9274350130504,
+          "mean_loss_gap": 7.445565782795059e-05,
+          "mean_latency_us": 3.2064996666666667
+        },
+        "recovery": {
+          "published_updates": 116,
+          "coalesced_updates": 4884,
+          "completed_queries": 1000,
+          "mean_staleness": 6.069,
+          "mean_feature_error": 1190.4277660160271,
+          "mean_loss_gap": 7.215467812966242e-05,
+          "mean_latency_us": 3.058282
+        }
+      }
+    },
+    {
+      "name": "pub_only",
+      "accounting": {
+        "processed_updates": 27000,
+        "published_updates": 6259,
+        "coalesced_updates": 20741,
+        "scheduled_queries": 5000,
+        "completed_queries": 5000,
+        "conservation_verified": true
+      },
+      "telemetry": {
+        "mean_staleness": 3.0546,
+        "max_staleness": 16,
+        "mean_feature_error": 546.2104247684961,
+        "p95_feature_error": 2924.380958639997,
+        "max_feature_error": 7845.880779006312,
+        "mean_paired_loss_gap": 3.9335097458642985e-05,
+        "p95_paired_loss_gap": 0.00023559358498217723,
+        "mean_latency_us": 3.117355,
+        "p95_latency_us": 3.625
+      },
+      "phases": {
+        "warm_up": {
+          "published_updates": 957,
+          "coalesced_updates": 1043,
+          "completed_queries": 0,
+          "mean_staleness": 0.0,
+          "mean_feature_error": 0.0,
+          "mean_loss_gap": 0.0,
+          "mean_latency_us": 0.0
+        },
+        "baseline": {
+          "published_updates": 2398,
+          "coalesced_updates": 2602,
+          "completed_queries": 1000,
+          "mean_staleness": 0.517,
+          "mean_feature_error": 193.98803494879147,
+          "mean_loss_gap": 1.1241964846040287e-05,
+          "mean_latency_us": 2.920373
+        },
+        "stress": {
+          "published_updates": 507,
+          "coalesced_updates": 14493,
+          "completed_queries": 3000,
+          "mean_staleness": 3.828333333333333,
+          "mean_feature_error": 665.1745301544172,
+          "mean_loss_gap": 4.878614641873946e-05,
+          "mean_latency_us": 3.2029006666666664
+        },
+        "recovery": {
+          "published_updates": 2397,
+          "coalesced_updates": 2603,
+          "completed_queries": 1000,
+          "mean_staleness": 3.271,
+          "mean_feature_error": 541.5404984304373,
+          "mean_loss_gap": 3.907508319095626e-05,
+          "mean_latency_us": 3.0576999999999996
+        }
+      }
+    },
+    {
+      "name": "joint_adaptive",
+      "accounting": {
+        "processed_updates": 27000,
+        "published_updates": 6259,
+        "coalesced_updates": 20741,
+        "scheduled_queries": 5000,
+        "completed_queries": 5000,
+        "conservation_verified": true
+      },
+      "telemetry": {
+        "mean_staleness": 3.0546,
+        "max_staleness": 16,
+        "mean_feature_error": 943.6111781601438,
+        "p95_feature_error": 5917.391478109443,
+        "max_feature_error": 20168.377251657428,
+        "mean_paired_loss_gap": 5.1936816307842745e-05,
+        "p95_paired_loss_gap": 0.00023601022839681018,
+        "mean_latency_us": 3.0482178,
+        "p95_latency_us": 3.5
+      },
+      "phases": {
+        "warm_up": {
+          "published_updates": 957,
+          "coalesced_updates": 1043,
+          "completed_queries": 0,
+          "mean_staleness": 0.0,
+          "mean_feature_error": 0.0,
+          "mean_loss_gap": 0.0,
+          "mean_latency_us": 0.0
+        },
+        "baseline": {
+          "published_updates": 2398,
+          "coalesced_updates": 2602,
+          "completed_queries": 1000,
+          "mean_staleness": 0.517,
+          "mean_feature_error": 88.953292304474,
+          "mean_loss_gap": 3.3378670903081664e-05,
+          "mean_latency_us": 2.5189540000000004
+        },
+        "stress": {
+          "published_updates": 507,
+          "coalesced_updates": 14493,
+          "completed_queries": 3000,
+          "mean_staleness": 3.828333333333333,
+          "mean_feature_error": 1220.3687708834987,
+          "mean_loss_gap": 5.8485706315915396e-05,
+          "mean_latency_us": 3.1775879999999996
+        },
+        "recovery": {
+          "published_updates": 2397,
+          "coalesced_updates": 2603,
+          "completed_queries": 1000,
+          "mean_staleness": 3.271,
+          "mean_feature_error": 967.9962858457495,
+          "mean_loss_gap": 5.084829168838589e-05,
+          "mean_latency_us": 3.189371
+        }
+      }
+    }
+  ]
+}
