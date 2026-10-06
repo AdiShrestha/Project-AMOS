@@ -21,7 +21,7 @@ It serves as an authoritative audit ledger demonstrating that each foundation co
 - **Purpose**: Formal retirement of legacy empirical claims (F01–F56), decoupling of transport batching ($W$), feature dynamics ($\alpha$), and publication cadence ($U$), and specification of initial research questions (RQ1–RQ3).
 - **Core Deliverables**:
   - `project/contracts/AMOS-01_scope_and_claim_retirement.md`
-  - `project/methodology.md` (Initial research boundary definition)
+  - `docs/methods.md` (Initial research boundary definition)
 - **Status**: Completed & Recorded.
 
 ---
@@ -141,11 +141,35 @@ It serves as an authoritative audit ledger demonstrating that each foundation co
 
 ---
 
+### AMOS-12: Hardware & Measurement Pilot
+- **Purpose**: OS system-call instrumentation (`resource.getrusage`, `time.monotonic_ns`, `os.statvfs`, macOS `sysctl`), non-fabrication accounting (explicit null for energy, GPU, core pinning), multi-trial variance analysis ($CV \le 0.025$), empirical memory scaling (124.91 bytes/key), logging overhead quantification, and sustainable envelope verification.
+- **Core Deliverables**:
+  - `tools/hardware_profiler.py` (Empirical profiler CLI and module)
+  - `tests/test_hardware_profiler.py` (11 passing unit, property, and integration tests)
+  - `docs/pilot/hardware_pilot_results.json` (Structured empirical telemetry across 5 trials per configuration)
+  - `project/contracts/AMOS-12/contract.md` & `project/contracts/AMOS-12/contract_report.md`
+- **Status**: Completed, Verified & Pushed (Commit `d9b395f`).
+
+---
+
+### AMOS-13: Prospective Scientific Freeze
+- **Purpose**: Full non-template research plan authorization, methodology specification, author-declared data provenance (`data/provenance.json`), standardization of 46 hourly test clusters (`data/cohort.csv`), and establishment of cryptographic Epoch 1 freeze with Merkle root attestation.
+- **Core Deliverables**:
+  - Preregistered research plan (35 experiments, 2 comparative contrasts, 5 seeds under `python-cpu-v1`)
+  - Preregistered methodology specification
+  - `data/provenance.json` (Author-declared dataset provenance, ISO date, SHA-256 digests)
+  - `data/cohort.csv` & `data/source_records.csv` (Standardized 95,263 evaluation events)
+  - Cryptographic Epoch 1 freeze manifest (SHA-256: `0baa393656c336b16a792b819a9728454c32e96c1aeeb48b89fdf44aa100912d`)
+  - `project/contracts/AMOS-13/contract.md` & `project/contracts/AMOS-13/contract_report.md`
+- **Status**: Completed & Cryptographically FROZEN.
+
+---
+
 ## Test Regression Matrix
 
 | Test Suite | Scope | Tests Run | Result |
 | :--- | :--- | :---: | :---: |
-| `pytest tests/ -v` | Comprehensive project test suite (canonicalization, labels, models, publication core, pilots, baselines, independent analysis, supervisor, streaming adapter) | 82 passed, 12 skipped, 13 subtests | **PASS (100%)** |
+| `pytest tests/ -v` | Comprehensive project test suite (canonicalization, labels, models, publication core, pilots, baselines, independent analysis, supervisor, streaming adapter, hardware profiler) | 93 passed, 12 skipped, 13 subtests | **PASS (100%)** |
 | `ctest --test-dir build/debug` | Native C++ test targets (`engine_counterexamples`, `python_engine_checks`) | 2/2 targets passed | **PASS (100%)** |
 | `factory/run_self_tests.py` | Software framework self-tests | 474/474 tests passed | **PASS (100%)** |
 | `factory/run_mutation_checks.py` | AST mutation test benchmark | 35/35 mutants killed | **PASS (100%)** |
