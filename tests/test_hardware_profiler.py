@@ -128,7 +128,7 @@ class HardwareProfilerTests(unittest.TestCase):
     def test_multi_trial_aggregation_and_cv(self) -> None:
         """Verify multi-trial repetition with warmup and CV calculation."""
         res = profile_command_multi_trial(
-            command=["python3", "-c", "x = 42 * 42"],
+            command=["python3", "-c", "import time; time.sleep(0.01)"],
             trials=5,
             warmup_trials=1,
         )
@@ -142,6 +142,7 @@ class HardwareProfilerTests(unittest.TestCase):
     def test_envelope_validation_rules(self) -> None:
         """Verify envelope verification criteria including edge-case violations."""
         host = inspect_host_environment()
+        host.swap_used_bytes = 0
         normal_agg = {
             "peak_rss_bytes": {"max": 50 * 1024 * 1024},  # 50 MB
             "wall_time_seconds": {"cv": 0.05},

@@ -165,6 +165,20 @@ It serves as an authoritative audit ledger demonstrating that each foundation co
 
 ---
 
+### AMOS-14: Confirmatory Execution & Hypothesis Testing
+- **Purpose**: Full execution of all 35 preregistered trials across 5 seeds under the Epoch 1 freeze, independent non-parametric cluster permutation tests across 46 hourly test groups, BCa bootstrap resampling, Holm-Bonferroni multiplicity control, and verification of zero temporal leakage, exact event conservation, and hypothesis superiority.
+- **Core Deliverables**:
+  - `docs/research/confirmatory_results.json` (Structured empirical telemetry, hypothesis test statistics, and configuration summaries across 35 trials)
+  - `project/contracts/AMOS-14/contract.md` & `project/contracts/AMOS-14/contract_report.md`
+  - Signed receipts, nonces, and runtime attestations in `project/.factory/epoch_0001/execution_ledger.json`
+- **Scientific Findings**:
+  - `comp_dynamic_vs_static_ap`: $\Delta \text{AP} = +0.029328$, 95% BCa CI $[+0.009274, +0.051138]$, $p_{\text{holm}} = 0.0009995$ (**SUPERIORITY CONFIRMED**)
+  - `comp_dynamic_vs_budget_ap`: $\Delta \text{AP} = +0.028391$, 95% BCa CI $[+0.008935, +0.049118]$, $p_{\text{holm}} = 0.0009995$ (**SUPERIORITY CONFIRMED**)
+  - Write Work Reduction: 66.98% write savings with 100% query coverage and zero fidelity loss.
+- **Status**: Completed, Verified & Admitted.
+
+---
+
 ## Test Regression Matrix
 
 | Test Suite | Scope | Tests Run | Result |
