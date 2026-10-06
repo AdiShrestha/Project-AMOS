@@ -1,0 +1,640 @@
+{
+  "metadata": {
+    "contract": "AMOS-09",
+    "study": "independent_analysis_metrics_replay",
+    "evaluated_split": "validation",
+    "total_cohort_records": 8747,
+    "random_seed": 314159,
+    "resampling_draws": 1000,
+    "family_alpha": 0.05,
+    "timestamp_iso": "2026-10-06T00:01:40Z"
+  },
+  "reconciliation_audit": {
+    "status": "PASS",
+    "reconciled_queries": 8747,
+    "unserved_queries": 0,
+    "duplicate_identities_detected": 0,
+    "phantom_identities_detected": 0,
+    "label_disagreements_detected": 0,
+    "non_finite_scores_detected": 0
+  },
+  "individual_configurations": {
+    "exact_fresh": {
+      "auroc": 0.4725525063494702,
+      "average_precision": 0.10278140224181642,
+      "accuracy": 0.88544643877901,
+      "f1": 0.0,
+      "brier": 0.10148049998550389,
+      "log_loss": 0.35616527137650106
+    },
+    "tuned_static": {
+      "auroc": 0.45304181823570416,
+      "average_precision": 0.10409533027425281,
+      "accuracy": 0.88544643877901,
+      "f1": 0.0,
+      "brier": 0.10150814613918943,
+      "log_loss": 0.356295668177406
+    },
+    "budget_matched": {
+      "auroc": 0.4687163439421995,
+      "average_precision": 0.10140697313257324,
+      "accuracy": 0.88544643877901,
+      "f1": 0.0,
+      "brier": 0.10147566318501194,
+      "log_loss": 0.35614193444641595
+    },
+    "alpha_only": {
+      "auroc": 0.4562858144266664,
+      "average_precision": 0.1044706005686813,
+      "accuracy": 0.88544643877901,
+      "f1": 0.0,
+      "brier": 0.10150028043967727,
+      "log_loss": 0.3562587707502653
+    },
+    "pub_only": {
+      "auroc": 0.46908545723272627,
+      "average_precision": 0.10210662541445374,
+      "accuracy": 0.88544643877901,
+      "f1": 0.0,
+      "brier": 0.10148096588498667,
+      "log_loss": 0.35616726251919095
+    },
+    "joint_adaptive": {
+      "auroc": 0.46940554011409075,
+      "average_precision": 0.1020955502588073,
+      "accuracy": 0.88544643877901,
+      "f1": 0.0,
+      "brier": 0.10148546328919975,
+      "log_loss": 0.3561891981413693
+    }
+  },
+  "loss_gap_summaries": {
+    "exact_fresh": {
+      "mean_loss_gap": 0.0,
+      "p95_loss_gap": 0.0,
+      "max_loss_gap": 0.0
+    },
+    "tuned_static": {
+      "mean_loss_gap": 0.00013039680090495324,
+      "p95_loss_gap": 0.004444341129717862,
+      "max_loss_gap": 0.018225650583463704
+    },
+    "budget_matched": {
+      "mean_loss_gap": -2.3336930085121887e-05,
+      "p95_loss_gap": 4.9064900794562304e-05,
+      "max_loss_gap": 0.010046827079814288
+    },
+    "alpha_only": {
+      "mean_loss_gap": 9.349937376424986e-05,
+      "p95_loss_gap": 0.00431897355213308,
+      "max_loss_gap": 0.012817092993403362
+    },
+    "pub_only": {
+      "mean_loss_gap": 1.9911426898952393e-06,
+      "p95_loss_gap": 0.00024688912891875336,
+      "max_loss_gap": 0.011977903379858296
+    },
+    "joint_adaptive": {
+      "mean_loss_gap": 2.392676486821462e-05,
+      "p95_loss_gap": 0.001964376921830447,
+      "max_loss_gap": 0.011982782479298237
+    }
+  },
+  "hypothesis_tests": [
+    {
+      "hypothesis_id": "H_vs_exact_fresh_tuned_static",
+      "contrast": "tuned_static vs exact_fresh",
+      "target": "tuned_static",
+      "reference": "exact_fresh",
+      "tier1_seed_inference": {
+        "effect": 0.00013039680090495324,
+        "ci": [
+          3.4185073959333814e-05,
+          0.00022660852785057265
+        ],
+        "p_raw": 0.00999000999000999,
+        "paired_dz": 0.02840648912293977,
+        "n_units": 8747,
+        "test": "monte_carlo_two_sided_paired_sign_flip_plus_one",
+        "ci_method": "paired_student_t",
+        "degenerate_variance": false,
+        "draws": 1000,
+        "analysis_seed": 314159,
+        "inference_scope": "fixed_test_corpus",
+        "assumptions": [
+          "independent paired seed differences",
+          "sign-exchangeability under the null",
+          "normal paired differences for Student-t CI"
+        ]
+      },
+      "tier2_group_inference": {
+        "effect": -0.00013039680090493055,
+        "ci": [
+          -0.00028147393988716757,
+          1.525985178488384e-05
+        ],
+        "p_raw": 0.0939060939060939,
+        "paired_dz": null,
+        "n_units": 22,
+        "n_seed_pairs": 1,
+        "test": "monte_carlo_two_sided_paired_group_swap_plus_one",
+        "ci_method": "paired_cluster_BCa",
+        "bootstrap_stratification": "none",
+        "invalid_bootstrap_draws": 0,
+        "degenerate_variance": false,
+        "draws": 1000,
+        "analysis_seed": 314159,
+        "inference_scope": "test_population_conditional_on_trained_models",
+        "assumptions": [
+          "independent representative test groups",
+          "group-level model-assignment exchangeability under the sharp null",
+          "BCa confidence interval coverage is approximate",
+          "training population and split variability are not estimated"
+        ]
+      },
+      "p_raw_tier1": 0.00999000999000999,
+      "p_raw_tier2": 0.0939060939060939,
+      "p_adj_tier1": 0.04995004995004995,
+      "p_adj_tier2": 0.6293706293706294,
+      "tier1_significant": true,
+      "tier2_significant": false
+    },
+    {
+      "hypothesis_id": "H_vs_exact_fresh_budget_matched",
+      "contrast": "budget_matched vs exact_fresh",
+      "target": "budget_matched",
+      "reference": "exact_fresh",
+      "tier1_seed_inference": {
+        "effect": -2.3336930085121887e-05,
+        "ci": [
+          -5.500477725267301e-05,
+          8.33091708242923e-06
+        ],
+        "p_raw": 0.15384615384615385,
+        "paired_dz": -0.015445565690357509,
+        "n_units": 8747,
+        "test": "monte_carlo_two_sided_paired_sign_flip_plus_one",
+        "ci_method": "paired_student_t",
+        "degenerate_variance": false,
+        "draws": 1000,
+        "analysis_seed": 314159,
+        "inference_scope": "fixed_test_corpus",
+        "assumptions": [
+          "independent paired seed differences",
+          "sign-exchangeability under the null",
+          "normal paired differences for Student-t CI"
+        ]
+      },
+      "tier2_group_inference": {
+        "effect": 2.3336930085104957e-05,
+        "ci": [
+          -5.222871832169385e-06,
+          7.150720546853392e-05
+        ],
+        "p_raw": 0.3196803196803197,
+        "paired_dz": null,
+        "n_units": 22,
+        "n_seed_pairs": 1,
+        "test": "monte_carlo_two_sided_paired_group_swap_plus_one",
+        "ci_method": "paired_cluster_BCa",
+        "bootstrap_stratification": "none",
+        "invalid_bootstrap_draws": 0,
+        "degenerate_variance": false,
+        "draws": 1000,
+        "analysis_seed": 314159,
+        "inference_scope": "test_population_conditional_on_trained_models",
+        "assumptions": [
+          "independent representative test groups",
+          "group-level model-assignment exchangeability under the sharp null",
+          "BCa confidence interval coverage is approximate",
+          "training population and split variability are not estimated"
+        ]
+      },
+      "p_raw_tier1": 0.15384615384615385,
+      "p_raw_tier2": 0.3196803196803197,
+      "p_adj_tier1": 0.46153846153846156,
+      "p_adj_tier2": 1.0,
+      "tier1_significant": false,
+      "tier2_significant": false
+    },
+    {
+      "hypothesis_id": "H_vs_tuned_static_budget_matched",
+      "contrast": "budget_matched vs tuned_static",
+      "target": "budget_matched",
+      "reference": "tuned_static",
+      "tier1_seed_inference": {
+        "effect": -0.0001537337309900751,
+        "ci": [
+          -0.00024422172121762634,
+          -6.324574076252387e-05
+        ],
+        "p_raw": 0.001998001998001998,
+        "paired_dz": -0.03560876068277993,
+        "n_units": 8747,
+        "test": "monte_carlo_two_sided_paired_sign_flip_plus_one",
+        "ci_method": "paired_student_t",
+        "degenerate_variance": false,
+        "draws": 1000,
+        "analysis_seed": 314159,
+        "inference_scope": "fixed_test_corpus",
+        "assumptions": [
+          "independent paired seed differences",
+          "sign-exchangeability under the null",
+          "normal paired differences for Student-t CI"
+        ]
+      },
+      "tier2_group_inference": {
+        "effect": 0.0001537337309900355,
+        "ci": [
+          8.589831231592364e-06,
+          0.00028739701849056417
+        ],
+        "p_raw": 0.054945054945054944,
+        "paired_dz": null,
+        "n_units": 22,
+        "n_seed_pairs": 1,
+        "test": "monte_carlo_two_sided_paired_group_swap_plus_one",
+        "ci_method": "paired_cluster_BCa",
+        "bootstrap_stratification": "none",
+        "invalid_bootstrap_draws": 0,
+        "degenerate_variance": false,
+        "draws": 1000,
+        "analysis_seed": 314159,
+        "inference_scope": "test_population_conditional_on_trained_models",
+        "assumptions": [
+          "independent representative test groups",
+          "group-level model-assignment exchangeability under the sharp null",
+          "BCa confidence interval coverage is approximate",
+          "training population and split variability are not estimated"
+        ]
+      },
+      "p_raw_tier1": 0.001998001998001998,
+      "p_raw_tier2": 0.054945054945054944,
+      "p_adj_tier1": 0.015984015984015984,
+      "p_adj_tier2": 0.43956043956043955,
+      "tier1_significant": true,
+      "tier2_significant": false
+    },
+    {
+      "hypothesis_id": "H_vs_exact_fresh_alpha_only",
+      "contrast": "alpha_only vs exact_fresh",
+      "target": "alpha_only",
+      "reference": "exact_fresh",
+      "tier1_seed_inference": {
+        "effect": 9.349937376424986e-05,
+        "ci": [
+          -2.0512272725916133e-06,
+          0.00018904997480109135
+        ],
+        "p_raw": 0.05194805194805195,
+        "paired_dz": 0.02050944522324357,
+        "n_units": 8747,
+        "test": "monte_carlo_two_sided_paired_sign_flip_plus_one",
+        "ci_method": "paired_student_t",
+        "degenerate_variance": false,
+        "draws": 1000,
+        "analysis_seed": 314159,
+        "inference_scope": "fixed_test_corpus",
+        "assumptions": [
+          "independent paired seed differences",
+          "sign-exchangeability under the null",
+          "normal paired differences for Student-t CI"
+        ]
+      },
+      "tier2_group_inference": {
+        "effect": -9.349937376423867e-05,
+        "ci": [
+          -0.00023017669135633797,
+          0.00010534169254233146
+        ],
+        "p_raw": 0.3016983016983017,
+        "paired_dz": null,
+        "n_units": 22,
+        "n_seed_pairs": 1,
+        "test": "monte_carlo_two_sided_paired_group_swap_plus_one",
+        "ci_method": "paired_cluster_BCa",
+        "bootstrap_stratification": "none",
+        "invalid_bootstrap_draws": 0,
+        "degenerate_variance": false,
+        "draws": 1000,
+        "analysis_seed": 314159,
+        "inference_scope": "test_population_conditional_on_trained_models",
+        "assumptions": [
+          "independent representative test groups",
+          "group-level model-assignment exchangeability under the sharp null",
+          "BCa confidence interval coverage is approximate",
+          "training population and split variability are not estimated"
+        ]
+      },
+      "p_raw_tier1": 0.05194805194805195,
+      "p_raw_tier2": 0.3016983016983017,
+      "p_adj_tier1": 0.2077922077922078,
+      "p_adj_tier2": 1.0,
+      "tier1_significant": false,
+      "tier2_significant": false
+    },
+    {
+      "hypothesis_id": "H_vs_tuned_static_alpha_only",
+      "contrast": "alpha_only vs tuned_static",
+      "target": "alpha_only",
+      "reference": "tuned_static",
+      "tier1_seed_inference": {
+        "effect": -3.689742714070337e-05,
+        "ci": [
+          -5.804626412018131e-05,
+          -1.5748590161225426e-05
+        ],
+        "p_raw": 0.000999000999000999,
+        "paired_dz": -0.03656690709362962,
+        "n_units": 8747,
+        "test": "monte_carlo_two_sided_paired_sign_flip_plus_one",
+        "ci_method": "paired_student_t",
+        "degenerate_variance": false,
+        "draws": 1000,
+        "analysis_seed": 314159,
+        "inference_scope": "fixed_test_corpus",
+        "assumptions": [
+          "independent paired seed differences",
+          "sign-exchangeability under the null",
+          "normal paired differences for Student-t CI"
+        ]
+      },
+      "tier2_group_inference": {
+        "effect": 3.6897427140691885e-05,
+        "ci": [
+          -4.091651485270501e-05,
+          0.0001448054181070176
+        ],
+        "p_raw": 0.44155844155844154,
+        "paired_dz": null,
+        "n_units": 22,
+        "n_seed_pairs": 1,
+        "test": "monte_carlo_two_sided_paired_group_swap_plus_one",
+        "ci_method": "paired_cluster_BCa",
+        "bootstrap_stratification": "none",
+        "invalid_bootstrap_draws": 0,
+        "degenerate_variance": false,
+        "draws": 1000,
+        "analysis_seed": 314159,
+        "inference_scope": "test_population_conditional_on_trained_models",
+        "assumptions": [
+          "independent representative test groups",
+          "group-level model-assignment exchangeability under the sharp null",
+          "BCa confidence interval coverage is approximate",
+          "training population and split variability are not estimated"
+        ]
+      },
+      "p_raw_tier1": 0.000999000999000999,
+      "p_raw_tier2": 0.44155844155844154,
+      "p_adj_tier1": 0.008991008991008992,
+      "p_adj_tier2": 1.0,
+      "tier1_significant": true,
+      "tier2_significant": false
+    },
+    {
+      "hypothesis_id": "H_vs_exact_fresh_pub_only",
+      "contrast": "pub_only vs exact_fresh",
+      "target": "pub_only",
+      "reference": "exact_fresh",
+      "tier1_seed_inference": {
+        "effect": 1.9911426898952393e-06,
+        "ci": [
+          -2.512989778201571e-05,
+          2.9112183161806192e-05
+        ],
+        "p_raw": 0.8781218781218781,
+        "paired_dz": 0.0015387734024886344,
+        "n_units": 8747,
+        "test": "monte_carlo_two_sided_paired_sign_flip_plus_one",
+        "ci_method": "paired_student_t",
+        "degenerate_variance": false,
+        "draws": 1000,
+        "analysis_seed": 314159,
+        "inference_scope": "fixed_test_corpus",
+        "assumptions": [
+          "independent paired seed differences",
+          "sign-exchangeability under the null",
+          "normal paired differences for Student-t CI"
+        ]
+      },
+      "tier2_group_inference": {
+        "effect": -1.9911426898944207e-06,
+        "ci": [
+          -2.4171441643568948e-05,
+          2.1180281790562635e-05
+        ],
+        "p_raw": 0.8741258741258742,
+        "paired_dz": null,
+        "n_units": 22,
+        "n_seed_pairs": 1,
+        "test": "monte_carlo_two_sided_paired_group_swap_plus_one",
+        "ci_method": "paired_cluster_BCa",
+        "bootstrap_stratification": "none",
+        "invalid_bootstrap_draws": 0,
+        "degenerate_variance": false,
+        "draws": 1000,
+        "analysis_seed": 314159,
+        "inference_scope": "test_population_conditional_on_trained_models",
+        "assumptions": [
+          "independent representative test groups",
+          "group-level model-assignment exchangeability under the sharp null",
+          "BCa confidence interval coverage is approximate",
+          "training population and split variability are not estimated"
+        ]
+      },
+      "p_raw_tier1": 0.8781218781218781,
+      "p_raw_tier2": 0.8741258741258742,
+      "p_adj_tier1": 0.8781218781218781,
+      "p_adj_tier2": 1.0,
+      "tier1_significant": false,
+      "tier2_significant": false
+    },
+    {
+      "hypothesis_id": "H_vs_tuned_static_pub_only",
+      "contrast": "pub_only vs tuned_static",
+      "target": "pub_only",
+      "reference": "tuned_static",
+      "tier1_seed_inference": {
+        "effect": -0.000128405658215058,
+        "ci": [
+          -0.00022089250330753303,
+          -3.591881312258298e-05
+        ],
+        "p_raw": 0.007992007992007992,
+        "paired_dz": -0.029099319330906304,
+        "n_units": 8747,
+        "test": "monte_carlo_two_sided_paired_sign_flip_plus_one",
+        "ci_method": "paired_student_t",
+        "degenerate_variance": false,
+        "draws": 1000,
+        "analysis_seed": 314159,
+        "inference_scope": "fixed_test_corpus",
+        "assumptions": [
+          "independent paired seed differences",
+          "sign-exchangeability under the null",
+          "normal paired differences for Student-t CI"
+        ]
+      },
+      "tier2_group_inference": {
+        "effect": 0.00012840565821503613,
+        "ci": [
+          -1.4874886671464958e-05,
+          0.0002647713566208848
+        ],
+        "p_raw": 0.0899100899100899,
+        "paired_dz": null,
+        "n_units": 22,
+        "n_seed_pairs": 1,
+        "test": "monte_carlo_two_sided_paired_group_swap_plus_one",
+        "ci_method": "paired_cluster_BCa",
+        "bootstrap_stratification": "none",
+        "invalid_bootstrap_draws": 0,
+        "degenerate_variance": false,
+        "draws": 1000,
+        "analysis_seed": 314159,
+        "inference_scope": "test_population_conditional_on_trained_models",
+        "assumptions": [
+          "independent representative test groups",
+          "group-level model-assignment exchangeability under the sharp null",
+          "BCa confidence interval coverage is approximate",
+          "training population and split variability are not estimated"
+        ]
+      },
+      "p_raw_tier1": 0.007992007992007992,
+      "p_raw_tier2": 0.0899100899100899,
+      "p_adj_tier1": 0.04795204795204795,
+      "p_adj_tier2": 0.6293706293706294,
+      "tier1_significant": true,
+      "tier2_significant": false
+    },
+    {
+      "hypothesis_id": "H_vs_exact_fresh_joint_adaptive",
+      "contrast": "joint_adaptive vs exact_fresh",
+      "target": "joint_adaptive",
+      "reference": "exact_fresh",
+      "tier1_seed_inference": {
+        "effect": 2.392676486821462e-05,
+        "ci": [
+          -2.6748112903903917e-05,
+          7.460164264033316e-05
+        ],
+        "p_raw": 0.34865134865134867,
+        "paired_dz": 0.009896232864591403,
+        "n_units": 8747,
+        "test": "monte_carlo_two_sided_paired_sign_flip_plus_one",
+        "ci_method": "paired_student_t",
+        "degenerate_variance": false,
+        "draws": 1000,
+        "analysis_seed": 314159,
+        "inference_scope": "fixed_test_corpus",
+        "assumptions": [
+          "independent paired seed differences",
+          "sign-exchangeability under the null",
+          "normal paired differences for Student-t CI"
+        ]
+      },
+      "tier2_group_inference": {
+        "effect": -2.3926764868231754e-05,
+        "ci": [
+          -9.024764149258435e-05,
+          8.079719547764554e-05
+        ],
+        "p_raw": 0.5774225774225774,
+        "paired_dz": null,
+        "n_units": 22,
+        "n_seed_pairs": 1,
+        "test": "monte_carlo_two_sided_paired_group_swap_plus_one",
+        "ci_method": "paired_cluster_BCa",
+        "bootstrap_stratification": "none",
+        "invalid_bootstrap_draws": 0,
+        "degenerate_variance": false,
+        "draws": 1000,
+        "analysis_seed": 314159,
+        "inference_scope": "test_population_conditional_on_trained_models",
+        "assumptions": [
+          "independent representative test groups",
+          "group-level model-assignment exchangeability under the sharp null",
+          "BCa confidence interval coverage is approximate",
+          "training population and split variability are not estimated"
+        ]
+      },
+      "p_raw_tier1": 0.34865134865134867,
+      "p_raw_tier2": 0.5774225774225774,
+      "p_adj_tier1": 0.6973026973026973,
+      "p_adj_tier2": 1.0,
+      "tier1_significant": false,
+      "tier2_significant": false
+    },
+    {
+      "hypothesis_id": "H_vs_tuned_static_joint_adaptive",
+      "contrast": "joint_adaptive vs tuned_static",
+      "target": "joint_adaptive",
+      "reference": "tuned_static",
+      "tier1_seed_inference": {
+        "effect": -0.00010647003603673862,
+        "ci": [
+          -0.00016269639709265085,
+          -5.024367498082638e-05
+        ],
+        "p_raw": 0.001998001998001998,
+        "paired_dz": -0.039688625446404356,
+        "n_units": 8747,
+        "test": "monte_carlo_two_sided_paired_sign_flip_plus_one",
+        "ci_method": "paired_student_t",
+        "degenerate_variance": false,
+        "draws": 1000,
+        "analysis_seed": 314159,
+        "inference_scope": "fixed_test_corpus",
+        "assumptions": [
+          "independent paired seed differences",
+          "sign-exchangeability under the null",
+          "normal paired differences for Student-t CI"
+        ]
+      },
+      "tier2_group_inference": {
+        "effect": 0.0001064700360366988,
+        "ci": [
+          2.3640407306330262e-05,
+          0.00020160045259523686
+        ],
+        "p_raw": 0.016983016983016984,
+        "paired_dz": null,
+        "n_units": 22,
+        "n_seed_pairs": 1,
+        "test": "monte_carlo_two_sided_paired_group_swap_plus_one",
+        "ci_method": "paired_cluster_BCa",
+        "bootstrap_stratification": "none",
+        "invalid_bootstrap_draws": 0,
+        "degenerate_variance": false,
+        "draws": 1000,
+        "analysis_seed": 314159,
+        "inference_scope": "test_population_conditional_on_trained_models",
+        "assumptions": [
+          "independent representative test groups",
+          "group-level model-assignment exchangeability under the sharp null",
+          "BCa confidence interval coverage is approximate",
+          "training population and split variability are not estimated"
+        ]
+      },
+      "p_raw_tier1": 0.001998001998001998,
+      "p_raw_tier2": 0.016983016983016984,
+      "p_adj_tier1": 0.015984015984015984,
+      "p_adj_tier2": 0.15284715284715286,
+      "tier1_significant": true,
+      "tier2_significant": false
+    }
+  ],
+  "multiplicity_family": {
+    "alpha": 0.05,
+    "total_hypotheses": 9,
+    "tier1_family_significant_count": 5,
+    "tier2_family_significant_count": 0
+  },
+  "acceptance_gates": {
+    "full_cohort_reconciliation": true,
+    "exact_metric_parity": true,
+    "inference_validation": true,
+    "multiplicity_invariance": true,
+    "zero_test_split_evaluation": true
+  }
+}
