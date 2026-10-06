@@ -1,0 +1,1462 @@
+{
+  "schema": "bpfeat.confirmatory_results.v1",
+  "contract_id": "AMOS-14",
+  "epoch": 1,
+  "status": "CONFIRMATORY_EXECUTION_COMPLETED",
+  "audit_evidence_digest": "d7e3a07e9b13d127be572c494cd4d90bc9e89cc04041f7d819f4727041bdf817",
+  "statistical_comparisons": [
+    {
+      "analysis_seed": 314159,
+      "assumptions": [
+        "independent representative test groups",
+        "group-level model-assignment exchangeability under the sharp null",
+        "BCa confidence interval coverage is approximate",
+        "training population and split variability are not estimated"
+      ],
+      "bootstrap_stratification": "none",
+      "ci": [
+        0.009273894636291352,
+        0.051138203938354915
+      ],
+      "ci_method": "paired_cluster_BCa",
+      "decision": "superiority",
+      "degenerate_variance": false,
+      "draws": 2000,
+      "effect": 0.02932758740411412,
+      "id": "comp_dynamic_vs_static_ap",
+      "inference_scope": "test_population_conditional_on_trained_models",
+      "invalid_bootstrap_draws": 0,
+      "multiplicity_family": "all_planned_comparisons",
+      "n_seed_pairs": 5,
+      "n_units": 46,
+      "p_holm": 0.0009995002498750624,
+      "p_raw": 0.0004997501249375312,
+      "paired_dz": null,
+      "sampling_unit": "test_group",
+      "test": "monte_carlo_two_sided_paired_group_swap_plus_one"
+    },
+    {
+      "analysis_seed": 314159,
+      "assumptions": [
+        "independent representative test groups",
+        "group-level model-assignment exchangeability under the sharp null",
+        "BCa confidence interval coverage is approximate",
+        "training population and split variability are not estimated"
+      ],
+      "bootstrap_stratification": "none",
+      "ci": [
+        0.008935126007379052,
+        0.04911784211279334
+      ],
+      "ci_method": "paired_cluster_BCa",
+      "decision": "superiority",
+      "degenerate_variance": false,
+      "draws": 2000,
+      "effect": 0.02839121493696596,
+      "id": "comp_dynamic_vs_budget_ap",
+      "inference_scope": "test_population_conditional_on_trained_models",
+      "invalid_bootstrap_draws": 0,
+      "multiplicity_family": "all_planned_comparisons",
+      "n_seed_pairs": 5,
+      "n_units": 46,
+      "p_holm": 0.0009995002498750624,
+      "p_raw": 0.0004997501249375312,
+      "paired_dz": null,
+      "sampling_unit": "test_group",
+      "test": "monte_carlo_two_sided_paired_group_swap_plus_one"
+    }
+  ],
+  "configuration_summaries": {
+    "exp_dynamic": {
+      "role": "benchmark",
+      "policy": "dynamic_pressure",
+      "target_split": "test",
+      "mean_average_precision": 0.141621,
+      "mean_auroc": 0.517559,
+      "mean_log_loss": 0.330392,
+      "mean_brier": 0.091727,
+      "mean_write_work_ratio": 0.330205,
+      "mean_staleness_ms": 1.2,
+      "max_staleness_ms": 45.0,
+      "query_coverage": 1.0,
+      "per_seed_ap": {
+        "s42": 0.14162081013823638,
+        "s43": 0.14162081013823638,
+        "s44": 0.14162081013823638,
+        "s45": 0.14162081013823638,
+        "s46": 0.14162081013823638
+      },
+      "per_seed_auroc": {
+        "s42": 0.5175594858648386,
+        "s43": 0.5175594858648386,
+        "s44": 0.5175594858648386,
+        "s45": 0.5175594858648386,
+        "s46": 0.5175594858648386
+      }
+    },
+    "exp_static": {
+      "role": "baseline (mechanism_matched)",
+      "policy": "fixed_cadence_u20",
+      "target_split": "test",
+      "mean_average_precision": 0.112293,
+      "mean_auroc": 0.5119,
+      "mean_log_loss": 0.330484,
+      "mean_brier": 0.091745,
+      "mean_write_work_ratio": 0.049992,
+      "mean_staleness_ms": 24.5,
+      "max_staleness_ms": 120.0,
+      "query_coverage": 1.0,
+      "per_seed_ap": {
+        "s42": 0.11229322273412226,
+        "s43": 0.11229322273412226,
+        "s44": 0.11229322273412226,
+        "s45": 0.11229322273412226,
+        "s46": 0.11229322273412226
+      },
+      "per_seed_auroc": {
+        "s42": 0.5119004409310401,
+        "s43": 0.5119004409310401,
+        "s44": 0.5119004409310401,
+        "s45": 0.5119004409310401,
+        "s46": 0.5119004409310401
+      }
+    },
+    "exp_budget": {
+      "role": "control",
+      "policy": "budget_matched_wwr033",
+      "target_split": "test",
+      "mean_average_precision": 0.11323,
+      "mean_auroc": 0.512466,
+      "mean_log_loss": 0.330475,
+      "mean_brier": 0.091743,
+      "mean_write_work_ratio": 0.330205,
+      "mean_staleness_ms": 18.2,
+      "max_staleness_ms": 95.0,
+      "query_coverage": 1.0,
+      "per_seed_ap": {
+        "s42": 0.11322959520127042,
+        "s43": 0.11322959520127042,
+        "s44": 0.11322959520127042,
+        "s45": 0.11322959520127042,
+        "s46": 0.11322959520127042
+      },
+      "per_seed_auroc": {
+        "s42": 0.5124660600222901,
+        "s43": 0.5124660600222901,
+        "s44": 0.5124660600222901,
+        "s45": 0.5124660600222901,
+        "s46": 0.5124660600222901
+      }
+    },
+    "exp_fresh": {
+      "role": "baseline (historical)",
+      "policy": "fixed_cadence_u1",
+      "target_split": "test",
+      "mean_average_precision": 0.141621,
+      "mean_auroc": 0.517559,
+      "mean_log_loss": 0.330392,
+      "mean_brier": 0.091727,
+      "mean_write_work_ratio": 1.0,
+      "mean_staleness_ms": 0.0,
+      "max_staleness_ms": 0.0,
+      "query_coverage": 1.0,
+      "per_seed_ap": {
+        "s42": 0.14162081013823638,
+        "s43": 0.14162081013823638,
+        "s44": 0.14162081013823638,
+        "s45": 0.14162081013823638,
+        "s46": 0.14162081013823638
+      },
+      "per_seed_auroc": {
+        "s42": 0.5175594858648386,
+        "s43": 0.5175594858648386,
+        "s44": 0.5175594858648386,
+        "s45": 0.5175594858648386,
+        "s46": 0.5175594858648386
+      }
+    },
+    "exp_alpha": {
+      "role": "ablation",
+      "policy": "alpha_adaptive_u1",
+      "target_split": "test",
+      "mean_average_precision": 0.229134,
+      "mean_auroc": 0.549163,
+      "mean_log_loss": 0.330682,
+      "mean_brier": 0.091714,
+      "mean_write_work_ratio": 1.0,
+      "mean_staleness_ms": 0.0,
+      "max_staleness_ms": 0.0,
+      "query_coverage": 1.0,
+      "per_seed_ap": {
+        "s42": 0.23011319166134267,
+        "s43": 0.22939931560391447,
+        "s44": 0.22736631967080567,
+        "s45": 0.22945651841663417,
+        "s46": 0.22933566153624202
+      },
+      "per_seed_auroc": {
+        "s42": 0.5498376170813218,
+        "s43": 0.5491856583991842,
+        "s44": 0.5482516635894071,
+        "s45": 0.5494429669377101,
+        "s46": 0.549096976767918
+      }
+    },
+    "exp_joint": {
+      "role": "ablation",
+      "policy": "joint_adaptive_mimd",
+      "target_split": "test",
+      "mean_average_precision": 0.228305,
+      "mean_auroc": 0.548771,
+      "mean_log_loss": 0.330682,
+      "mean_brier": 0.091714,
+      "mean_write_work_ratio": 0.330205,
+      "mean_staleness_ms": 1.2,
+      "max_staleness_ms": 45.0,
+      "query_coverage": 1.0,
+      "per_seed_ap": {
+        "s42": 0.22445346341751268,
+        "s43": 0.22929976177000325,
+        "s44": 0.22933490029723524,
+        "s45": 0.22924452095187353,
+        "s46": 0.22919231494468661
+      },
+      "per_seed_auroc": {
+        "s42": 0.5480555204310017,
+        "s43": 0.549081486621786,
+        "s44": 0.5491021837228063,
+        "s45": 0.5487682632308724,
+        "s46": 0.5488480451086999
+      }
+    },
+    "exp_ood": {
+      "role": "ood",
+      "policy": "dynamic_pressure_cold_users",
+      "target_split": "ood",
+      "mean_average_precision": 0.227853,
+      "mean_auroc": 0.59224,
+      "mean_log_loss": 0.331625,
+      "mean_brier": 0.092291,
+      "mean_write_work_ratio": 0.330205,
+      "mean_staleness_ms": 1.2,
+      "max_staleness_ms": 45.0,
+      "query_coverage": 1.0,
+      "per_seed_ap": {
+        "s42": 0.22785335678714463,
+        "s43": 0.22785335678714463,
+        "s44": 0.22785335678714463,
+        "s45": 0.22785335678714463,
+        "s46": 0.22785335678714463
+      },
+      "per_seed_auroc": {
+        "s42": 0.5922399035395655,
+        "s43": 0.5922399035395655,
+        "s44": 0.5922399035395655,
+        "s45": 0.5922399035395655,
+        "s46": 0.5922399035395655
+      }
+    }
+  },
+  "experiments": {
+    "exp_alpha_s42": {
+      "seed": 42,
+      "model": "bpfeat_logistic_v2",
+      "split": "test",
+      "metrics": {
+        "accuracy": 0.898106804786569,
+        "auroc": 0.5498376170813218,
+        "average_precision": 0.23011319166134267,
+        "brier": 0.09171609215913512,
+        "f1": 0.0,
+        "log_loss": 0.3306912244657413
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 0.0,
+        "mean_staleness_ms": 0.0,
+        "query_coverage": 1.0,
+        "write_work_ratio": 1.0
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_alpha_s43": {
+      "seed": 43,
+      "model": "bpfeat_logistic_v2",
+      "split": "test",
+      "metrics": {
+        "accuracy": 0.898106804786569,
+        "auroc": 0.5491856583991842,
+        "average_precision": 0.22939931560391447,
+        "brier": 0.09171326840293996,
+        "f1": 0.0,
+        "log_loss": 0.33067497132323115
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 0.0,
+        "mean_staleness_ms": 0.0,
+        "query_coverage": 1.0,
+        "write_work_ratio": 1.0
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_alpha_s44": {
+      "seed": 44,
+      "model": "bpfeat_logistic_v2",
+      "split": "test",
+      "metrics": {
+        "accuracy": 0.898106804786569,
+        "auroc": 0.5482516635894071,
+        "average_precision": 0.22736631967080567,
+        "brier": 0.09171691864834948,
+        "f1": 0.0,
+        "log_loss": 0.33069513367483444
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 0.0,
+        "mean_staleness_ms": 0.0,
+        "query_coverage": 1.0,
+        "write_work_ratio": 1.0
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_alpha_s45": {
+      "seed": 45,
+      "model": "bpfeat_logistic_v2",
+      "split": "test",
+      "metrics": {
+        "accuracy": 0.898106804786569,
+        "auroc": 0.5494429669377101,
+        "average_precision": 0.22945651841663417,
+        "brier": 0.09171185561259623,
+        "f1": 0.0,
+        "log_loss": 0.33066510109472325
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 0.0,
+        "mean_staleness_ms": 0.0,
+        "query_coverage": 1.0,
+        "write_work_ratio": 1.0
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_alpha_s46": {
+      "seed": 46,
+      "model": "bpfeat_logistic_v2",
+      "split": "test",
+      "metrics": {
+        "accuracy": 0.898106804786569,
+        "auroc": 0.549096976767918,
+        "average_precision": 0.22933566153624202,
+        "brier": 0.09171428816172886,
+        "f1": 0.0,
+        "log_loss": 0.33068158352870275
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 0.0,
+        "mean_staleness_ms": 0.0,
+        "query_coverage": 1.0,
+        "write_work_ratio": 1.0
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_budget_s42": {
+      "seed": 42,
+      "model": "bpfeat_logistic_v2",
+      "split": "test",
+      "metrics": {
+        "accuracy": 0.898106804786569,
+        "auroc": 0.5124660600222901,
+        "average_precision": 0.11322959520127042,
+        "brier": 0.09174281487702929,
+        "f1": 0.0,
+        "log_loss": 0.3304748755863132
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 95.0,
+        "mean_staleness_ms": 18.199999877,
+        "query_coverage": 1.0,
+        "write_work_ratio": 0.3302052903277442
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_budget_s43": {
+      "seed": 43,
+      "model": "bpfeat_logistic_v2",
+      "split": "test",
+      "metrics": {
+        "accuracy": 0.898106804786569,
+        "auroc": 0.5124660600222901,
+        "average_precision": 0.11322959520127042,
+        "brier": 0.09174281687632979,
+        "f1": 0.0,
+        "log_loss": 0.3304748843670097
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 95.0,
+        "mean_staleness_ms": 18.199999877,
+        "query_coverage": 1.0,
+        "write_work_ratio": 0.3302052903277442
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_budget_s44": {
+      "seed": 44,
+      "model": "bpfeat_logistic_v2",
+      "split": "test",
+      "metrics": {
+        "accuracy": 0.898106804786569,
+        "auroc": 0.5124660600222901,
+        "average_precision": 0.11322959520127042,
+        "brier": 0.09174281887565029,
+        "f1": 0.0,
+        "log_loss": 0.3304748931478028
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 95.0,
+        "mean_staleness_ms": 18.199999877,
+        "query_coverage": 1.0,
+        "write_work_ratio": 0.3302052903277442
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_budget_s45": {
+      "seed": 45,
+      "model": "bpfeat_logistic_v2",
+      "split": "test",
+      "metrics": {
+        "accuracy": 0.898106804786569,
+        "auroc": 0.5124660600222901,
+        "average_precision": 0.11322959520127042,
+        "brier": 0.09174282087499079,
+        "f1": 0.0,
+        "log_loss": 0.3304749019286925
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 95.0,
+        "mean_staleness_ms": 18.199999877,
+        "query_coverage": 1.0,
+        "write_work_ratio": 0.3302052903277442
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_budget_s46": {
+      "seed": 46,
+      "model": "bpfeat_logistic_v2",
+      "split": "test",
+      "metrics": {
+        "accuracy": 0.898106804786569,
+        "auroc": 0.5124660600222901,
+        "average_precision": 0.11322959520127042,
+        "brier": 0.09174282287435129,
+        "f1": 0.0,
+        "log_loss": 0.3304749107096789
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 95.0,
+        "mean_staleness_ms": 18.199999877,
+        "query_coverage": 1.0,
+        "write_work_ratio": 0.3302052903277442
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_dynamic_s42": {
+      "seed": 42,
+      "model": "bpfeat_logistic_v2",
+      "split": "test",
+      "metrics": {
+        "accuracy": 0.898106804786569,
+        "auroc": 0.5175594858648386,
+        "average_precision": 0.14162081013823638,
+        "brier": 0.09172652706267846,
+        "f1": 0.0,
+        "log_loss": 0.3303917848593024
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 45.0,
+        "mean_staleness_ms": 1.199999844,
+        "query_coverage": 1.0,
+        "write_work_ratio": 0.3302052903277442
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_dynamic_s43": {
+      "seed": 43,
+      "model": "bpfeat_logistic_v2",
+      "split": "test",
+      "metrics": {
+        "accuracy": 0.898106804786569,
+        "auroc": 0.5175594858648386,
+        "average_precision": 0.14162081013823638,
+        "brier": 0.09172652906381305,
+        "f1": 0.0,
+        "log_loss": 0.3303917937166515
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 45.0,
+        "mean_staleness_ms": 1.199999844,
+        "query_coverage": 1.0,
+        "write_work_ratio": 0.3302052903277442
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_dynamic_s44": {
+      "seed": 44,
+      "model": "bpfeat_logistic_v2",
+      "split": "test",
+      "metrics": {
+        "accuracy": 0.898106804786569,
+        "auroc": 0.5175594858648386,
+        "average_precision": 0.14162081013823638,
+        "brier": 0.09172653106496763,
+        "f1": 0.0,
+        "log_loss": 0.3303918025740971
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 45.0,
+        "mean_staleness_ms": 1.199999844,
+        "query_coverage": 1.0,
+        "write_work_ratio": 0.3302052903277442
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_dynamic_s45": {
+      "seed": 45,
+      "model": "bpfeat_logistic_v2",
+      "split": "test",
+      "metrics": {
+        "accuracy": 0.898106804786569,
+        "auroc": 0.5175594858648386,
+        "average_precision": 0.14162081013823638,
+        "brier": 0.0917265330661422,
+        "f1": 0.0,
+        "log_loss": 0.3303918114316392
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 45.0,
+        "mean_staleness_ms": 1.199999844,
+        "query_coverage": 1.0,
+        "write_work_ratio": 0.3302052903277442
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_dynamic_s46": {
+      "seed": 46,
+      "model": "bpfeat_logistic_v2",
+      "split": "test",
+      "metrics": {
+        "accuracy": 0.898106804786569,
+        "auroc": 0.5175594858648386,
+        "average_precision": 0.14162081013823638,
+        "brier": 0.09172653506733679,
+        "f1": 0.0,
+        "log_loss": 0.33039182028927777
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 45.0,
+        "mean_staleness_ms": 1.199999844,
+        "query_coverage": 1.0,
+        "write_work_ratio": 0.3302052903277442
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_fresh_s42": {
+      "seed": 42,
+      "model": "bpfeat_logistic_v2",
+      "split": "test",
+      "metrics": {
+        "accuracy": 0.898106804786569,
+        "auroc": 0.5175594858648386,
+        "average_precision": 0.14162081013823638,
+        "brier": 0.09172652706267846,
+        "f1": 0.0,
+        "log_loss": 0.3303917848593024
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 0.0,
+        "mean_staleness_ms": 0.0,
+        "query_coverage": 1.0,
+        "write_work_ratio": 1.0
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_fresh_s43": {
+      "seed": 43,
+      "model": "bpfeat_logistic_v2",
+      "split": "test",
+      "metrics": {
+        "accuracy": 0.898106804786569,
+        "auroc": 0.5175594858648386,
+        "average_precision": 0.14162081013823638,
+        "brier": 0.09172652906381305,
+        "f1": 0.0,
+        "log_loss": 0.3303917937166515
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 0.0,
+        "mean_staleness_ms": 0.0,
+        "query_coverage": 1.0,
+        "write_work_ratio": 1.0
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_fresh_s44": {
+      "seed": 44,
+      "model": "bpfeat_logistic_v2",
+      "split": "test",
+      "metrics": {
+        "accuracy": 0.898106804786569,
+        "auroc": 0.5175594858648386,
+        "average_precision": 0.14162081013823638,
+        "brier": 0.09172653106496763,
+        "f1": 0.0,
+        "log_loss": 0.3303918025740971
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 0.0,
+        "mean_staleness_ms": 0.0,
+        "query_coverage": 1.0,
+        "write_work_ratio": 1.0
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_fresh_s45": {
+      "seed": 45,
+      "model": "bpfeat_logistic_v2",
+      "split": "test",
+      "metrics": {
+        "accuracy": 0.898106804786569,
+        "auroc": 0.5175594858648386,
+        "average_precision": 0.14162081013823638,
+        "brier": 0.0917265330661422,
+        "f1": 0.0,
+        "log_loss": 0.3303918114316392
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 0.0,
+        "mean_staleness_ms": 0.0,
+        "query_coverage": 1.0,
+        "write_work_ratio": 1.0
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_fresh_s46": {
+      "seed": 46,
+      "model": "bpfeat_logistic_v2",
+      "split": "test",
+      "metrics": {
+        "accuracy": 0.898106804786569,
+        "auroc": 0.5175594858648386,
+        "average_precision": 0.14162081013823638,
+        "brier": 0.09172653506733679,
+        "f1": 0.0,
+        "log_loss": 0.33039182028927777
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 0.0,
+        "mean_staleness_ms": 0.0,
+        "query_coverage": 1.0,
+        "write_work_ratio": 1.0
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_joint_s42": {
+      "seed": 42,
+      "model": "bpfeat_logistic_v2",
+      "split": "test",
+      "metrics": {
+        "accuracy": 0.898106804786569,
+        "auroc": 0.5480555204310017,
+        "average_precision": 0.22445346341751268,
+        "brier": 0.09171380354211507,
+        "f1": 0.0,
+        "log_loss": 0.33067619117384905
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 45.0,
+        "mean_staleness_ms": 1.199999844,
+        "query_coverage": 1.0,
+        "write_work_ratio": 0.3302052903277442
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_joint_s43": {
+      "seed": 43,
+      "model": "bpfeat_logistic_v2",
+      "split": "test",
+      "metrics": {
+        "accuracy": 0.898106804786569,
+        "auroc": 0.549081486621786,
+        "average_precision": 0.22929976177000325,
+        "brier": 0.09171441749933505,
+        "f1": 0.0,
+        "log_loss": 0.3306818756708828
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 45.0,
+        "mean_staleness_ms": 1.199999844,
+        "query_coverage": 1.0,
+        "write_work_ratio": 0.3302052903277442
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_joint_s44": {
+      "seed": 44,
+      "model": "bpfeat_logistic_v2",
+      "split": "test",
+      "metrics": {
+        "accuracy": 0.898106804786569,
+        "auroc": 0.5491021837228063,
+        "average_precision": 0.22933490029723524,
+        "brier": 0.09171417791281923,
+        "f1": 0.0,
+        "log_loss": 0.3306808748804361
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 45.0,
+        "mean_staleness_ms": 1.199999844,
+        "query_coverage": 1.0,
+        "write_work_ratio": 0.3302052903277442
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_joint_s45": {
+      "seed": 45,
+      "model": "bpfeat_logistic_v2",
+      "split": "test",
+      "metrics": {
+        "accuracy": 0.898106804786569,
+        "auroc": 0.5487682632308724,
+        "average_precision": 0.22924452095187353,
+        "brier": 0.09171483588418992,
+        "f1": 0.0,
+        "log_loss": 0.33068329435391736
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 45.0,
+        "mean_staleness_ms": 1.199999844,
+        "query_coverage": 1.0,
+        "write_work_ratio": 0.3302052903277442
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_joint_s46": {
+      "seed": 46,
+      "model": "bpfeat_logistic_v2",
+      "split": "test",
+      "metrics": {
+        "accuracy": 0.898106804786569,
+        "auroc": 0.5488480451086999,
+        "average_precision": 0.22919231494468661,
+        "brier": 0.09171525194275328,
+        "f1": 0.0,
+        "log_loss": 0.3306865332740899
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 45.0,
+        "mean_staleness_ms": 1.199999844,
+        "query_coverage": 1.0,
+        "write_work_ratio": 0.3302052903277442
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_ood_s42": {
+      "seed": 42,
+      "model": "bpfeat_logistic_v2",
+      "split": "ood",
+      "metrics": {
+        "accuracy": 0.897251865143073,
+        "auroc": 0.5922399035395655,
+        "average_precision": 0.22785335678714463,
+        "brier": 0.09229102938396194,
+        "f1": 0.0,
+        "log_loss": 0.33162455226453913
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 45.0,
+        "mean_staleness_ms": 1.199999844,
+        "query_coverage": 1.0,
+        "write_work_ratio": 0.3302052903277442
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_ood_s43": {
+      "seed": 43,
+      "model": "bpfeat_logistic_v2",
+      "split": "ood",
+      "metrics": {
+        "accuracy": 0.897251865143073,
+        "auroc": 0.5922399035395655,
+        "average_precision": 0.22785335678714463,
+        "brier": 0.09229103187577738,
+        "f1": 0.0,
+        "log_loss": 0.33162456426237413
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 45.0,
+        "mean_staleness_ms": 1.199999844,
+        "query_coverage": 1.0,
+        "write_work_ratio": 0.3302052903277442
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_ood_s44": {
+      "seed": 44,
+      "model": "bpfeat_logistic_v2",
+      "split": "ood",
+      "metrics": {
+        "accuracy": 0.897251865143073,
+        "auroc": 0.5922399035395655,
+        "average_precision": 0.22785335678714463,
+        "brier": 0.09229103436761282,
+        "f1": 0.0,
+        "log_loss": 0.33162457626029923
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 45.0,
+        "mean_staleness_ms": 1.199999844,
+        "query_coverage": 1.0,
+        "write_work_ratio": 0.3302052903277442
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_ood_s45": {
+      "seed": 45,
+      "model": "bpfeat_logistic_v2",
+      "split": "ood",
+      "metrics": {
+        "accuracy": 0.897251865143073,
+        "auroc": 0.5922399035395655,
+        "average_precision": 0.22785335678714463,
+        "brier": 0.09229103685946828,
+        "f1": 0.0,
+        "log_loss": 0.3316245882583144
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 45.0,
+        "mean_staleness_ms": 1.199999844,
+        "query_coverage": 1.0,
+        "write_work_ratio": 0.3302052903277442
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_ood_s46": {
+      "seed": 46,
+      "model": "bpfeat_logistic_v2",
+      "split": "ood",
+      "metrics": {
+        "accuracy": 0.897251865143073,
+        "auroc": 0.5922399035395655,
+        "average_precision": 0.22785335678714463,
+        "brier": 0.09229103935134372,
+        "f1": 0.0,
+        "log_loss": 0.3316246002564197
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 45.0,
+        "mean_staleness_ms": 1.199999844,
+        "query_coverage": 1.0,
+        "write_work_ratio": 0.3302052903277442
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_static_s42": {
+      "seed": 42,
+      "model": "bpfeat_logistic_v2",
+      "split": "test",
+      "metrics": {
+        "accuracy": 0.898106804786569,
+        "auroc": 0.5119004409310401,
+        "average_precision": 0.11229322273412226,
+        "brier": 0.09174462473607257,
+        "f1": 0.0,
+        "log_loss": 0.3304841121492737
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 120.0,
+        "mean_staleness_ms": 24.499999596,
+        "query_coverage": 1.0,
+        "write_work_ratio": 0.04999199647845052
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_static_s43": {
+      "seed": 43,
+      "model": "bpfeat_logistic_v2",
+      "split": "test",
+      "metrics": {
+        "accuracy": 0.898106804786569,
+        "auroc": 0.5119004409310401,
+        "average_precision": 0.11229322273412226,
+        "brier": 0.09174462673516928,
+        "f1": 0.0,
+        "log_loss": 0.33048412092144513
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 120.0,
+        "mean_staleness_ms": 24.499999596,
+        "query_coverage": 1.0,
+        "write_work_ratio": 0.04999199647845052
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_static_s44": {
+      "seed": 44,
+      "model": "bpfeat_logistic_v2",
+      "split": "test",
+      "metrics": {
+        "accuracy": 0.898106804786569,
+        "auroc": 0.5119004409310401,
+        "average_precision": 0.11229322273412226,
+        "brier": 0.091744628734286,
+        "f1": 0.0,
+        "log_loss": 0.33048412969371327
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 120.0,
+        "mean_staleness_ms": 24.499999596,
+        "query_coverage": 1.0,
+        "write_work_ratio": 0.04999199647845052
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_static_s45": {
+      "seed": 45,
+      "model": "bpfeat_logistic_v2",
+      "split": "test",
+      "metrics": {
+        "accuracy": 0.898106804786569,
+        "auroc": 0.5119004409310401,
+        "average_precision": 0.11229322273412226,
+        "brier": 0.09174463073342272,
+        "f1": 0.0,
+        "log_loss": 0.330484138466078
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 120.0,
+        "mean_staleness_ms": 24.499999596,
+        "query_coverage": 1.0,
+        "write_work_ratio": 0.04999199647845052
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    },
+    "exp_static_s46": {
+      "seed": 46,
+      "model": "bpfeat_logistic_v2",
+      "split": "test",
+      "metrics": {
+        "accuracy": 0.898106804786569,
+        "auroc": 0.5119004409310401,
+        "average_precision": 0.11229322273412226,
+        "brier": 0.09174463273257943,
+        "f1": 0.0,
+        "log_loss": 0.3304841472385394
+      },
+      "streaming_metrics": {
+        "deadline_utility": 1.0,
+        "max_staleness_ms": 120.0,
+        "mean_staleness_ms": 24.499999596,
+        "query_coverage": 1.0,
+        "write_work_ratio": 0.04999199647845052
+      },
+      "receipt_verified": true,
+      "runtime_attestation": {
+        "byte_order": "little",
+        "dependency_isolation": "installed_runtime_not_isolated",
+        "encoding": "utf-8",
+        "interpreter_hash": "a7f5b535d61d1c7326824204ac80f045a97a652abb154421e2c74fcc365a3539",
+        "locale": "('C', 'UTF-8')",
+        "platform_machine": "arm64",
+        "platform_release": "27.0.0",
+        "platform_system": "Darwin",
+        "python_version": "3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]",
+        "timezone": "-20700",
+        "trust_profile": "same_user_local"
+      }
+    }
+  },
+  "invariants_verification": {
+    "all_35_trials_recorded": true,
+    "zero_post_hoc_selection": true,
+    "immutable_attempts_conserved": true,
+    "zero_temporal_leakage_verified": true,
+    "exact_event_conservation_verified": true,
+    "independent_recomputation_matched": true,
+    "cluster_level_permutation_tests_passed": true,
+    "holm_bonferroni_fwer_controlled": true
+  }
+}
