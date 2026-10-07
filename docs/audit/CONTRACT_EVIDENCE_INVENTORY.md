@@ -196,11 +196,29 @@ It serves as an authoritative audit ledger demonstrating that each foundation co
 
 ---
 
+### AMOS-16: Independent Clean-Checkout Reproduction Recipe & Standalone Verifier
+- **Purpose**: Independent clean-checkout reproduction walkthrough, cryptographic cohort digest verification, standalone metric replay engine (`tools/reproduction_verifier.py`), reproduction manifest comparing original and replay values within tolerance $\le 10^{-5}$, per-number/figure lineage registry (`docs/research/per_number_manifest.json`), and fully automated one-command reproduction shell script (`scripts/reproduce_all.sh`).
+- **Core Deliverables**:
+  - `tools/reproduction_verifier.py` (Standalone metric replay engine and reproduction verifier CLI)
+  - `docs/research/reproduction_manifest.json` (Structured reproduction manifest with 12 primary metrics matching within $\le 10^{-5}$ tolerance)
+  - `docs/research/per_number_manifest.json` (Itemized lineage registry cataloging 13 primary numbers with definitions, artifacts, raw runs, and CLI commands)
+  - `docs/research/REPRODUCTION.md` (Self-contained independent peer evaluator walkthrough guide and trust model)
+  - `scripts/reproduce_all.sh` (Automated end-to-end clean-checkout reproduction script)
+  - `tests/test_reproduction_verifier.py` (6 passing unit, property, and integration tests)
+  - `project/contracts/AMOS-16/contract.md` & `project/contracts/AMOS-16/contract_report.md`
+- **Scientific Findings**:
+  - **Reproduction Invariance**: Replay values match original benchmark values with zero numerical drift ($\Delta \le 10^{-5}$) across all 12 key primary metrics. Verified via `verify-reproducibility` (**PASS**).
+  - **Automated Recipe**: Execution of `bash scripts/reproduce_all.sh` succeeds unattended from scratch with status `SUCCESS`.
+  - **Audit Lineage**: Every headline claim, table number, and figure maps to an authentic raw prediction file with SHA-256 bindings.
+- **Status**: Completed, Verified & Admitted.
+
+---
+
 ## Test Regression Matrix
 
 | Test Suite | Scope | Tests Run | Result |
 | :--- | :--- | :---: | :---: |
-| `pytest tests/ -v` | Comprehensive project test suite (canonicalization, labels, models, publication core, pilots, baselines, independent analysis, supervisor, streaming adapter, hardware profiler, robustness analysis) | 100 passed, 12 skipped, 13 subtests | **PASS (100%)** |
+| `pytest tests/ -v` | Comprehensive project test suite (canonicalization, labels, models, publication core, pilots, baselines, independent analysis, supervisor, streaming adapter, hardware profiler, robustness analysis, reproduction verifier) | 106 passed, 12 skipped, 13 subtests | **PASS (100%)** |
 | `ctest --test-dir build/debug` | Native C++ test targets (`engine_counterexamples`, `python_engine_checks`) | 2/2 targets passed | **PASS (100%)** |
 | `factory/run_self_tests.py` | Software framework self-tests | 474/474 tests passed | **PASS (100%)** |
 | `factory/run_mutation_checks.py` | AST mutation test benchmark | 35/35 mutants killed | **PASS (100%)** |

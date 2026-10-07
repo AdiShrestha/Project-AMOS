@@ -1,0 +1,124 @@
+{
+  "schema": "bpfeat.per_number_manifest.v1",
+  "generated_at": "2026-10-07T00:54:25.674437+00:00",
+  "total_items": 13,
+  "items": [
+    {
+      "item_id": "table1_dynamic_mimd_test_ap",
+      "headline_claim": "Dynamic MIMD preserves full always-fresh ranking precision (AP = 0.141621)",
+      "reported_value": 0.141621,
+      "metric_definition": "Non-interpolated Average Precision sum_k (P@k * delta R@k) on test cohort",
+      "source_artifact": "docs/research/confirmatory_results.json",
+      "raw_evidence_source": "runs/exp_dynamic_s42/attempt0001/predictions.csv",
+      "reproduction_command": "python3 -B tools/reproduction_verifier.py --metric dynamic_mimd_test_ap"
+    },
+    {
+      "item_id": "table1_dynamic_mimd_test_auroc",
+      "headline_claim": "Dynamic MIMD achieves 0.517560 AUROC on test cohort",
+      "reported_value": 0.51756,
+      "metric_definition": "Mann-Whitney U normalized rank-sum statistic (U / (n_pos * n_neg))",
+      "source_artifact": "docs/research/confirmatory_results.json",
+      "raw_evidence_source": "runs/exp_dynamic_s42/attempt0001/predictions.csv",
+      "reproduction_command": "python3 -B tools/reproduction_verifier.py --metric dynamic_mimd_test_auroc"
+    },
+    {
+      "item_id": "table1_dynamic_mimd_write_work_ratio",
+      "headline_claim": "Dynamic MIMD reduces publication write work to 33.02% (66.98% savings)",
+      "reported_value": 0.330205,
+      "metric_definition": "Ratio of published feature updates to total processed entity events",
+      "source_artifact": "docs/research/confirmatory_results.json",
+      "raw_evidence_source": "runs/exp_dynamic_s42/attempt0001/telemetry.json",
+      "reproduction_command": "python3 -B tools/reproduction_verifier.py --metric dynamic_mimd_write_work_ratio"
+    },
+    {
+      "item_id": "table1_dynamic_mimd_mean_staleness_ms",
+      "headline_claim": "Dynamic MIMD incurs only 1.20 ms average feature transport staleness",
+      "reported_value": 1.2,
+      "metric_definition": "Mean query-time staleness in milliseconds across 22,396 test queries",
+      "source_artifact": "docs/research/confirmatory_results.json",
+      "raw_evidence_source": "runs/exp_dynamic_s42/attempt0001/telemetry.json",
+      "reproduction_command": "python3 -B tools/reproduction_verifier.py --metric dynamic_mimd_mean_staleness_ms"
+    },
+    {
+      "item_id": "table1_static_u20_test_ap",
+      "headline_claim": "Tuned static cadence baseline (U=20) degrades to 0.112292 AP",
+      "reported_value": 0.112292,
+      "metric_definition": "Average Precision under static interval batching U*=20",
+      "source_artifact": "docs/research/confirmatory_results.json",
+      "raw_evidence_source": "runs/exp_static_s42/attempt0001/predictions.csv",
+      "reproduction_command": "python3 -B tools/reproduction_verifier.py --metric static_u20_test_ap"
+    },
+    {
+      "item_id": "table1_budget_matched_test_ap",
+      "headline_claim": "Work-budget-matched FIFO control (WWR=0.3302) achieves 0.113229 AP",
+      "reported_value": 0.113229,
+      "metric_definition": "Average Precision under uniform budget-matched FIFO batching",
+      "source_artifact": "docs/research/confirmatory_results.json",
+      "raw_evidence_source": "runs/exp_budget_s42/attempt0001/predictions.csv",
+      "reproduction_command": "python3 -B tools/reproduction_verifier.py --metric budget_matched_test_ap"
+    },
+    {
+      "item_id": "claim1_dynamic_vs_static_ap_delta",
+      "headline_claim": "Statistically superior AP ranking gain vs tuned static baseline (+0.029328)",
+      "reported_value": 0.029328,
+      "metric_definition": "Paired cluster-swapped mean difference across 46 hourly test groups (p_holm = 0.0009995)",
+      "source_artifact": "docs/research/confirmatory_results.json",
+      "raw_evidence_source": "runs/exp_dynamic_s42/ and runs/exp_static_s42/",
+      "reproduction_command": "python3 -B tools/reproduction_verifier.py --contrast comp_dynamic_vs_static_ap"
+    },
+    {
+      "item_id": "claim2_dynamic_vs_budget_ap_delta",
+      "headline_claim": "Statistically superior AP ranking gain vs budget-matched control (+0.028391)",
+      "reported_value": 0.028391,
+      "metric_definition": "Paired cluster-swapped mean difference under matched write budget (p_holm = 0.0009995)",
+      "source_artifact": "docs/research/confirmatory_results.json",
+      "raw_evidence_source": "runs/exp_dynamic_s42/ and runs/exp_budget_s42/",
+      "reproduction_command": "python3 -B tools/reproduction_verifier.py --contrast comp_dynamic_vs_budget_ap"
+    },
+    {
+      "item_id": "claim3_cold_user_ood_ap",
+      "headline_claim": "Dynamic MIMD generalizes to 10,589 cold users with 0.227853 AP",
+      "reported_value": 0.227853,
+      "metric_definition": "Average Precision on out-of-distribution cold users unseen during model fitting",
+      "source_artifact": "docs/research/robustness_analysis.json",
+      "raw_evidence_source": "runs/exp_ood_s42/attempt0001/predictions.csv",
+      "reproduction_command": "python3 -B tools/reproduction_verifier.py --metric cold_user_ood_ap"
+    },
+    {
+      "item_id": "claim4_sensitivity_max_cadence_delta",
+      "headline_claim": "Dynamic MIMD is robust to +-50% perturbation in max cadence ceiling (delta AP = 0.00007)",
+      "reported_value": 7e-05,
+      "metric_definition": "Maximum AP spread across U_max in [32, 96] perturbation grid",
+      "source_artifact": "docs/research/robustness_analysis.json",
+      "raw_evidence_source": "docs/research/robustness_analysis.json",
+      "reproduction_command": "python3 -B tools/robustness_analysis.py --sweep max_cadence"
+    },
+    {
+      "item_id": "claim5_factorial_interaction_synergy",
+      "headline_claim": "Feature memory dynamics and publication cadence operate orthogonally (I = -0.000829)",
+      "reported_value": -0.000829,
+      "metric_definition": "2x2 factorial interaction synergy I = Delta_joint - (Delta_alpha + Delta_cadence)",
+      "source_artifact": "docs/research/robustness_analysis.json",
+      "raw_evidence_source": "runs/ 2x2 factorial matrix cells",
+      "reproduction_command": "python3 -B tools/robustness_analysis.py"
+    },
+    {
+      "item_id": "failure_taxonomy_stale_lag_prevalence",
+      "headline_claim": "SEV-2 stale feature lag accounts for 3.20% prevalence (716 queries)",
+      "reported_value": 0.032,
+      "metric_definition": "Grounded failure prevalence of false negatives during user bursts under staleness",
+      "source_artifact": "docs/research/robustness_analysis.json",
+      "raw_evidence_source": "data/cohort.csv joined with runs/exp_dynamic_s42/predictions.csv",
+      "reproduction_command": "python3 -B tools/robustness_analysis.py --taxonomy"
+    },
+    {
+      "item_id": "failure_taxonomy_decision_ambiguity_prevalence",
+      "headline_claim": "SEV-4 boundary ambiguity accounts for 9.01% prevalence (2,018 queries)",
+      "reported_value": 0.0901,
+      "metric_definition": "Grounded failure prevalence of decision boundary ambiguity (|score - tau| < 0.002)",
+      "source_artifact": "docs/research/robustness_analysis.json",
+      "raw_evidence_source": "data/cohort.csv joined with runs/exp_dynamic_s42/predictions.csv",
+      "reproduction_command": "python3 -B tools/robustness_analysis.py --taxonomy"
+    }
+  ]
+}
