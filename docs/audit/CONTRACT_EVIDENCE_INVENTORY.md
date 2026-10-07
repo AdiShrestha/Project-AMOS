@@ -233,6 +233,22 @@ It serves as an authoritative audit ledger demonstrating that each foundation co
 
 ---
 
+### AMOS-18: Submission Release & Final Research Certification
+- **Purpose**: Capstone contract executing final submission release freeze, release bundle inventory (`docs/research/release_manifest.json`), architectural independent scientific review (`project/review.json`), preflight verification across all 14 submission-readiness gates in `plan.md`, and planning state transition to `RESEARCH_LIFECYCLE_COMPLETED`.
+- **Core Deliverables**:
+  - `docs/research/release_manifest.json` (Structured machine-readable release manifest cataloging git commit `3fa742e`, toolchain versions, native build binaries, source file hashes, research artifact hashes, and all 35 execution attempts with cryptographic receipts and nonces)
+  - `project/review.json` (Architectural independent review record verified across all 9 topics without adverse verdicts, including 3 resolved adversarial objections and 4 explicit operational limitations)
+  - `plan.md` (Section 15 checklist updated: all 14 submission-readiness gates transitioned from Pending/BLOCKED to VERIFIED & ADMITTED)
+  - `project/planning_state.json` (Status advanced to `RESEARCH_LIFECYCLE_COMPLETED` with all 18 contracts completed)
+  - `project/contracts/AMOS-18/contract.md` & `project/contracts/AMOS-18/contract_report.md`
+- **Scientific Findings**:
+  - **Full Lifecycle Closure**: All 18 planned contracts in Project AMOS research migration completed, verified, and admitted under local trust boundaries.
+  - **Review Integrity**: Validated via independent architectural review verification (`verify_review`) across all 9 mandatory topics (**PASS**).
+  - **Release Transparency**: 100% of reported results, models, and binaries cryptographically cataloged in the release manifest.
+- **Status**: Completed, Verified & Admitted.
+
+---
+
 ## Test Regression Matrix
 
 | Test Suite | Scope | Tests Run | Result |
