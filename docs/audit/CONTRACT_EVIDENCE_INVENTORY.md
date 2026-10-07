@@ -179,11 +179,28 @@ It serves as an authoritative audit ledger demonstrating that each foundation co
 
 ---
 
+### AMOS-15: Robustness, Sensitivity & Empirical Failure Taxonomy
+- **Purpose**: Empirical stress testing, failure mode classification joined to `data/cohort.csv`, $\pm 10\%, \pm 25\%, \pm 50\%$ hyperparameter perturbation sweeps ($U_{\max}, U^*, \alpha$), $2 \times 2$ factorial component decomposition, out-of-distribution cold-user validation, activity tercile stratification, and maintenance of the living claim ledger (`project/claim_ledger.json`).
+- **Core Deliverables**:
+  - `tools/robustness_analysis.py` (Robustness analysis, failure taxonomy, sensitivity sweep, and claim ledger generator CLI)
+  - `docs/research/robustness_analysis.json` (Structured empirical telemetry: 4 failure categories, 3 sensitivity sweeps, $2 \times 2$ factorial decomposition, activity tercile subgroup stratification)
+  - `project/claim_ledger.json` (Living registry with 5 confirmed scientific claims, empirical 95% BCa CIs, and explicit limitation boundaries)
+  - `tests/test_robustness_analysis.py` (7 passing unit, property, and gatekeeper-compatibility tests)
+  - `project/contracts/AMOS-15/contract.md` & `project/contracts/AMOS-15/contract_report.md`
+- **Scientific Findings**:
+  - **Empirical Failure Taxonomy**: 4 mutually disjoint failure modes classified relative to calibrated decision threshold $\tau = 0.115946$ (`stale_feature_lag_fn`: 3.20%, `inter_arrival_decay_obsolescence`: 1.00%, `cold_start_miscalibration_fp`: 0.60%, `marginal_decision_ambiguity`: 9.01%). Verified via `verify-failure-taxonomy` (**PASS**).
+  - **Sensitivity Stability**: $U_{\max} \in [32, 96]$ exhibits flat response ($\Delta \text{AP} = 0.00007 < 0.005$) with full justification; $U^*$ and $\alpha$ exhibit clear, monotonic empirical curvature. Verified via `verify-sensitivity-analysis` (**PASS**).
+  - **Factorial Orthogonality**: Cadence main effect $\Delta \text{AP} = 0.000000$ (66.98% write work reduction); $\alpha$ main effect $\Delta \text{AP} = +0.087513$; interaction synergy $I = -0.000829$ ($|I| < 0.001$), confirming strict decoupling.
+  - **Subgroup Regimes**: Dynamic MIMD ranking advantage concentrated in high-activity burst regimes ($+0.03263$ AP gain vs $+0.00010$ in low-activity).
+- **Status**: Completed, Verified & Admitted.
+
+---
+
 ## Test Regression Matrix
 
 | Test Suite | Scope | Tests Run | Result |
 | :--- | :--- | :---: | :---: |
-| `pytest tests/ -v` | Comprehensive project test suite (canonicalization, labels, models, publication core, pilots, baselines, independent analysis, supervisor, streaming adapter, hardware profiler) | 93 passed, 12 skipped, 13 subtests | **PASS (100%)** |
+| `pytest tests/ -v` | Comprehensive project test suite (canonicalization, labels, models, publication core, pilots, baselines, independent analysis, supervisor, streaming adapter, hardware profiler, robustness analysis) | 100 passed, 12 skipped, 13 subtests | **PASS (100%)** |
 | `ctest --test-dir build/debug` | Native C++ test targets (`engine_counterexamples`, `python_engine_checks`) | 2/2 targets passed | **PASS (100%)** |
 | `factory/run_self_tests.py` | Software framework self-tests | 474/474 tests passed | **PASS (100%)** |
 | `factory/run_mutation_checks.py` | AST mutation test benchmark | 35/35 mutants killed | **PASS (100%)** |
