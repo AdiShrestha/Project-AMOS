@@ -1,0 +1,19 @@
+{
+  "schema": "bpfeat.statistical_protocol.v1",
+  "statistical_protocol": {
+    "primary_metric": "average_precision",
+    "sampling_unit": "group",
+    "test": "paired_group_permutation",
+    "multiplicity_correction": "holm",
+    "p_values": [
+      0.0004997501249375312,
+      0.0004997501249375312
+    ],
+    "alpha": 0.05,
+    "effect_size": 0.029328,
+    "confidence_interval": [
+      0.009274,
+      0.051138
+    ]
+  }
+}

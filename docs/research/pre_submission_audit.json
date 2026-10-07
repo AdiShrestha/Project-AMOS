@@ -1,0 +1,115 @@
+{
+  "claims": [
+    {
+      "id": "claim_dynamic_vs_static_quality",
+      "scope": "Streaming e-commerce events with bursty user query arrivals on M3 Air architecture.",
+      "evidence": [
+        {
+          "path": "confirmatory_results.json",
+          "sha256": "d4672b5abb4f4778d0ece8c235bb2c4c79097bf4ecb4f91e45f7cefb95330c05"
+        }
+      ]
+    },
+    {
+      "id": "claim_dynamic_vs_budget_quality",
+      "scope": "Equal-budget FIFO batch allocation on unified memory architecture under identical query cohorts.",
+      "evidence": [
+        {
+          "path": "confirmatory_results.json",
+          "sha256": "d4672b5abb4f4778d0ece8c235bb2c4c79097bf4ecb4f91e45f7cefb95330c05"
+        }
+      ]
+    },
+    {
+      "id": "claim_ood_generalization",
+      "scope": "Cold entity feature synthesis under dynamic stream transport without historical interactions.",
+      "evidence": [
+        {
+          "path": "robustness_analysis.json",
+          "sha256": "fd8d07fdbcd73334458c1c18ac3538c8d8d107319d9e15d6f45285444d7b82e7"
+        }
+      ]
+    },
+    {
+      "id": "claim_sensitivity_stability",
+      "scope": "Hyperparameter perturbation envelope across plus-minus 50 percent under nominal query load.",
+      "evidence": [
+        {
+          "path": "robustness_analysis.json",
+          "sha256": "fd8d07fdbcd73334458c1c18ac3538c8d8d107319d9e15d6f45285444d7b82e7"
+        }
+      ]
+    },
+    {
+      "id": "claim_decoupled_mechanisms",
+      "scope": "Linear scoring models with stateful EMA feature extractors across full 2x2 factorial matrix.",
+      "evidence": [
+        {
+          "path": "robustness_analysis.json",
+          "sha256": "fd8d07fdbcd73334458c1c18ac3538c8d8d107319d9e15d6f45285444d7b82e7"
+        }
+      ]
+    }
+  ],
+  "data_provenance": {
+    "assessment": "Author-declared Tianchi UserBehavior dataset canonicalization with verified cryptographic SHA-256 digests.",
+    "evidence": [
+      {
+        "path": "confirmatory_results.json",
+        "sha256": "d4672b5abb4f4778d0ece8c235bb2c4c79097bf4ecb4f91e45f7cefb95330c05"
+      }
+    ]
+  },
+  "reproducibility": {
+    "assessment": "Deterministic clean-checkout reproduction manifest verifying 12 primary headline metrics within 1e-5 tolerance.",
+    "evidence": [
+      {
+        "path": "reproduction_manifest.json",
+        "sha256": "1abeeb194d1e460e8b080f23beaa9f87b9f6bcbe273cfa9b6285695b2032ff8f"
+      },
+      {
+        "path": "per_number_manifest.json",
+        "sha256": "3d72319893bb01036a19766741748680d2f522ae00692cd71461312776f7594d"
+      }
+    ]
+  },
+  "baselines": [
+    {
+      "id": "tuned_static_cadence_u20",
+      "assessment": "Prospective hyperparameter selection on validation data establishes U*=20 as the optimal static trade-off.",
+      "evidence": [
+        {
+          "path": "confirmatory_results.json",
+          "sha256": "d4672b5abb4f4778d0ece8c235bb2c4c79097bf4ecb4f91e45f7cefb95330c05"
+        }
+      ]
+    },
+    {
+      "id": "budget_matched_control",
+      "assessment": "Matches dynamic MIMD write work envelope to within 1 percent (WWR=0.3302) using uniform periodic batching.",
+      "evidence": [
+        {
+          "path": "confirmatory_results.json",
+          "sha256": "d4672b5abb4f4778d0ece8c235bb2c4c79097bf4ecb4f91e45f7cefb95330c05"
+        }
+      ]
+    }
+  ],
+  "ablations": [
+    {
+      "id": "factorial_cadence_vs_alpha",
+      "assessment": "Full 2x2 factorial decomposition isolates cadence throttling from feature memory adaptation with near-zero synergy.",
+      "evidence": [
+        {
+          "path": "robustness_analysis.json",
+          "sha256": "fd8d07fdbcd73334458c1c18ac3538c8d8d107319d9e15d6f45285444d7b82e7"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Evaluation is restricted to a single admitted real-world e-commerce event stream trace.",
+    "Single-node CPU thread execution envelope without distributed network transport latency.",
+    "Gains over static batching are concentrated in high-activity burst interaction regimes."
+  ]
+}
