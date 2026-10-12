@@ -24,7 +24,7 @@ We advise a **cautious stance**: The project should aim to **characterize** and 
 | **Data quality issues**: Invalid domains/outliers in Taobao. | User noted timestamp outliers, invalid domain records. | Garbage in can skew feature stats and label alignment. | **Low**: If not cleaned, metrics and learned weights off. | Inspect data for anomalies. Filter or truncate extreme timestamps. Document data cleaning. | Provide summary stats (min/max times, behavior counts) and any cleaning done. |
 | **Dataset authenticity/license**: Unclear provenance. | “Local hashes exist, terms unresolved.” | Risk of unauthorized use or data inconsistencies. | **Low**: Could restrict publishability but not technical. | Verify Kaggle/Tianchi terms for research use. Document data source (e.g. Kaggle link). | Attempt to find official data description. If closed, state uncertainty. |
 | **Evaluation environment**: Hardware variability. | CPU threads on M3 Air, no known performance baseline. | Results may not generalize to real servers. | **Low**: Only affects absolute throughput numbers. | Focus on relative comparisons. Repeat experiments to account for timing jitter. | Measure CPU utilization, thread performance. Compare with simple work (e.g. empty loops) to gauge overhead. |
-| **Software integrity checks**: Avoiding bypass or fake metrics. | Strict framework integrity (hashes, receipts) disallows data fudging. | Harder to “cheat” results, but requires honest implementation. | **N/A**: This is a guard, not a threat. | Ensure compliance. Use automated testing to catch schema violations. | Ensure final artifacts (hashes, logs) match code logs from pipeline runs. |
+| **Software integrity checks**: Avoiding bypass or fake metrics. | Strict validation integrity (hashes, receipts) disallows data fudging. | Harder to “cheat” results, but requires honest implementation. | **N/A**: This is a guard, not a threat. | Ensure compliance. Use automated testing to catch schema violations. | Ensure final artifacts (hashes, logs) match code logs from pipeline runs. |
 
 Each issue above should be clearly documented in the final writeup (e.g. in an appendix), with evidence (code audits or data profiles) where possible. Fixes should be implemented early so that any claims made later are on valid data/protocols.
 
@@ -167,7 +167,7 @@ Statistical protocol: We will treat each user (or day) as a block and do paired 
    *Gate:* Show that controller reacts qualitatively correctly (e.g. in low load B grows, high load B shrinks). Check no crashes or oscillations from zero/overflow.
 
 5. **Prediction/Model Worker:** (Gate: Model integration)  
-   - Connect the pipeline to the model-training and scoring module of the framework (e.g. logistic regression or sklearn).  
+   - Connect the pipeline to the model-training and scoring module (e.g. logistic regression or sklearn).  
    - Ensure seeds are fixed for comparability, and that metrics are computed by user-block.  
    *Gate:* Run an end-to-end with baseline (no adaptivity) and verify that metrics (e.g. AUC) are reasonable (e.g. >0.5, not NaN).
 

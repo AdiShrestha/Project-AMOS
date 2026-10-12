@@ -1,6 +1,6 @@
 # Corrected engine boundary
 
-This is a small C++17 CPU engine for **per-event feature extraction, batching, and scoring**. It replaces defective legacy execution paths and preserves the seven declared Taobao features. It is not yet the complete scientific system described in `README.md`.
+This is a small C++17 CPU engine for **per-event feature extraction, batching, and scoring**. It replaces defective legacy execution paths and preserves the seven declared Taobao features. It is not yet the complete scientific system described in the research specifications.
 
 There are three actual workers: streaming source/features, batching/controller, and scoring/file output. Every successfully read event is extracted, batched, scored and written exactly once before success. EOF flushes the partial batch. Closed queues, joined workers and equal terminal counters are required. Failure cancels the workers and produces no successful engine receipt. The cooperative timeout cannot interrupt a blocking operating-system file call; a future research supervisor must enforce a process deadline.
 

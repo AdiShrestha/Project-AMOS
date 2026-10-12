@@ -337,7 +337,7 @@ def build_claim_ledger(
     confirmatory_data: Dict[str, Any],
     robustness_data: Dict[str, Any],
 ) -> Dict[str, Any]:
-    """Construct the living claim ledger per README.md Section 10.3 and Contract AMOS-15."""
+    """Construct the living claim ledger per research plan Section 10.3 and Contract AMOS-15."""
     comparisons = {c["id"]: c for c in confirmatory_data.get("statistical_comparisons", [])}
     comp_static = comparisons.get("comp_dynamic_vs_static_ap", {})
     comp_budget = comparisons.get("comp_dynamic_vs_budget_ap", {})
