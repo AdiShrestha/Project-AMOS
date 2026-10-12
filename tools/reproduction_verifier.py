@@ -410,7 +410,7 @@ def main() -> None:
     if runs_dir is None:
         candidates = [
             Path("runs"),
-            Path("project") / ("." + "framework") / "epoch_0001" / "runs",
+            Path("data/runs"),
         ]
         for c in candidates:
             if c.exists():

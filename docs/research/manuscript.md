@@ -246,8 +246,8 @@ Project AMOS is fully reproducible from a clean git checkout:
 - **Repository**: Public Git repository at `https://github.com/AdiShrestha/Project-AMOS.git`
 - **One-Command Reproduction**: `bash scripts/reproduce_all.sh`
 - **Standalone Reproduction Verifier**: `python3 -B tools/reproduction_verifier.py`
-- **Per-Number Lineage Registry**: [`docs/research/per_number_manifest.json`](file:///workspace/Desktop/Projects/Using%20v3.3%20New%20projects/New%20Bpfeat/docs/research/per_number_manifest.json)
-- **Reproduction Manifest**: [`docs/research/reproduction_manifest.json`](file:///workspace/Desktop/Projects/Using%20v3.3%20New%20projects/New%20Bpfeat/docs/research/reproduction_manifest.json)
+- **Per-Number Lineage Registry**: [`docs/research/per_number_manifest.json`](per_number_manifest.json)
+- **Reproduction Manifest**: [`docs/research/reproduction_manifest.json`](reproduction_manifest.json)
 
 ---
 

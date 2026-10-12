@@ -46,7 +46,7 @@ The assessment proposes `s_new = alpha*x + (1-alpha**delta)*s_old`. Set `alpha=.
 
 For constant gain, `mean_age=(1-alpha)/alpha` and `L_var=(2-alpha)/alpha=2*mean_age+1`. The variance identity assumes independent equal-variance noise in steady state. Correlated behavior streams, irregular physical intervals, initialization and changing gain invalidate a casual conversion into a universal window length. For a prescribed changing gain sequence, the initial state keeps weight `product(1-alpha_j)` and observation `i` keeps `alpha_i*product_{j>i}(1-alpha_j)`. The finite observation weights alone do not always sum to one. These identities are tested separately from the native recursion.
 
-Five strictly positive equal paired differences have two-sided exact sign-flip p-value `2/32=.0625`, including the all-positive and all-negative tails. Independent seeds do not establish the sign-symmetry/exchangeability assumption. This matters because the framework minimum of five seeds cannot itself deliver p<.05 for that exact test, let alone establish power. The repaired implementation preserves this arithmetic under very small and large finite unit rescalings; it does not manufacture independence.
+Five strictly positive equal paired differences have two-sided exact sign-flip p-value `2/32=.0625`, including the all-positive and all-negative tails. Independent seeds do not establish the sign-symmetry/exchangeability assumption. This matters because the protocol minimum of five seeds cannot itself deliver p<.05 for that exact test, let alone establish power. The repaired implementation preserves this arithmetic under very small and large finite unit rescalings; it does not manufacture independence.
 
 ## Primary sources checked and limits
 

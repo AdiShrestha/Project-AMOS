@@ -148,8 +148,8 @@ Statistical protocol: We will treat each user (or day) as a block and do paired 
    - Validate ULB data (confirm 284,807 rows, 492 frauds).  
    *Stop/Go:* If data irregularities (e.g. time gaps or corrupt rows) persist or licenses unclear, reconsider using the dataset.
 
-2. **Baseline Framework (Framework Integration):** (Gate: Correct static pipeline)  
-   - Use the provided project framework to implement a static pipeline: streaming ingestion (but without adaptation), fixed batch size and fixed α.  
+2. **Baseline Framework (Pipeline Integration):** (Gate: Correct static pipeline)  
+   - Implement a static baseline pipeline: streaming ingestion (without adaptation), fixed batch size and fixed α.  
    - Confirm event-by-event scoring matches expectations (test on synthetic data).  
    - Add logging of all required metrics (timestamps, queue length, features).  
    *Gate:* Verify output matches simple offline results (e.g. produce same scores as batch logistic regression). If static pipeline fails basic tests, fix before proceeding.

@@ -378,7 +378,7 @@ class PublicationSimulator:
 
 
 def make_policy(policy_name: str, cadence: int = 1, delta_t_ns: int = 0) -> PublicationPolicy:
-    """Framework helper to instantiate a publication policy."""
+    """Helper function to instantiate a publication policy."""
     p_lower = policy_name.lower()
     if p_lower in ("exactfresh", "exact_fresh", "fresh", "u1"):
         return ExactFreshPolicy()

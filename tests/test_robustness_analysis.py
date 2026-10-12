@@ -10,6 +10,7 @@ Verifies:
 
 import json
 import math
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -31,7 +32,7 @@ class RobustnessAnalysisTests(unittest.TestCase):
         cls.artifact_path = cls.root / "docs" / "research" / "robustness_analysis.json"
         cls.claim_ledger_path = cls.root / "project" / "claim_ledger.json"
         cls.cohort_path = cls.root / "data" / "cohort.csv"
-        cls.runs_dir = cls.root / "project" / ".framework" / "epoch_0001" / "runs"
+        cls.runs_dir = Path(os.environ.get("RUNS_DIR", str(cls.root / "runs")))
 
         # Ensure artifact exists
         if not cls.artifact_path.is_file() or not cls.claim_ledger_path.is_file():

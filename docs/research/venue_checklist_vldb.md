@@ -36,4 +36,4 @@
 All reported quantitative statistics in the manuscript originate from logged raw trial executions. No values were generated post-hoc or inferred from marketing specifications.
 
 ### 3.2 Acceptance Disclaimer
-> **Important Scholarly Notice**: Passing mechanical framework pre-submission audits, Verifier checks, and reproduction tests demonstrates software correctness, internal consistency, and reproducible scientific accounting. It does **not** constitute or guarantee scholarly peer-review acceptance by the VLDB 2027 program committee, which evaluates subjective novelty, broader community interest, and peer comparative merit.
+> **Important Scholarly Notice**: Passing mechanical pre-submission audits and reproduction verification demonstrates software correctness, internal consistency, and reproducible scientific accounting. It does **not** constitute or guarantee scholarly peer-review acceptance by the VLDB 2027 program committee, which evaluates subjective novelty, broader community interest, and peer comparative merit.
